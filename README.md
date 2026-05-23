@@ -1,36 +1,112 @@
 <div align="center">
 
-# 🌌 PROJECT README 🌌
+<!-- Galaxy Animated Background -->
+<img 
+src="https://64.media.tumblr.com/24525c0c6f7b1ec3f08b4374c1c1ff5f/tumblr_o8rt5oI9zW1v1nhzvo1_500.gif" 
+width="100%" 
+/>
 
-<img src="https://readme-typing-svg.demolab.com?font=Orbitron&size=30&pause=1000&color=7DF9FF&center=true&vCenter=true&width=850&lines=Welcome+to+our+Galaxy+Project+🚀;Code+không+bug+💫;Project+đẹp+long+lẫy+✨" />
+# ✨🌌 PROJECT README 🌌✨
 
-![Stars](https://img.shields.io/badge/GALAXY-MODE-0D1117?style=for-the-badge&logo=starship&logoColor=7DF9FF)
-![Status](https://img.shields.io/badge/STATUS-ACTIVE-111827?style=for-the-badge&logo=github&logoColor=00FFFF)
+<img src="https://readme-typing-svg.demolab.com?font=Orbitron&size=32&pause=1000&color=7DF9FF&center=true&vCenter=true&width=900&lines=Welcome+to+our+Galaxy+Project+🚀;Stars+are+shining+through+the+code+✨;Code+không+bug+-+Project+đẹp+long+lẫy+🌌" />
 
 </div>
 
 ---
-
-# 👨‍🚀 THÀNH VIÊN NHÓM
 
 <div align="center">
 
-| 🚀 MSSV | 🌟 Họ và tên |
-|---|---|
-| `3124560024` | **Trần Việt Đức** |
-| `3124560022` | **Lê Khánh Đăng** |
-| `3124550065` | **Nguyễn Thành Nhân** |
-| `3124560076` | **Dương Chí Tài** |
-| `3124560098` | **Phan Ngọc Vinh** |
+# 👨‍🚀 THÀNH VIÊN NHÓM
+
+<table>
+<tr>
+<th>🚀 MSSV</th>
+<th>🌟 Họ và tên</th>
+</tr>
+
+<tr>
+<td><code>3124560024</code></td>
+<td><b>Trần Việt Đức</b></td>
+</tr>
+
+<tr>
+<td><code>3124560022</code></td>
+<td><b>Lê Khánh Đăng</b></td>
+</tr>
+
+<tr>
+<td><code>3124550065</code></td>
+<td><b>Nguyễn Thành Nhân</b></td>
+</tr>
+
+<tr>
+<td><code>3124560076</code></td>
+<td><b>Dương Chí Tài</b></td>
+</tr>
+
+<tr>
+<td><code>3124560098</code></td>
+<td><b>Phan Ngọc Vinh</b></td>
+</tr>
+
+</table>
 
 </div>
 
 ---
 
+<div align="center">
+
+<img 
+src="https://i.gifer.com/7efs.gif" 
+width="100%" 
+/>
+
 # 🌠 GIỚI THIỆU DỰ ÁN
 
-```txt
-✦ Một project mang phong cách thiên hà ngoài không gian
-✦ Thiết kế futuristic hiện đại
-✦ Xây dựng để học tập và phát triển kỹ năng lập trình
-✦ Chinh phục những dòng code giữa các vì sao 🚀
+🚀 Một project mang phong cách thiên hà ngoài không gian  
+💫 Thiết kế futuristic với hiệu ứng sao lấp lánh  
+🌌 Xây dựng để học tập và phát triển kỹ năng lập trình  
+
+</div>
+
+---
+
+<div align="center">
+
+# ⚡ CÔNG NGHỆ SỬ DỤNG
+
+<img src="https://skillicons.dev/icons?i=cs,dotnet,git,vscode,github" />
+
+</div>
+
+---
+
+<div align="center">
+
+<img 
+src="https://media.tenor.com/2uyENRmiUt0AAAAC/stars-space.gif" 
+width="100%" 
+/>
+
+# 🌌 CHỨC NĂNG CHÍNH
+
+🛰️ Quản lý dữ liệu  
+🌠 Xử lý thông tin  
+🚀 Giao diện application  
+👨‍🚀 Làm việc nhóm với GitHub  
+
+</div>
+
+---
+
+<div align="center">
+
+# 🛠️ CÁCH CHẠY PROJECT
+
+</div>
+
+```bash
+git clone <repository-link>
+cd <project-name>
+dotnet run
