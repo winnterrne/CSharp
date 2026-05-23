@@ -1,55 +1,33 @@
 <div align="center">
 
-<!-- Galaxy Animated Background -->
+<!-- ================= BACKGROUND HEADER ================= -->
+
 <img 
-src="https://64.media.tumblr.com/24525c0c6f7b1ec3f08b4374c1c1ff5f/tumblr_o8rt5oI9zW1v1nhzvo1_500.gif" 
+src="https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=1920&auto=format&fit=crop" 
 width="100%" 
 />
 
-# ✨🌌 PROJECT README 🌌✨
+# 🌌 PROJECT README 🌌
 
-<img src="https://readme-typing-svg.demolab.com?font=Orbitron&size=32&pause=1000&color=7DF9FF&center=true&vCenter=true&width=900&lines=Welcome+to+our+Galaxy+Project+🚀;Stars+are+shining+through+the+code+✨;Code+không+bug+-+Project+đẹp+long+lẫy+🌌" />
+<img 
+src="https://readme-typing-svg.demolab.com?font=Orbitron&size=30&pause=1000&color=7DF9FF&center=true&vCenter=true&width=850&lines=Welcome+to+our+Galaxy+Project+🚀;Code+không+bug+💫;Project+đẹp+long+lẫy+✨" 
+/>
 
 </div>
 
 ---
-
-<div align="center">
 
 # 👨‍🚀 THÀNH VIÊN NHÓM
 
-<table>
-<tr>
-<th>🚀 MSSV</th>
-<th>🌟 Họ và tên</th>
-</tr>
+<div align="center">
 
-<tr>
-<td><code>3124560024</code></td>
-<td><b>Trần Việt Đức</b></td>
-</tr>
-
-<tr>
-<td><code>3124560022</code></td>
-<td><b>Lê Khánh Đăng</b></td>
-</tr>
-
-<tr>
-<td><code>3124550065</code></td>
-<td><b>Nguyễn Thành Nhân</b></td>
-</tr>
-
-<tr>
-<td><code>3124560076</code></td>
-<td><b>Dương Chí Tài</b></td>
-</tr>
-
-<tr>
-<td><code>3124560098</code></td>
-<td><b>Phan Ngọc Vinh</b></td>
-</tr>
-
-</table>
+| 🚀 MSSV | 🌟 Họ và tên |
+|---|---|
+| `3124560024` | **Trần Việt Đức** |
+| `3124560022` | **Lê Khánh Đăng** |
+| `3124550065` | **Nguyễn Thành Nhân** |
+| `3124560076` | **Dương Chí Tài** |
+| `3124560098` | **Phan Ngọc Vinh** |
 
 </div>
 
@@ -58,23 +36,23 @@ width="100%"
 <div align="center">
 
 <img 
-src="https://i.gifer.com/7efs.gif" 
+src="https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?q=80&w=1600&auto=format&fit=crop" 
 width="100%" 
 />
+
+</div>
 
 # 🌠 GIỚI THIỆU DỰ ÁN
 
 🚀 Một project mang phong cách thiên hà ngoài không gian  
-💫 Thiết kế futuristic với hiệu ứng sao lấp lánh  
+💫 Thiết kế futuristic với hiệu ứng vũ trụ hiện đại  
 🌌 Xây dựng để học tập và phát triển kỹ năng lập trình  
-
-</div>
 
 ---
 
-<div align="center">
-
 # ⚡ CÔNG NGHỆ SỬ DỤNG
+
+<div align="center">
 
 <img src="https://skillicons.dev/icons?i=cs,dotnet,git,vscode,github" />
 
@@ -85,26 +63,22 @@ width="100%"
 <div align="center">
 
 <img 
-src="https://media.tenor.com/2uyENRmiUt0AAAAC/stars-space.gif" 
+src="https://images.unsplash.com/photo-1502134249126-9f3755a50d78?q=80&w=1600&auto=format&fit=crop" 
 width="100%" 
 />
 
+</div>
+
 # 🌌 CHỨC NĂNG CHÍNH
 
-🛰️ Quản lý dữ liệu  
-🌠 Xử lý thông tin  
-🚀 Giao diện application  
-👨‍🚀 Làm việc nhóm với GitHub  
-
-</div>
+- 🛰️ Quản lý dữ liệu  
+- 🌠 Xử lý thông tin  
+- 🚀 Giao diện application  
+- 👨‍🚀 Làm việc nhóm với GitHub  
 
 ---
 
-<div align="center">
-
 # 🛠️ CÁCH CHẠY PROJECT
-
-</div>
 
 ```bash
 git clone <repository-link>
