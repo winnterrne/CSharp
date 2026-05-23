@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=1920&auto=format&fit=crop" width="100%" />
+
 # 🌌 PROJECT README 🌌
 
 <img src="https://readme-typing-svg.demolab.com?font=Orbitron&size=28&pause=1000&color=00F7FF&center=true&vCenter=true&width=700&lines=Welcome+to+our+project!;Code+kh%C3%B4ng+bug+%F0%9F%9A%80;Project+%C4%91%E1%BA%B9p+long+l%E1%BA%ABy+%E2%9C%A8" />
@@ -25,6 +27,12 @@
 ---
 
 # 🪐 Giới thiệu dự án
+
+<div align="center">
+
+<img src="https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?q=80&w=1200&auto=format&fit=crop" width="85%" />
+
+</div>
 
 > Một project mang phong cách vũ trụ 🌌  
 > Được xây dựng nhằm học tập, phát triển kỹ năng lập trình  
