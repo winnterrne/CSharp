@@ -1,68 +1,103 @@
 <div align="center">
 
-<img src="https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=1920&auto=format&fit=crop" width="100%" />
+<!-- BACKGROUND -->
+<img src="https://i.pinimg.com/originals/0d/6e/9b/0d6e9b9b8d9f0b7f9d6d5e5c4d9c0f9d.gif" width="100%" />
 
 # 🌌 PROJECT README 🌌
 
-<img src="https://readme-typing-svg.demolab.com?font=Orbitron&size=28&pause=1000&color=00F7FF&center=true&vCenter=true&width=700&lines=Welcome+to+our+project!;Code+kh%C3%B4ng+bug+%F0%9F%9A%80;Project+%C4%91%E1%BA%B9p+long+l%E1%BA%ABy+%E2%9C%A8" />
+<img src="https://readme-typing-svg.demolab.com?font=Orbitron&size=30&pause=1000&color=7DF9FF&center=true&vCenter=true&width=800&lines=Welcome+to+our+universe+%F0%9F%9A%80;Code+kh%C3%B4ng+bug+%F0%9F%92%AB;Project+%C4%91%E1%BA%B9p+long+l%E1%BA%ABy+%E2%9C%A8" />
 
 </div>
 
 ---
-
-# 👨‍🚀 Thành viên nhóm
 
 <div align="center">
 
-| 🚀 MSSV | 🌟 Họ và tên |
-|---|---|
-| `3124560024` | **Trần Việt Đức** |
-| `3124560022` | **Lê Khánh Đăng** |
-| `3124550065` | **Nguyễn Thành Nhân** |
-| `3124560076` | **Dương Chí Tài** |
-| `3124560098` | **Phan Ngọc Vinh** |
+# 👨‍🚀 THÀNH VIÊN NHÓM
+
+<table>
+<tr>
+<th>🚀 MSSV</th>
+<th>🌟 Họ và tên</th>
+</tr>
+
+<tr>
+<td><code>3124560024</code></td>
+<td><b>Trần Việt Đức</b></td>
+</tr>
+
+<tr>
+<td><code>3124560022</code></td>
+<td><b>Lê Khánh Đăng</b></td>
+</tr>
+
+<tr>
+<td><code>3124550065</code></td>
+<td><b>Nguyễn Thành Nhân</b></td>
+</tr>
+
+<tr>
+<td><code>3124560076</code></td>
+<td><b>Dương Chí Tài</b></td>
+</tr>
+
+<tr>
+<td><code>3124560098</code></td>
+<td><b>Phan Ngọc Vinh</b></td>
+</tr>
+
+</table>
 
 </div>
 
 ---
-
-# 🪐 Giới thiệu dự án
 
 <div align="center">
 
-<img src="https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?q=80&w=1200&auto=format&fit=crop" width="85%" />
+<img src="https://i.pinimg.com/originals/73/1d/4b/731d4b7d0e1f4c7c2d6a9e52f9f8d8c5.gif" width="100%" />
+
+# 🪐 GIỚI THIỆU DỰ ÁN
+
+### 🌠 Một project mang phong cách thiên hà ngoài không gian 🌠
+
+🚀 Xây dựng để học tập và phát triển kỹ năng lập trình  
+💫 Chinh phục những dòng code giữa các vì sao  
+🌌 Mang giao diện và cảm hứng futuristic galaxy
 
 </div>
 
-> Một project mang phong cách vũ trụ 🌌  
-> Được xây dựng nhằm học tập, phát triển kỹ năng lập trình  
-> và chinh phục những dòng code ngoài không gian 🚀
-
 ---
-
-# ⚡ Công nghệ sử dụng
 
 <div align="center">
 
-![C#](https://img.shields.io/badge/C%23-68217A?style=for-the-badge&logo=csharp&logoColor=white)
-![.NET](https://img.shields.io/badge/.NET-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)
-![Git](https://img.shields.io/badge/Git-000000?style=for-the-badge&logo=git&logoColor=orange)
-![VSCode](https://img.shields.io/badge/VSCode-0D1117?style=for-the-badge&logo=visualstudiocode&logoColor=00BFFF)
+# ⚡ CÔNG NGHỆ SỬ DỤNG
+
+<img src="https://skillicons.dev/icons?i=cs,dotnet,git,vscode,github" />
 
 </div>
 
 ---
 
-# 🌠 Chức năng chính
+<div align="center">
 
-- 🛰️ Quản lý dữ liệu
-- 🌌 Xử lý thông tin
-- 🚀 Giao diện application
-- 👨‍🚀 Làm việc nhóm với GitHub
+<img src="https://i.pinimg.com/originals/c8/6f/2f/c86f2f9a4b84dc7f5f7d7cbf0df4f07.gif" width="100%" />
+
+# 🌠 CHỨC NĂNG CHÍNH
+
+🛰️ Quản lý dữ liệu  
+🌌 Xử lý thông tin  
+🚀 Giao diện application  
+👨‍🚀 Làm việc nhóm với GitHub  
+
+</div>
 
 ---
 
-# 🛠️ Cách chạy project
+<div align="center">
+
+# 🛠️ CÁCH CHẠY PROJECT
+
+</div>
 
 ```bash
 git clone <repository-link>
