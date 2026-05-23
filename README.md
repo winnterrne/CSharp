@@ -64,9 +64,8 @@ width="100%"
 
 # 🌠 GIỚI THIỆU DỰ ÁN
 
-🚀 Một project mang phong cách thiên hà ngoài không gian  
-💫 Thiết kế futuristic với hiệu ứng sao lấp lánh  
-🌌 Xây dựng để học tập và phát triển kỹ năng lập trình  
+ 
+🌌 Comming soon
 
 </div>
 
