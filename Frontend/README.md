@@ -1,194 +1,399 @@
+# 🎵 TuneVault Frontend
+
+Frontend của hệ thống **TuneVault** được xây dựng bằng:
+
+* React
+* TypeScript
+* Vite
+* Zustand
+* TailwindCSS
+* SignalR
+
+Mục tiêu của project là xây dựng nền tảng nghe nhạc/xem video giống Spotify hoặc YouTube Music.
+
+---
+
+# 📁 Cấu trúc thư mục
+
+```txt
 frontend/
 │
-├── public/                     # File tĩnh public, truy cập trực tiếp
-│   ├── favicon.ico             # Icon website trên tab browser
-│   └── vite.svg                # Logo mặc định của Vite
+├── public/                     
+│   ├── favicon.ico             
+│   └── vite.svg                
 │
-├── src/                        # Source code chính của frontend
+├── src/                        
 │   │
-│   ├── api/                    # Chứa các file gọi backend API
-│   │   ├── axios.ts            # Config axios chung (baseURL, token...)
-│   │   ├── authApi.ts          # API login/register
-│   │   ├── mediaApi.ts         # API media/audio/video
-│   │   ├── playlistApi.ts      # API playlist
-│   │   ├── notificationApi.ts  # API notification
-│   │   ├── favoriteApi.ts      # API favorite/like
-│   │   ├── historyApi.ts       # API play history
-│   │   └── shareApi.ts         # API share media
+│   ├── api/                    
+│   │   ├── axios.ts            
+│   │   ├── authApi.ts          
+│   │   ├── mediaApi.ts         
+│   │   ├── playlistApi.ts      
+│   │   ├── notificationApi.ts  
+│   │   ├── favoriteApi.ts      
+│   │   ├── historyApi.ts       
+│   │   └── shareApi.ts         
 │   │
-│   ├── assets/                 # Tài nguyên tĩnh
-│   │   ├── images/             # Hình ảnh
-│   │   ├── icons/              # Icon SVG/PNG
-│   │   ├── videos/             # Video local
-│   │   ├── music/              # Audio local
-│   │   └── fonts/              # Custom fonts
+│   ├── assets/                 
+│   │   ├── images/             
+│   │   ├── icons/              
+│   │   ├── videos/             
+│   │   ├── music/              
+│   │   └── fonts/              
 │   │
-│   ├── components/             # Các component tái sử dụng
+│   ├── components/             
 │   │   │
-│   │   ├── common/             # Component dùng chung toàn app
-│   │   │   ├── Button.tsx      # Nút button custom
-│   │   │   ├── Input.tsx       # Input custom
-│   │   │   ├── Modal.tsx       # Popup/modal
-│   │   │   ├── Spinner.tsx     # Loading spinner
-│   │   │   └── Loading.tsx     # Component loading
+│   │   ├── common/             
+│   │   │   ├── Button.tsx      
+│   │   │   ├── Input.tsx       
+│   │   │   ├── Modal.tsx       
+│   │   │   ├── Spinner.tsx     
+│   │   │   └── Loading.tsx     
 │   │   │
-│   │   ├── layout/             # Component layout chính
-│   │   │   ├── Sidebar.tsx     # Thanh sidebar trái
-│   │   │   ├── Header.tsx      # Header phía trên
-│   │   │   ├── RightPanel.tsx  # Panel phải
-│   │   │   ├── PlayerBar.tsx   # Thanh player dưới cùng
-│   │   │   └── MobileNavbar.tsx# Navbar mobile
+│   │   ├── layout/             
+│   │   │   ├── Sidebar.tsx     
+│   │   │   ├── Header.tsx      
+│   │   │   ├── RightPanel.tsx  
+│   │   │   ├── PlayerBar.tsx   
+│   │   │   └── MobileNavbar.tsx
 │   │   │
-│   │   ├── media/              # Component media
-│   │   │   ├── MediaCard.tsx   # Card media tổng quát
-│   │   │   ├── MediaGrid.tsx   # Grid hiển thị media
-│   │   │   ├── AudioCard.tsx   # Card audio
-│   │   │   ├── VideoCard.tsx   # Card video
-│   │   │   └── MediaThumbnail.tsx # Thumbnail media
+│   │   ├── media/              
+│   │   │   ├── MediaCard.tsx   
+│   │   │   ├── MediaGrid.tsx   
+│   │   │   ├── AudioCard.tsx   
+│   │   │   ├── VideoCard.tsx   
+│   │   │   └── MediaThumbnail.tsx
 │   │   │
-│   │   ├── player/             # Component player
-│   │   │   ├── AudioPlayer.tsx # Trình phát audio
-│   │   │   ├── VideoPlayer.tsx # Trình phát video
-│   │   │   ├── PlayerControls.tsx # Nút play/pause/next
-│   │   │   ├── ProgressBar.tsx # Thanh tiến trình
-│   │   │   ├── VolumeControl.tsx # Điều chỉnh âm lượng
-│   │   │   └── QueueList.tsx   # Danh sách queue nhạc
+│   │   ├── player/             
+│   │   │   ├── AudioPlayer.tsx 
+│   │   │   ├── VideoPlayer.tsx 
+│   │   │   ├── PlayerControls.tsx
+│   │   │   ├── ProgressBar.tsx 
+│   │   │   ├── VolumeControl.tsx
+│   │   │   └── QueueList.tsx   
 │   │   │
-│   │   ├── playlist/           # Component playlist
-│   │   │   ├── PlaylistCard.tsx # Card playlist
-│   │   │   ├── PlaylistHeader.tsx # Header playlist
-│   │   │   ├── PlaylistTracks.tsx # Danh sách bài hát
-│   │   │   └── AddTrackModal.tsx # Modal thêm bài hát
+│   │   ├── playlist/           
+│   │   │   ├── PlaylistCard.tsx
+│   │   │   ├── PlaylistHeader.tsx
+│   │   │   ├── PlaylistTracks.tsx
+│   │   │   └── AddTrackModal.tsx
 │   │   │
-│   │   ├── notification/       # Component notification
-│   │   │   ├── NotificationBell.tsx # Chuông thông báo
-│   │   │   ├── NotificationItem.tsx # 1 notification item
-│   │   │   └── NotificationDropdown.tsx # Dropdown notification
+│   │   ├── notification/       
+│   │   │   ├── NotificationBell.tsx
+│   │   │   ├── NotificationItem.tsx
+│   │   │   └── NotificationDropdown.tsx
 │   │   │
-│   │   ├── share/              # Component share media
-│   │   │   ├── ShareModal.tsx  # Popup share
-│   │   │   ├── ShareCard.tsx   # Card share
-│   │   │   └── ShareList.tsx   # Danh sách share
+│   │   ├── share/              
+│   │   │   ├── ShareModal.tsx  
+│   │   │   ├── ShareCard.tsx   
+│   │   │   └── ShareList.tsx   
 │   │   │
-│   │   └── ui/                 # UI component nhỏ
-│   │       ├── Badge.tsx       # Badge
-│   │       ├── Tooltip.tsx     # Tooltip
-│   │       ├── Dropdown.tsx    # Dropdown
-│   │       └── Tabs.tsx        # Tabs component
+│   │   └── ui/                 
+│   │       ├── Badge.tsx       
+│   │       ├── Tooltip.tsx     
+│   │       ├── Dropdown.tsx    
+│   │       └── Tabs.tsx        
 │   │
-│   ├── constants/              # Hằng số toàn app
-│   │   ├── api.ts              # API endpoint constants
-│   │   ├── routes.ts           # Route constants
-│   │   ├── storage.ts          # LocalStorage keys
-│   │   └── signalr.ts          # SignalR event names
+│   ├── constants/              
+│   │   ├── api.ts              
+│   │   ├── routes.ts           
+│   │   ├── storage.ts          
+│   │   └── signalr.ts          
 │   │
-│   ├── contexts/               # React Context API
-│   │   ├── AuthContext.tsx     # Context auth
-│   │   ├── PlayerContext.tsx   # Context player
-│   │   └── ThemeContext.tsx    # Context theme dark/light
+│   ├── contexts/               
+│   │   ├── AuthContext.tsx     
+│   │   ├── PlayerContext.tsx   
+│   │   └── ThemeContext.tsx    
 │   │
-│   ├── hooks/                  # Custom React hooks
-│   │   ├── useAuth.ts          # Hook auth
-│   │   ├── usePlayer.ts        # Hook player
-│   │   ├── useNotification.ts  # Hook notification
-│   │   ├── useDebounce.ts      # Hook debounce search
-│   │   ├── useMedia.ts         # Hook media
-│   │   └── usePlaylist.ts      # Hook playlist
+│   ├── hooks/                  
+│   │   ├── useAuth.ts          
+│   │   ├── usePlayer.ts        
+│   │   ├── useNotification.ts  
+│   │   ├── useDebounce.ts      
+│   │   ├── useMedia.ts         
+│   │   └── usePlaylist.ts      
 │   │
-│   ├── layouts/                # Layout tổng của page
-│   │   ├── MainLayout.tsx      # Layout chính Spotify-like
-│   │   ├── AuthLayout.tsx      # Layout login/register
-│   │   └── AdminLayout.tsx     # Layout admin
+│   ├── layouts/                
+│   │   ├── MainLayout.tsx      
+│   │   ├── AuthLayout.tsx      
+│   │   └── AdminLayout.tsx     
 │   │
-│   ├── pages/                  # Các page/màn hình lớn
+│   ├── pages/                  
 │   │   │
 │   │   ├── Auth/
-│   │   │   ├── LoginPage.tsx   # Trang login
-│   │   │   └── RegisterPage.tsx # Trang register
+│   │   │   ├── LoginPage.tsx
+│   │   │   └── RegisterPage.tsx
 │   │   │
 │   │   ├── Home/
-│   │   │   └── HomePage.tsx    # Trang chủ
+│   │   │   └── HomePage.tsx
 │   │   │
 │   │   ├── Search/
-│   │   │   └── SearchPage.tsx  # Trang tìm kiếm
+│   │   │   └── SearchPage.tsx
 │   │   │
 │   │   ├── Library/
-│   │   │   └── LibraryPage.tsx # Thư viện cá nhân
+│   │   │   └── LibraryPage.tsx
 │   │   │
 │   │   ├── Playlist/
-│   │   │   └── PlaylistDetailPage.tsx # Chi tiết playlist
+│   │   │   └── PlaylistDetailPage.tsx
 │   │   │
 │   │   ├── Profile/
-│   │   │   └── ProfilePage.tsx # Hồ sơ người dùng
+│   │   │   └── ProfilePage.tsx
 │   │   │
 │   │   ├── Notifications/
-│   │   │   └── NotificationsPage.tsx # Trang notification
+│   │   │   └── NotificationsPage.tsx
 │   │   │
 │   │   ├── ShareInbox/
-│   │   │   └── ShareInboxPage.tsx # Media được share
+│   │   │   └── ShareInboxPage.tsx
 │   │   │
 │   │   ├── Favorites/
-│   │   │   └── FavoritesPage.tsx # Bài hát yêu thích
+│   │   │   └── FavoritesPage.tsx
 │   │   │
 │   │   ├── History/
-│   │   │   └── HistoryPage.tsx # Lịch sử nghe
+│   │   │   └── HistoryPage.tsx
 │   │   │
 │   │   ├── Upload/
-│   │   │   └── UploadPage.tsx  # Upload media
+│   │   │   └── UploadPage.tsx
 │   │   │
 │   │   └── VideoPlayer/
-│   │       └── VideoPlayerPage.tsx # Trang xem video
+│   │       └── VideoPlayerPage.tsx
 │   │
-│   ├── routes/                 # React Router config
-│   │   ├── AppRoutes.tsx       # Toàn bộ routes app
-│   │   ├── ProtectedRoute.tsx # Route cần login
-│   │   └── PublicRoute.tsx    # Route public
+│   ├── routes/                 
+│   │   ├── AppRoutes.tsx       
+│   │   ├── ProtectedRoute.tsx  
+│   │   └── PublicRoute.tsx     
 │   │
-│   ├── services/               # Business logic frontend
-│   │   ├── authService.ts      # Logic auth
-│   │   ├── mediaService.ts     # Logic media
-│   │   ├── playerService.ts    # Logic player
-│   │   ├── signalrService.ts   # Kết nối SignalR
-│   │   ├── storageService.ts   # Local storage/session
-│   │   └── notificationService.ts # Logic notification
+│   ├── services/               
+│   │   ├── authService.ts      
+│   │   ├── mediaService.ts     
+│   │   ├── playerService.ts    
+│   │   ├── signalrService.ts   
+│   │   ├── storageService.ts   
+│   │   └── notificationService.ts
 │   │
-│   ├── store/                  # Global state (Zustand/Redux)
-│   │   ├── authStore.ts        # State user/token
-│   │   ├── mediaStore.ts       # State media
-│   │   ├── playerStore.ts      # State player toàn app
-│   │   ├── playlistStore.ts    # State playlist
-│   │   └── notificationStore.ts # State notification realtime
+│   ├── store/                  
+│   │   ├── authStore.ts        
+│   │   ├── mediaStore.ts       
+│   │   ├── playerStore.ts      
+│   │   ├── playlistStore.ts    
+│   │   └── notificationStore.ts
 │   │
-│   ├── styles/                 # CSS global
-│   │   ├── globals.css         # CSS toàn app
-│   │   ├── variables.css       # CSS variables/theme
-│   │   └── tailwind.css        # Tailwind import
+│   ├── styles/                 
+│   │   ├── globals.css         
+│   │   ├── variables.css       
+│   │   └── tailwind.css        
 │   │
-│   ├── types/                  # TypeScript interfaces/types
-│   │   ├── auth.ts             # Type auth
-│   │   ├── media.ts            # Type media
-│   │   ├── playlist.ts         # Type playlist
-│   │   ├── notification.ts     # Type notification
-│   │   ├── favorite.ts         # Type favorite
-│   │   ├── history.ts          # Type history
-│   │   ├── share.ts            # Type share
-│   │   └── api.ts              # Type API response
+│   ├── types/                  
+│   │   ├── auth.ts             
+│   │   ├── media.ts            
+│   │   ├── playlist.ts         
+│   │   ├── notification.ts     
+│   │   ├── favorite.ts         
+│   │   ├── history.ts          
+│   │   ├── share.ts            
+│   │   └── api.ts              
 │   │
-│   ├── utils/                  # Hàm helper tiện ích
-│   │   ├── formatTime.ts       # Format thời gian player
-│   │   ├── truncateText.ts     # Cắt text dài
-│   │   ├── generateThumbnail.ts # Tạo thumbnail
-│   │   ├── formatDate.ts       # Format ngày tháng
-│   │   └── helpers.ts          # Helper chung
+│   ├── utils/                  
+│   │   ├── formatTime.ts       
+│   │   ├── truncateText.ts     
+│   │   ├── generateThumbnail.ts
+│   │   ├── formatDate.ts       
+│   │   └── helpers.ts          
 │   │
-│   ├── App.tsx                 # Root component app
-│   ├── main.tsx                # Entry point React
-│   └── vite-env.d.ts           # Type cho Vite
+│   ├── App.tsx                 
+│   ├── main.tsx                
+│   └── vite-env.d.ts           
 │
-├── .env                        # Environment variables
-├── .gitignore                  # File git bỏ qua
-├── index.html                  # HTML root
-├── package.json                # Dependencies/scripts
-├── tsconfig.json               # Config TypeScript
-├── vite.config.ts              # Config Vite
-└── README.md                   # Hướng dẫn project
+├── .env                        
+├── .gitignore                  
+├── index.html                  
+├── package.json                
+├── tsconfig.json               
+├── vite.config.ts              
+└── README.md                   
+```
+
+---
+
+# 🚀 Cách chạy project
+
+## 1. Cài dependencies
+
+```bash
+npm install
+```
+
+---
+
+## 2. Chạy development server
+
+```bash
+npm run dev
+```
+
+---
+
+# 📦 Các thư viện chính
+
+## React Router
+
+```bash
+npm install react-router-dom
+```
+
+Dùng để điều hướng trang.
+
+---
+
+## Axios
+
+```bash
+npm install axios
+```
+
+Dùng để gọi API backend.
+
+---
+
+## Zustand
+
+```bash
+npm install zustand
+```
+
+Dùng để quản lý global state.
+
+---
+
+## SignalR
+
+```bash
+npm install @microsoft/signalr
+```
+
+Dùng cho realtime notification/chat/player sync.
+
+---
+
+## TailwindCSS
+
+```bash
+npm install -D tailwindcss postcss autoprefixer
+```
+
+Framework CSS utility-first.
+
+---
+
+# 🧠 Kiến trúc frontend
+
+Flow hoạt động chính:
+
+```txt
+Page
+ ↓
+Layout
+ ↓
+Components
+ ↓
+API / Services
+ ↓
+Backend
+```
+
+---
+
+# 📌 Quy ước đặt tên
+
+## Component
+
+```txt
+PascalCase
+```
+
+Ví dụ:
+
+```txt
+MediaCard.tsx
+PlayerBar.tsx
+```
+
+---
+
+## Hook
+
+```txt
+useSomething.ts
+```
+
+Ví dụ:
+
+```txt
+useAuth.ts
+usePlayer.ts
+```
+
+---
+
+## Store
+
+```txt
+somethingStore.ts
+```
+
+Ví dụ:
+
+```txt
+authStore.ts
+playerStore.ts
+```
+
+---
+
+# 🎯 Chức năng chính
+
+* Authentication
+* Upload media
+* Audio/Video player
+* Playlist management
+* Favorite system
+* Play history
+* Share media
+* Realtime notification
+* Search media
+* Responsive UI
+
+---
+
+# 🔥 Công nghệ sử dụng
+
+| Công nghệ   | Vai trò          |
+| ----------- | ---------------- |
+| React       | UI Library       |
+| TypeScript  | Type safety      |
+| Vite        | Build tool       |
+| Zustand     | State management |
+| Axios       | HTTP client      |
+| SignalR     | Realtime         |
+| TailwindCSS | Styling          |
+
+---
+
+# 👨‍💻 Team Development Notes
+
+* Không viết toàn bộ logic trong page
+* Component phải reusable
+* API call nên tách riêng trong `api/`
+* Global state để trong `store/`
+* Không hardcode URL/API
+
+---
+
+# 📌 Future Improvements
+
+* Dark mode
+* Infinite scroll
+* Media recommendation
+* Realtime chat
+* Upload progress
+* Admin dashboard
+* AI recommendation system
