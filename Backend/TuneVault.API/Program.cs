@@ -1,41 +1,33 @@
-var builder = WebApplication.CreateBuilder(args);
+using System;
+using Microsoft.Data.SqlClient;
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
-
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+class Program
 {
-    app.MapOpenApi();
-}
+    static void Main()
+    {
+        string connStr = "Server=MSI;Database=TuneVault;User Id=sa;Password=123;TrustServerCertificate=True;";
 
-app.UseHttpsRedirection();
+        using (SqlConnection conn = new SqlConnection(connStr))
+        {
+            try
+            {
+                conn.Open();
+                Console.WriteLine("Kết nối OK");
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+                string query = "SELECT TOP 3 TitleName FROM MediaItem";
+                SqlCommand cmd = new SqlCommand(query, conn);
 
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+                SqlDataReader reader = cmd.ExecuteReader();
 
-app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+                while (reader.Read())
+                {
+                    Console.WriteLine(reader["TitleName"].ToString());
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+    }
 }
