@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "c:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.API\\TuneVault.API.csproj": {}
+    "C:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.API\\TuneVault.API.csproj": {}
   },
   "projects": {
-    "c:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.API\\TuneVault.API.csproj": {
+    "C:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.API\\TuneVault.API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.API\\TuneVault.API.csproj",
+        "projectUniqueName": "C:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.API\\TuneVault.API.csproj",
         "projectName": "TuneVault.API",
-        "projectPath": "c:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.API\\TuneVault.API.csproj",
+        "projectPath": "C:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.API\\TuneVault.API.csproj",
         "packagesPath": "C:\\Users\\NHAN\\.nuget\\packages\\",
-        "outputPath": "c:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.API\\obj\\",
+        "outputPath": "C:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.API\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\NHAN\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -26,11 +26,14 @@
           "net10.0": {
             "targetAlias": "net10.0",
             "projectReferences": {
-              "c:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Application\\TuneVault.Application.csproj": {
-                "projectPath": "c:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Application\\TuneVault.Application.csproj"
+              "C:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Application\\TuneVault.Application.csproj": {
+                "projectPath": "C:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Application\\TuneVault.Application.csproj"
               },
-              "c:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Infrastructure\\TuneVault.Infrastructure.csproj": {
-                "projectPath": "c:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Infrastructure\\TuneVault.Infrastructure.csproj"
+              "C:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Domain\\TuneVault.Domain.csproj": {
+                "projectPath": "C:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Domain\\TuneVault.Domain.csproj"
+              },
+              "C:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Infrastructure\\TuneVault.Infrastructure.csproj": {
+                "projectPath": "C:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Infrastructure\\TuneVault.Infrastructure.csproj"
               }
             }
           }
@@ -493,14 +496,14 @@
         }
       }
     },
-    "c:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Application\\TuneVault.Application.csproj": {
+    "C:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Application\\TuneVault.Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Application\\TuneVault.Application.csproj",
+        "projectUniqueName": "C:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Application\\TuneVault.Application.csproj",
         "projectName": "TuneVault.Application",
-        "projectPath": "c:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Application\\TuneVault.Application.csproj",
+        "projectPath": "C:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Application\\TuneVault.Application.csproj",
         "packagesPath": "C:\\Users\\NHAN\\.nuget\\packages\\",
-        "outputPath": "c:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Application\\obj\\",
+        "outputPath": "C:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Application\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\NHAN\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -515,8 +518,8 @@
           "net10.0": {
             "targetAlias": "net10.0",
             "projectReferences": {
-              "c:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Domain\\TuneVault.Domain.csproj": {
-                "projectPath": "c:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Domain\\TuneVault.Domain.csproj"
+              "C:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Domain\\TuneVault.Domain.csproj": {
+                "projectPath": "C:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Domain\\TuneVault.Domain.csproj"
               }
             }
           }
@@ -830,14 +833,14 @@
         }
       }
     },
-    "c:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Domain\\TuneVault.Domain.csproj": {
+    "C:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Domain\\TuneVault.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Domain\\TuneVault.Domain.csproj",
+        "projectUniqueName": "C:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Domain\\TuneVault.Domain.csproj",
         "projectName": "TuneVault.Domain",
-        "projectPath": "c:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Domain\\TuneVault.Domain.csproj",
+        "projectPath": "C:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Domain\\TuneVault.Domain.csproj",
         "packagesPath": "C:\\Users\\NHAN\\.nuget\\packages\\",
-        "outputPath": "c:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Domain\\obj\\",
+        "outputPath": "C:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Domain\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\NHAN\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -1163,14 +1166,14 @@
         }
       }
     },
-    "c:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Infrastructure\\TuneVault.Infrastructure.csproj": {
+    "C:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Infrastructure\\TuneVault.Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Infrastructure\\TuneVault.Infrastructure.csproj",
+        "projectUniqueName": "C:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Infrastructure\\TuneVault.Infrastructure.csproj",
         "projectName": "TuneVault.Infrastructure",
-        "projectPath": "c:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Infrastructure\\TuneVault.Infrastructure.csproj",
+        "projectPath": "C:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Infrastructure\\TuneVault.Infrastructure.csproj",
         "packagesPath": "C:\\Users\\NHAN\\.nuget\\packages\\",
-        "outputPath": "c:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Infrastructure\\obj\\",
+        "outputPath": "C:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\NHAN\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -1185,11 +1188,11 @@
           "net10.0": {
             "targetAlias": "net10.0",
             "projectReferences": {
-              "c:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Application\\TuneVault.Application.csproj": {
-                "projectPath": "c:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Application\\TuneVault.Application.csproj"
+              "C:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Application\\TuneVault.Application.csproj": {
+                "projectPath": "C:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Application\\TuneVault.Application.csproj"
               },
-              "c:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Domain\\TuneVault.Domain.csproj": {
-                "projectPath": "c:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Domain\\TuneVault.Domain.csproj"
+              "C:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Domain\\TuneVault.Domain.csproj": {
+                "projectPath": "C:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Domain\\TuneVault.Domain.csproj"
               }
             }
           }
@@ -1209,6 +1212,16 @@
       "frameworks": {
         "net10.0": {
           "targetAlias": "net10.0",
+          "dependencies": {
+            "Dapper": {
+              "target": "Package",
+              "version": "[2.1.79, )"
+            },
+            "Microsoft.Data.SqlClient": {
+              "target": "Package",
+              "version": "[7.0.1, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",
