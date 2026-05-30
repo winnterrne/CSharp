@@ -2,6 +2,7 @@
 CREATE TABLE AspNetUsers(
     UserID NVARCHAR(450) PRIMARY KEY, 
     UserName NVARCHAR(255),
+    UserImage NVARCHAR(MAX) DEFAULT NULL,
     Email NVARCHAR(255),
     Password NVARCHAR(MAX),
     Role NVARCHAR(50), 
@@ -12,6 +13,7 @@ CREATE TABLE AspNetUsers(
 CREATE TABLE Artist(
     ArtistID INT IDENTITY(1,1) PRIMARY KEY,
     ArtistName NVARCHAR(255),
+    ArtistImage NVARCHAR(MAX),
     CreatedAt DATETIME DEFAULT GETDATE(),
     IsDelete BIT DEFAULT 0
 );
@@ -21,6 +23,7 @@ CREATE TABLE Album(
     AlbumID INT IDENTITY(1,1) PRIMARY KEY,
     AlbumName NVARCHAR(255),
     Title NVARCHAR(255),
+    AlbumItemImage NVARCHAR(MAX),
     RealeaseDate DATETIME,
     UploadAT DATETIME DEFAULT GETDATE(),
     ArtistID INT FOREIGN KEY REFERENCES Artist(ArtistID),

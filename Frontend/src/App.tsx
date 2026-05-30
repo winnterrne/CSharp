@@ -1,9 +1,5 @@
+import AppRoutes from "./routes/AppRoutes";
 function App() {
-  return (
-    <div className="text-3xl font-bold">
-      TuneVault 
-    </div>
-  );
+  return <AppRoutes />;
 }
-
 export default App;
