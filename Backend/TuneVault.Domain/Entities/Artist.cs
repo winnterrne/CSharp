@@ -7,7 +7,7 @@ namespace TuneVault.Domain.Entities
 {
     public class Artist
     {
-    public string? ArtistID{get; set;}
+    public string ArtistID{get; set;} //Primary Key
     public string? ArtistName{get; set;}
     public string? ArtistImage{get; set;}
     public DateTime? CreateAt{get; set;}
