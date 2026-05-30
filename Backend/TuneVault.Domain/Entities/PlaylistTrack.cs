@@ -7,7 +7,7 @@ namespace TuneVault.Domain.Entities
 {
     public class PlaylistTrack
     {
-        public int? PLaylist{get; set;} //Foreign Key to Playlist
-        public int? MetadataID{get; set;} //Foreign Key to Metadata
+        public int PLaylist{get; set;} //Foreign Key to Playlist
+        public int MetadataID{get; set;} //Foreign Key to Metadata
     }
 }
