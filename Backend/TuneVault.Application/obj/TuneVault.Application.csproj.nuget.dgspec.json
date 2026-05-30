@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "D:\\TuneVault\\CSharp\\Backend\\TuneVault.Application\\TuneVault.Application.csproj": {}
+    "C:\\DoAnMonHoc\\CSharp\\Backend\\TuneVault.Application\\TuneVault.Application.csproj": {}
   },
   "projects": {
-    "D:\\TuneVault\\CSharp\\Backend\\TuneVault.Application\\TuneVault.Application.csproj": {
+    "C:\\DoAnMonHoc\\CSharp\\Backend\\TuneVault.Application\\TuneVault.Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\TuneVault\\CSharp\\Backend\\TuneVault.Application\\TuneVault.Application.csproj",
+        "projectUniqueName": "C:\\DoAnMonHoc\\CSharp\\Backend\\TuneVault.Application\\TuneVault.Application.csproj",
         "projectName": "TuneVault.Application",
-        "projectPath": "D:\\TuneVault\\CSharp\\Backend\\TuneVault.Application\\TuneVault.Application.csproj",
-        "packagesPath": "C:\\Users\\Vinh\\.nuget\\packages\\",
-        "outputPath": "D:\\TuneVault\\CSharp\\Backend\\TuneVault.Application\\obj\\",
+        "projectPath": "C:\\DoAnMonHoc\\CSharp\\Backend\\TuneVault.Application\\TuneVault.Application.csproj",
+        "packagesPath": "C:\\Users\\ADMIN\\.nuget\\packages\\",
+        "outputPath": "C:\\DoAnMonHoc\\CSharp\\Backend\\TuneVault.Application\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Vinh\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\ADMIN\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
@@ -26,8 +26,8 @@
           "net10.0": {
             "targetAlias": "net10.0",
             "projectReferences": {
-              "D:\\TuneVault\\CSharp\\Backend\\TuneVault.Domain\\TuneVault.Domain.csproj": {
-                "projectPath": "D:\\TuneVault\\CSharp\\Backend\\TuneVault.Domain\\TuneVault.Domain.csproj"
+              "C:\\DoAnMonHoc\\CSharp\\Backend\\TuneVault.Domain\\TuneVault.Domain.csproj": {
+                "projectPath": "C:\\DoAnMonHoc\\CSharp\\Backend\\TuneVault.Domain\\TuneVault.Domain.csproj"
               }
             }
           }
@@ -63,7 +63,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.203/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.204/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.CSharp": "(,4.7.32767]",
             "Microsoft.VisualBasic": "(,10.4.32767]",
@@ -341,17 +341,17 @@
         }
       }
     },
-    "D:\\TuneVault\\CSharp\\Backend\\TuneVault.Domain\\TuneVault.Domain.csproj": {
+    "C:\\DoAnMonHoc\\CSharp\\Backend\\TuneVault.Domain\\TuneVault.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\TuneVault\\CSharp\\Backend\\TuneVault.Domain\\TuneVault.Domain.csproj",
+        "projectUniqueName": "C:\\DoAnMonHoc\\CSharp\\Backend\\TuneVault.Domain\\TuneVault.Domain.csproj",
         "projectName": "TuneVault.Domain",
-        "projectPath": "D:\\TuneVault\\CSharp\\Backend\\TuneVault.Domain\\TuneVault.Domain.csproj",
-        "packagesPath": "C:\\Users\\Vinh\\.nuget\\packages\\",
-        "outputPath": "D:\\TuneVault\\CSharp\\Backend\\TuneVault.Domain\\obj\\",
+        "projectPath": "C:\\DoAnMonHoc\\CSharp\\Backend\\TuneVault.Domain\\TuneVault.Domain.csproj",
+        "packagesPath": "C:\\Users\\ADMIN\\.nuget\\packages\\",
+        "outputPath": "C:\\DoAnMonHoc\\CSharp\\Backend\\TuneVault.Domain\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Vinh\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\ADMIN\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
@@ -396,7 +396,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.203/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.204/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.CSharp": "(,4.7.32767]",
             "Microsoft.VisualBasic": "(,10.4.32767]",
