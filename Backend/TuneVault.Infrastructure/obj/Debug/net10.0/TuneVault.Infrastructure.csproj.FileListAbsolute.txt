@@ -16,3 +16,21 @@ C:\CODE\C Sharp\DoanCsharp\CSharp\backend\TuneVault.Infrastructure\obj\Debug\net
 C:\CODE\C Sharp\DoanCsharp\CSharp\backend\TuneVault.Infrastructure\obj\Debug\net10.0\refint\TuneVault.Infrastructure.dll
 C:\CODE\C Sharp\DoanCsharp\CSharp\backend\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVault.Infrastructure.pdb
 C:\CODE\C Sharp\DoanCsharp\CSharp\backend\TuneVault.Infrastructure\obj\Debug\net10.0\ref\TuneVault.Infrastructure.dll
+C:\DoAnMonHoc\CSharp\Backend\TuneVault.Infrastructure\bin\Debug\net10.0\TuneVault.Infrastructure.deps.json
+C:\DoAnMonHoc\CSharp\Backend\TuneVault.Infrastructure\bin\Debug\net10.0\TuneVault.Infrastructure.dll
+C:\DoAnMonHoc\CSharp\Backend\TuneVault.Infrastructure\bin\Debug\net10.0\TuneVault.Infrastructure.pdb
+C:\DoAnMonHoc\CSharp\Backend\TuneVault.Infrastructure\bin\Debug\net10.0\TuneVault.Application.dll
+C:\DoAnMonHoc\CSharp\Backend\TuneVault.Infrastructure\bin\Debug\net10.0\TuneVault.Domain.dll
+C:\DoAnMonHoc\CSharp\Backend\TuneVault.Infrastructure\bin\Debug\net10.0\TuneVault.Application.pdb
+C:\DoAnMonHoc\CSharp\Backend\TuneVault.Infrastructure\bin\Debug\net10.0\TuneVault.Domain.pdb
+C:\DoAnMonHoc\CSharp\Backend\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVault.Infrastructure.csproj.AssemblyReference.cache
+C:\DoAnMonHoc\CSharp\Backend\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVault.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+C:\DoAnMonHoc\CSharp\Backend\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVault.Infrastructure.AssemblyInfoInputs.cache
+C:\DoAnMonHoc\CSharp\Backend\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVault.Infrastructure.AssemblyInfo.cs
+C:\DoAnMonHoc\CSharp\Backend\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVault.Infrastructure.csproj.CoreCompileInputs.cache
+C:\DoAnMonHoc\CSharp\Backend\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVault.Infrastructure.sourcelink.json
+C:\DoAnMonHoc\CSharp\Backend\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVaul.F19165C9.Up2Date
+C:\DoAnMonHoc\CSharp\Backend\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVault.Infrastructure.dll
+C:\DoAnMonHoc\CSharp\Backend\TuneVault.Infrastructure\obj\Debug\net10.0\refint\TuneVault.Infrastructure.dll
+C:\DoAnMonHoc\CSharp\Backend\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVault.Infrastructure.pdb
+C:\DoAnMonHoc\CSharp\Backend\TuneVault.Infrastructure\obj\Debug\net10.0\ref\TuneVault.Infrastructure.dll
