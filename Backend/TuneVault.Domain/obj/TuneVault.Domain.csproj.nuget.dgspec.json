@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Domain\\TuneVault.Domain.csproj": {}
+    "C:\\Users\\Tran Duc\\Documents\\HOC KI 3 NAM 2\\DOAN\\CSharp\\Backend\\TuneVault.Domain\\TuneVault.Domain.csproj": {}
   },
   "projects": {
-    "C:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Domain\\TuneVault.Domain.csproj": {
+    "C:\\Users\\Tran Duc\\Documents\\HOC KI 3 NAM 2\\DOAN\\CSharp\\Backend\\TuneVault.Domain\\TuneVault.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Domain\\TuneVault.Domain.csproj",
+        "projectUniqueName": "C:\\Users\\Tran Duc\\Documents\\HOC KI 3 NAM 2\\DOAN\\CSharp\\Backend\\TuneVault.Domain\\TuneVault.Domain.csproj",
         "projectName": "TuneVault.Domain",
-        "projectPath": "C:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Domain\\TuneVault.Domain.csproj",
-        "packagesPath": "C:\\Users\\NHAN\\.nuget\\packages\\",
-        "outputPath": "C:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\TuneVault.Domain\\obj\\",
+        "projectPath": "C:\\Users\\Tran Duc\\Documents\\HOC KI 3 NAM 2\\DOAN\\CSharp\\Backend\\TuneVault.Domain\\TuneVault.Domain.csproj",
+        "packagesPath": "C:\\Users\\Tran Duc\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Tran Duc\\Documents\\HOC KI 3 NAM 2\\DOAN\\CSharp\\Backend\\TuneVault.Domain\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\NHAN\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\Tran Duc\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"

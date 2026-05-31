@@ -12,10 +12,11 @@ public class DataContextDapper
         _connectionString = connectionString;
     }
 
-    public IDbConnection CreataConnection() => new SqlConnection(_connectionString);
-    public T LoadDataString<T> (string sql)
+    public IDbConnection CreateConnection() => new SqlConnection(_connectionString);
+    
+    public async Task<IEnumerable<T>> QueryAsync<T>(string sql, object ? param = null)
     {
-        using var con = CreataConnection();
-        return con.QueryFirstOrDefault<T>(sql);
+        using var con = CreateConnection();
+        return await con.QueryAsync<T>(sql, param);
     }
 }
