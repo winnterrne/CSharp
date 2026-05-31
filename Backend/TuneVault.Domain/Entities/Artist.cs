@@ -7,10 +7,10 @@ namespace TuneVault.Domain.Entities
 {
     public class Artist
     {
-    public string ArtistID{get; set;} //Primary Key
+    public required string ArtistID{get; set;} //Primary Key
     public string? ArtistName{get; set;}
     public string? ArtistImage{get; set;}
     public DateTime? CreateAt{get; set;}
-    public bool? IsDelete{get; set;}
+    public bool? IsDeleted{get; set;}
     }
 }

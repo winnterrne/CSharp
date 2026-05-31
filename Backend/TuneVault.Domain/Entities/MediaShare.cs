@@ -7,11 +7,11 @@ namespace TuneVault.Domain.Entities
 {
     public class MediaShare
     {
-        public int ShareID{get; set;} //Primary Key
-        public string SenderID{get; set;} //Foreign Key to AspNetUsers
-        public string ReceiverID{get; set;} //Foreign Key to AspNetUsers
-        public int MediaItemID{get; set;} //Foreign Key to MediaItem
-        public int PlaylistID{get; set;} //Foreign Key to Playlist (nullable if sharing a single media item)
+        public required int ShareID{get; set;} //Primary Key
+        public required string SenderID{get; set;} //Foreign Key to AspNetUsers
+        public required string ReceiverID{get; set;} //Foreign Key to AspNetUsers
+        public required int MediaItemID{get; set;} //Foreign Key to MediaItem
+        public required int PlaylistID{get; set;} //Foreign Key to Playlist (nullable if sharing a single media item)
         public DateTime? SharedAt{get; set;}
     }
 }
