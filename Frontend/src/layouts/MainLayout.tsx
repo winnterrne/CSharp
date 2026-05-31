@@ -1,22 +1,45 @@
+// src/layouts/MainLayout.tsx
+import { useState, type ReactNode } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "../components/layout/Header";
-import LeftPanel from "../components/layout/LeftPanel";
+import Sidebar from "../components/layout/LeftPanel";
 import RightPanel from "../components/layout/RightPanel";
 import PlayerBar from "../components/layout/PlayerBar";
-import type { ReactNode } from "react";
+import { usePlayer } from "../hooks/usePlayer";
+import { useAuth } from "../hooks/useAuth";
 
 const MainLayout = ({ children }: { children: ReactNode }) => {
+  const navigate = useNavigate();
+  const [searchValue, setSearchValue] = useState("");
+
+  const { user } = useAuth();
+
+  const {
+    currentTrack, isPlaying, progress, volume, shuffle, repeat, liked,
+    togglePlay, prev, next, seek, setVolume,
+    toggleShuffle, toggleRepeat, toggleLike,
+  } = usePlayer();
+
   return (
     <div
       style={{
         display: "flex",
         flexDirection: "column",
         height: "100vh",
-         background: "linear-gradient(180deg, #121212 100%, #121212 100%)",
+        background: "#121212",
         overflow: "hidden",
         fontFamily: "'Circular', 'Helvetica Neue', Helvetica, Arial, sans-serif",
       }}
     >
-      <Header />
+      <Header
+        searchValue={searchValue}
+        user={user ? { displayName: user.username, avatarUrl: user.avatarUrl } : null}
+        onSearchChange={setSearchValue}
+        onHomeClick={() => navigate("/")}
+        onNotificationClick={() => navigate("/notifications")}
+        onAvatarClick={() => navigate("/profile")}
+      />
+
       <div
         style={{
           display: "flex",
@@ -28,11 +51,10 @@ const MainLayout = ({ children }: { children: ReactNode }) => {
         }}
       >
         <div style={{ borderRadius: "8px", overflow: "hidden", background: "#121212", flexShrink: 0, display: "flex", flexDirection: "column", height: "100%" }}>
-          <LeftPanel />
+          <Sidebar />
         </div>
 
-        {/* ← children thay cho MainContent hardcode */}
-        <div style={{  borderRadius: "8px", overflow: "hidden", background: "#121212", minWidth: 0, height: "100%" , display:"flex" }}>
+        <div style={{ borderRadius: "8px", overflow: "hidden", background: "#121212", minWidth: 0, height: "100%", display: "flex" }}>
           {children}
         </div>
 
@@ -41,7 +63,23 @@ const MainLayout = ({ children }: { children: ReactNode }) => {
         </div>
       </div>
 
-      <PlayerBar />
+      <PlayerBar
+        currentTrack={currentTrack}
+        isPlaying={isPlaying}
+        progress={progress}
+        volume={volume}
+        shuffle={shuffle}
+        repeat={repeat}
+        liked={liked}
+        onTogglePlay={togglePlay}
+        onPrev={prev}
+        onNext={next}
+        onSeek={seek}
+        onVolumeChange={setVolume}
+        onToggleShuffle={toggleShuffle}
+        onToggleRepeat={toggleRepeat}
+        onToggleLike={toggleLike}
+      />
     </div>
   );
 };

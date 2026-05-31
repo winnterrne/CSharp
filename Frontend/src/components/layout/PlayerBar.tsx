@@ -1,6 +1,36 @@
 import { useState, useRef } from "react";
-import { usePlayer } from "../../hooks/usePlayer";
 
+// ─── Types ────────────────────────────────────────────────────────────────────
+export interface Track {
+  id: string;
+  title: string;
+  artist: string;
+  duration: number;   // seconds
+  color?: string;
+  emoji?: string;
+  albumArt?: string;  // URL tuỳ chọn
+}
+
+export interface PlayerBarProps {
+  // State
+  currentTrack: Track | null;
+  isPlaying: boolean;
+  progress: number;       // 0–100
+  volume: number;         // 0–100
+  shuffle: boolean;
+  repeat: boolean;
+  liked?: boolean;
+
+  // Callbacks
+  onTogglePlay: () => void;
+  onPrev: () => void;
+  onNext: () => void;
+  onSeek: (pct: number) => void;
+  onVolumeChange: (pct: number) => void;
+  onToggleShuffle: () => void;
+  onToggleRepeat: () => void;
+  onToggleLike?: () => void;
+}
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 const ShuffleIcon = ({ active }: { active: boolean }) => (
@@ -58,16 +88,18 @@ const DeviceIcon = () => (
 );
 
 const VolumeIcon = ({ level }: { level: number }) => {
-  if (level === 0) return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z" />
-    </svg>
-  );
-  if (level < 50) return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M18.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM5 9v6h4l5 5V4L9 9H5z" />
-    </svg>
-  );
+  if (level === 0)
+    return (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z" />
+      </svg>
+    );
+  if (level < 50)
+    return (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M18.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM5 9v6h4l5 5V4L9 9H5z" />
+      </svg>
+    );
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
       <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
@@ -82,7 +114,14 @@ const FullscreenIcon = () => (
 );
 
 const HeartIcon = ({ liked }: { liked: boolean }) => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill={liked ? "#1DB954" : "none"} stroke={liked ? "#1DB954" : "currentColor"} strokeWidth="2">
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill={liked ? "#1DB954" : "none"}
+    stroke={liked ? "#1DB954" : "currentColor"}
+    strokeWidth="2"
+  >
     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
   </svg>
 );
@@ -122,7 +161,6 @@ const Slider = ({
         width: "100%",
       }}
     >
-      {/* Fill */}
       <div
         style={{
           position: "absolute",
@@ -135,7 +173,6 @@ const Slider = ({
           transition: "background 0.15s",
         }}
       />
-      {/* Thumb */}
       <div
         style={{
           position: "absolute",
@@ -195,34 +232,30 @@ const IconBtn = ({
   </button>
 );
 
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+const formatSeconds = (sec: number) =>
+  `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, "0")}`;
+
 // ─── Main Component ───────────────────────────────────────────────────────────
-const PlayerBar = () => {
-  const {
-    currentTrack,
-    isPlaying,
-    progress,
-    volume,
-    shuffle,
-    repeat,
-    togglePlay,
-    setProgress,
-    setVolume,
-    toggleShuffle,
-    toggleRepeat,
-  } = usePlayer();
-
-  const [liked, setLiked] = useState(false); // giữ local vì chưa có API
-
-  const formatTime = (pct: number) => {
-    const totalSec = currentTrack?.duration ?? 214;
-    const s = Math.round((pct / 100) * totalSec);
-    return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
-  };
-
-  const formatDuration = () => {
-    const s = currentTrack?.duration ?? 214;
-    return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
-  };
+const PlayerBar = ({
+  currentTrack,
+  isPlaying,
+  progress,
+  volume,
+  shuffle,
+  repeat,
+  liked = false,
+  onTogglePlay,
+  onPrev,
+  onNext,
+  onSeek,
+  onVolumeChange,
+  onToggleShuffle,
+  onToggleRepeat,
+  onToggleLike,
+}: PlayerBarProps) => {
+  const totalSec = currentTrack?.duration ?? 0;
+  const currentSec = Math.round((progress / 100) * totalSec);
 
   return (
     <footer
@@ -248,23 +281,34 @@ const PlayerBar = () => {
             width: "56px",
             height: "56px",
             borderRadius: "4px",
-            background: `linear-gradient(135deg, ${currentTrack?.color ?? "#1a3050"}, #1DB954)`,
             flexShrink: 0,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             fontSize: "22px",
             boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
+            overflow: "hidden",
+            background: currentTrack?.albumArt
+              ? "transparent"
+              : `linear-gradient(135deg, ${currentTrack?.color ?? "#1a3050"}, #1DB954)`,
           }}
         >
-          {currentTrack?.emoji ?? "🎵"}
+          {currentTrack?.albumArt ? (
+            <img
+              src={currentTrack.albumArt}
+              alt={currentTrack.title}
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            />
+          ) : (
+            currentTrack?.emoji ?? "🎵"
+          )}
         </div>
 
         {/* Song info */}
         <div style={{ minWidth: 0 }}>
           <div
             style={{
-              color: "#fff",
+              color: currentTrack ? "#fff" : "#6b6b6b",
               fontSize: "14px",
               fontWeight: 600,
               whiteSpace: "nowrap",
@@ -289,10 +333,12 @@ const PlayerBar = () => {
           </div>
         </div>
 
-        {/* Heart */}
-        <IconBtn title="Thêm vào thư viện" active={liked} onClick={() => setLiked(!liked)}>
-          <HeartIcon liked={liked} />
-        </IconBtn>
+        {/* Heart – chỉ hiện khi có bài */}
+        {currentTrack && onToggleLike && (
+          <IconBtn title="Thêm vào thư viện" active={liked} onClick={onToggleLike}>
+            <HeartIcon liked={liked} />
+          </IconBtn>
+        )}
       </div>
 
       {/* ── Center: Controls + Progress ── */}
@@ -307,19 +353,20 @@ const PlayerBar = () => {
       >
         {/* Control buttons */}
         <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-          <IconBtn title="Phát ngẫu nhiên" active={shuffle} onClick={toggleShuffle}>
+          <IconBtn title="Phát ngẫu nhiên" active={shuffle} onClick={onToggleShuffle}>
             <ShuffleIcon active={shuffle} />
           </IconBtn>
 
-          <IconBtn title="Trước">
+          <IconBtn title="Trước" onClick={onPrev}>
             <PrevIcon />
           </IconBtn>
 
           {/* Play/Pause */}
           <button
-            onClick={togglePlay}
+            onClick={onTogglePlay}
+            disabled={!currentTrack}
             style={{
-              background: "#fff",
+              background: currentTrack ? "#fff" : "#4d4d4d",
               border: "none",
               borderRadius: "50%",
               width: "36px",
@@ -327,28 +374,29 @@ const PlayerBar = () => {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              cursor: "pointer",
+              cursor: currentTrack ? "pointer" : "default",
               margin: "0 4px",
               transition: "transform 0.1s ease, background 0.15s",
               flexShrink: 0,
             }}
             onMouseEnter={(e) => {
+              if (!currentTrack) return;
               e.currentTarget.style.transform = "scale(1.07)";
               e.currentTarget.style.background = "#f0f0f0";
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = "scale(1)";
-              e.currentTarget.style.background = "#fff";
+              e.currentTarget.style.background = currentTrack ? "#fff" : "#4d4d4d";
             }}
           >
             {isPlaying ? <PauseIcon /> : <PlayIcon />}
           </button>
 
-          <IconBtn title="Tiếp theo">
+          <IconBtn title="Tiếp theo" onClick={onNext}>
             <NextIcon />
           </IconBtn>
 
-          <IconBtn title="Lặp lại" active={repeat} onClick={toggleRepeat}>
+          <IconBtn title="Lặp lại" active={repeat} onClick={onToggleRepeat}>
             <RepeatIcon active={repeat} />
           </IconBtn>
         </div>
@@ -364,11 +412,11 @@ const PlayerBar = () => {
           }}
         >
           <span style={{ color: "#b3b3b3", fontSize: "11px", minWidth: "32px", textAlign: "right" }}>
-            {formatTime(progress)}
+            {formatSeconds(currentSec)}
           </span>
-          <Slider value={progress} onChange={setProgress} color="#1DB954" />
+          <Slider value={progress} onChange={onSeek} color="#1DB954" />
           <span style={{ color: "#b3b3b3", fontSize: "11px", minWidth: "32px" }}>
-            {formatDuration()}
+            {formatSeconds(totalSec)}
           </span>
         </div>
       </div>
@@ -399,7 +447,7 @@ const PlayerBar = () => {
         </IconBtn>
 
         <div style={{ width: "80px" }}>
-          <Slider value={volume} onChange={setVolume} color="#1DB954" />
+          <Slider value={volume} onChange={onVolumeChange} color="#1DB954" />
         </div>
 
         <IconBtn title="Toàn màn hình">

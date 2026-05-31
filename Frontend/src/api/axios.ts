@@ -4,4 +4,11 @@ const api = axios.create({
   baseURL: "http://localhost:5000/api",
 });
 
-export default api; // ← thêm dòng này
+// Tự động gắn token vào mọi request
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
+export default api;
