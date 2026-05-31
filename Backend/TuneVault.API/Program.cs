@@ -1,33 +1,43 @@
 using System;
 using Microsoft.Data.SqlClient;
-
+using TuneVault.Infrastructure.Repositories;
+using TuneVault.Infrastructure.Dapper;
+using TuneVault.Domain.Entities;
+using Dapper;
+using Microsoft.Extensions.Configuration;
 class Program
 {
-    static void Main()
+    static async Task Main()
     {
-        string connStr = "Server=MSI;Database=TuneVault;User Id=sa;Password=123;TrustServerCertificate=True;";
+        var configuration = new ConfigurationBuilder()
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .Build();
 
-        using (SqlConnection conn = new SqlConnection(connStr))
-        {
-            try
-            {
-                conn.Open();
-                Console.WriteLine("Kết nối OK");
+// 2. Tự khởi tạo bằng tay (Không cần Dependency Injection)
+var dbContext = new DataContextDapper(configuration);
+var userRepo = new UserRepository(dbContext);
 
-                string query = "SELECT TOP 3 TitleName FROM MediaItem";
-                SqlCommand cmd = new SqlCommand(query, conn);
+// 3. GỌI HÀM TEST LUÔN
+Console.WriteLine("=== ĐANG TEST HÀM ===");
 
-                SqlDataReader reader = cmd.ExecuteReader();
-
-                while (reader.Read())
-                {
-                    Console.WriteLine(reader["TitleName"].ToString());
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-        }
+try
+{
+    // Giả sử test lấy thông tin tài khoản U1
+    var user = await userRepo.GetUserByIdAsync("U1");
+    
+    if (user != null)
+    {
+        Console.WriteLine($"Thành công! Lấy được user: {user.UserName} - {user.Email}");
+    }
+    else
+    {
+        Console.WriteLine("Hàm chạy thành công nhưng không có dữ liệu (hoặc user đã bị xóa mềm).");
+    }
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Lỗi rồi: {ex.Message}");
+}
+        
     }
 }

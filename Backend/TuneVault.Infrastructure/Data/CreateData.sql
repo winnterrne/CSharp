@@ -1,3 +1,5 @@
+
+-- Seed inserts
 INSERT INTO AspNetUsers(UserID, UserName, UserImage, Email, Password, Role, Phone)
 VALUES 
 ('U1', 'nhan1', 'user1.jpg', 'user1@gmail.com', '123', 'User', '0123456789'),
@@ -16,7 +18,8 @@ VALUES
 (N'AMEE', 'amee.jpg'),
 (N'Karik', 'karik.jpg');
 
-INSERT INTO Album(AlbumName, Title, AlbumItemImage, RealeaseDate, ArtistID, UserID)
+/* Đã sửa RealeaseDate -> ReleaseDate */
+INSERT INTO Album(AlbumName, Title, AlbumItemImage, ReleaseDate, ArtistID, UserID)
 VALUES
 (N'Album Hit', N'Best Songs 2023', 'album1.jpg', '2023-01-01', 1, 'U1'),
 (N'Album MV', N'Best Videos 2023', 'album2.jpg', '2023-06-01', 2, 'U2');

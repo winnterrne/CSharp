@@ -7,13 +7,14 @@ namespace TuneVault.Domain.Entities
 {
     public class Album
     {
-         public string AlbumID{get; set;} //Primary Key
+         public required string AlbumID{get; set;} //Primary Key
         public string? AlbumName{get; set;}
         public string? Title{get; set;}
         public string? AlbumItemImage{get; set;}
-        public DateTime? RealeaseDate{get; set;}
+        public DateTime? ReleaseDate{get; set;}
         public DateTime? UploadAt{get; set;}
-        public int ArtistID{get; set;} //Foreign Key to Artist
-        public string UserID{get; set;} //Foreign Key to AspNetUsers
+        public required int ArtistID{get; set;} //Foreign Key to Artist
+        public required string UserID{get; set;} //Foreign Key to AspNetUsers
+        public bool? IsDeleted{get; set;}
     }
 }
