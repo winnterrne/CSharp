@@ -3,47 +3,50 @@ import MediaCard from "../../components/media/MediaCard";
 const songs = [
   {
     id: 1,
-    title: "Em",
-    artist: "Binz, SOOBIN",
+    title: "Blinding Lights",
+    artist: "The Weeknd",
+    image:
+      "https://picsum.photos/300?1",
   },
   {
     id: 2,
-    title: "Cho Con",
-    artist: "B Ray",
+    title: "Starboy",
+    artist: "The Weeknd",
+    image:
+      "https://picsum.photos/300?2",
   },
   {
     id: 3,
-    title: "Sau Này Em Cưới Ai Rồi",
-    artist: "Kiều Chi",
+    title: "Believer",
+    artist: "Imagine Dragons",
+    image:
+      "https://picsum.photos/300?3",
   },
   {
     id: 4,
-    title: "Một Nửa Sự Thật",
-    artist: "24K.Right",
+    title: "Faded",
+    artist: "Alan Walker",
+    image:
+      "https://picsum.photos/300?4",
   },
 ];
 
 export default function HomePage() {
   return (
-    <div>
+    <div className="space-y-12">
+      {/* Trending */}
       <section>
-        <div className="flex justify-between items-center mb-8">
-          <h2 className="text-5xl font-bold">
-            Những bài hát thịnh hành
-          </h2>
-
-          <button className="text-gray-400 hover:text-white">
-            Hiện tất cả
-          </button>
-        </div>
+        <h2 className="text-3xl font-bold mb-6">
+          Trending Songs
+        </h2>
 
         <div
           className="
             grid
             grid-cols-1
-            md:grid-cols-2
-            xl:grid-cols-4
-            gap-4
+            sm:grid-cols-2
+            lg:grid-cols-4
+            gap-6
           "
         >
           {songs.map((song) => (
@@ -51,6 +54,7 @@ export default function HomePage() {
               key={song.id}
               title={song.title}
               artist={song.artist}
+              image={song.image}
             />
           ))}
         </div>
