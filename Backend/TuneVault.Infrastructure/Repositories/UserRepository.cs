@@ -46,7 +46,6 @@ namespace TuneVault.Infrastructure.Repositories
                     (@NewUserID, @UserName, @Email, @Password, @Role, @Phone, 0)
             ";
             
-            // Dùng ExecuteAsync cho lệnh ghi dữ liệu
             return await _db.ExecuteDataAsync(sql, user);
         }
 
