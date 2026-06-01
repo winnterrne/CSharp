@@ -1,0 +1,20 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using TuneVault.Domain.Entities;
+namespace TuneVault.Domain.Interfaces
+{
+    public interface IMediaItemRepository
+    {
+        public Task<MediaItem> GetMediaByIdAsync(string mediaId);
+        public Task<IEnumerable<MediaItem>> GetAllMediaAsync();
+        
+        // Chức năng 7: Tìm kiếm theo tên bài hát
+        public Task<IEnumerable<MediaItem>> SearchMediaAsync(string keyword); 
+        
+        public Task<int> CreateMediaAsync(MediaItem media);
+        public Task<int> UpdateMediaAsync(MediaItem media);
+        public Task<int> DeleteMediaAsync(string mediaId); // Dùng xóa mềm (IsDelete = 1)
+    }
+}

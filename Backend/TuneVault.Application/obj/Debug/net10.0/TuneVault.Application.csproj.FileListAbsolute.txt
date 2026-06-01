@@ -14,3 +14,19 @@ C:\CODE\C Sharp\DoanCsharp\CSharp\backend\TuneVault.Application\obj\Debug\net10.
 C:\CODE\C Sharp\DoanCsharp\CSharp\backend\TuneVault.Application\obj\Debug\net10.0\refint\TuneVault.Application.dll
 C:\CODE\C Sharp\DoanCsharp\CSharp\backend\TuneVault.Application\obj\Debug\net10.0\TuneVault.Application.pdb
 C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\TuneVault.Application\obj\Debug\net10.0\ref\TuneVault.Application.dll
+C:\DoAnMonHoc\CSharp\Backend\TuneVault.Application\bin\Debug\net10.0\TuneVault.Application.deps.json
+C:\DoAnMonHoc\CSharp\Backend\TuneVault.Application\bin\Debug\net10.0\TuneVault.Application.dll
+C:\DoAnMonHoc\CSharp\Backend\TuneVault.Application\bin\Debug\net10.0\TuneVault.Application.pdb
+C:\DoAnMonHoc\CSharp\Backend\TuneVault.Application\bin\Debug\net10.0\TuneVault.Domain.dll
+C:\DoAnMonHoc\CSharp\Backend\TuneVault.Application\bin\Debug\net10.0\TuneVault.Domain.pdb
+C:\DoAnMonHoc\CSharp\Backend\TuneVault.Application\obj\Debug\net10.0\TuneVault.Application.csproj.AssemblyReference.cache
+C:\DoAnMonHoc\CSharp\Backend\TuneVault.Application\obj\Debug\net10.0\TuneVault.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\DoAnMonHoc\CSharp\Backend\TuneVault.Application\obj\Debug\net10.0\TuneVault.Application.AssemblyInfoInputs.cache
+C:\DoAnMonHoc\CSharp\Backend\TuneVault.Application\obj\Debug\net10.0\TuneVault.Application.AssemblyInfo.cs
+C:\DoAnMonHoc\CSharp\Backend\TuneVault.Application\obj\Debug\net10.0\TuneVault.Application.csproj.CoreCompileInputs.cache
+C:\DoAnMonHoc\CSharp\Backend\TuneVault.Application\obj\Debug\net10.0\TuneVault.Application.sourcelink.json
+C:\DoAnMonHoc\CSharp\Backend\TuneVault.Application\obj\Debug\net10.0\TuneVaul.CD6889CD.Up2Date
+C:\DoAnMonHoc\CSharp\Backend\TuneVault.Application\obj\Debug\net10.0\TuneVault.Application.dll
+C:\DoAnMonHoc\CSharp\Backend\TuneVault.Application\obj\Debug\net10.0\refint\TuneVault.Application.dll
+C:\DoAnMonHoc\CSharp\Backend\TuneVault.Application\obj\Debug\net10.0\TuneVault.Application.pdb
+C:\DoAnMonHoc\CSharp\Backend\TuneVault.Application\obj\Debug\net10.0\ref\TuneVault.Application.dll

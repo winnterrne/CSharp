@@ -30,6 +30,16 @@ namespace TuneVault.Infrastructure.Repositories
             return await _db.LoadDataSingleAsync<AspNetUsers>(sql, new { Email = email });
         }
 
+        public async Task<bool> EmailExistsAsync(string email)
+        {
+            string sql = "SELECT COUNT(1) FROM AspNetUsers WHERE Email = @Email AND IsDeleted = 0";
+            int count = await _db.LoadDataSingleAsync<int>(
+                sql,
+                new {Email = email}
+            );
+            return count>0;
+        }
+
         // Tạo User mới
         public async Task<int> CreateUserAsync(AspNetUsers user)
         {
