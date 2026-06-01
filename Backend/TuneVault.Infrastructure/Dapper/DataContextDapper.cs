@@ -33,6 +33,12 @@ namespace TuneVault.Infrastructure.Dapper
             return await conn.ExecuteAsync(sql, parameters);
         }
 
+        public async Task<T> ExecuteScalarAsync<T>(string sql, object? parameters = null)
+        {
+            using var conn = CreateConnection();
+            return await conn.ExecuteScalarAsync<T>(sql, parameters);
+        }
+
     }
     
 }
