@@ -1,69 +1,41 @@
-type Props = {
+type MediaCardProps = {
   title: string;
   artist: string;
+  image: string;
 };
 
 export default function MediaCard({
   title,
   artist,
-}: Props) {
+  image,
+}: MediaCardProps) {
   return (
     <div
       className="
-        p-4
+        bg-[#181818]
         rounded-xl
-        hover:bg-[#1f1f1f]
+        p-4
+        hover:bg-[#282828]
         transition-all
-        duration-300
         cursor-pointer
-        group
       "
     >
-      <div
+      <img
+        src={image}
+        alt={title}
         className="
-          relative
-          overflow-hidden
-          rounded-xl
+          w-full
+          aspect-square
+          object-cover
+          rounded-lg
         "
-      >
-        <div
-          className="
-            w-full
-            h-[220px]
-            bg-gradient-to-br
-            from-gray-700
-            to-gray-900
-          "
-        ></div>
+      />
 
-        <button
-          className="
-            absolute
-            bottom-4
-            right-4
-            w-14
-            h-14
-            rounded-full
-            bg-green-500
-            text-black
-            text-xl
-            shadow-2xl
-            opacity-0
-            translate-y-3
-            group-hover:opacity-100
-            group-hover:translate-y-0
-            transition-all
-          "
-        >
-          ▶
-        </button>
-      </div>
-
-      <h3 className="mt-4 font-bold text-lg">
+      <h3 className="mt-3 font-bold text-white">
         {title}
       </h3>
 
-      <p className="text-gray-400 mt-2 text-sm">
+      <p className="text-gray-400 text-sm mt-1">
         {artist}
       </p>
     </div>
