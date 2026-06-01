@@ -33,10 +33,7 @@ namespace TuneVault.Infrastructure.Repositories
         public async Task<bool> EmailExistsAsync(string email)
         {
             string sql = "SELECT COUNT(1) FROM AspNetUsers WHERE Email = @Email AND IsDeleted = 0";
-            int count = await _db.LoadDataSingleAsync<int>(
-                sql,
-                new {Email = email}
-            );
+            int count = await _db.LoadDataSingleAsync<int>(sql, new {Email = email});
             return count>0;
         }
 

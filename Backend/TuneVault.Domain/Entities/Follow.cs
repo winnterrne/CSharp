@@ -9,7 +9,7 @@ namespace TuneVault.Domain.Entities
     {
         public required int FollowID{get; set;} //Primary Key
         public required string FollowerID{get; set;} //Foreign Key to AspNetUsers
-        public required string FollowingUserID{get; set;} //Foreign Key to AspNetUsers
-        public required string FollowingArtistID{get; set;} //Foreign Key to Artist
+        public string? FollowingUserID{get; set;} //Foreign Key to AspNetUsers
+        public int? FollowingArtistID{get; set;} //Foreign Key to Artist
     }
 }
