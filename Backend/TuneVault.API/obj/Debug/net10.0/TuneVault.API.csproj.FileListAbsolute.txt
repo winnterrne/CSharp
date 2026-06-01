@@ -161,3 +161,12 @@ C:\DoAnMonHoc\CSharp\Backend\TuneVault.API\obj\Debug\net10.0\refint\TuneVault.AP
 C:\DoAnMonHoc\CSharp\Backend\TuneVault.API\obj\Debug\net10.0\TuneVault.API.pdb
 C:\DoAnMonHoc\CSharp\Backend\TuneVault.API\obj\Debug\net10.0\TuneVault.API.genruntimeconfig.cache
 C:\DoAnMonHoc\CSharp\Backend\TuneVault.API\obj\Debug\net10.0\ref\TuneVault.API.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\TuneVault.API\bin\Debug\net10.0\BCrypt-Net-Next.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\TuneVault.API\bin\Debug\net10.0\FluentValidation.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\TuneVault.API\bin\Debug\net10.0\FluentValidation.DependencyInjectionExtensions.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\TuneVault.API\bin\Debug\net10.0\MediatR.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\TuneVault.API\bin\Debug\net10.0\MediatR.Contracts.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\TuneVault.API\bin\Debug\net10.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\TuneVault.API\bin\Debug\net10.0\Swashbuckle.AspNetCore.Swagger.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\TuneVault.API\bin\Debug\net10.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\TuneVault.API\bin\Debug\net10.0\Swashbuckle.AspNetCore.SwaggerUI.dll

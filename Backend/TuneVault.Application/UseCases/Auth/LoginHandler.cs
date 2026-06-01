@@ -5,6 +5,12 @@ using TuneVault.Domain.Interfaces;
 
 namespace TuneVault.Application.UseCases.Auth;
 
+//<summary>
+// Handler để xử lý đăng nhập người dùng
+// Sử dụng IUserRepository để lấy thông tin người dùng từ database
+// Sử dụng IJwtService để tạo JWT token nếu đăng nhập thành công
+// Trả về AuthResponseDTO chứa token và thông tin người dùng nếu đăng nhập thành công
+//</summary>
 public class LoginHandler : IRequestHandler<LoginCommand, AuthResponseDTO>
 {
     private readonly IUserRepository _userRepo;

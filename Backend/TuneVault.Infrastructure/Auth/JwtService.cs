@@ -7,7 +7,9 @@ using TuneVault.Application.Interfaces;
 using TuneVault.Domain.Entities;
 
 namespace TuneVault.Infrastructure.Auth;
-
+///<summary>
+/// Dịch vụ tạo JWT token cho người dùng sau khi đăng nhập thành công.
+///</summary>
 public class JwtService : IJwtService
 {
     private readonly IConfiguration _config;
@@ -20,14 +22,14 @@ public class JwtService : IJwtService
     {
         var claims = new[]
         {
-            new Claim(ClaimTypes.NameIdentifier, user.UserID),
+            new Claim(ClaimTypes.NameIdentifier, user.UserID), 
             new Claim(ClaimTypes.Email, user.Email!),
             new Claim(ClaimTypes.Name, user.UserName!),
             new Claim(ClaimTypes.Role, user.Role ?? "User")
         };
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"])!);
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"])!); 
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256); 
         var token = new JwtSecurityToken(
             issuer: _config["Jwt: Issuer"],
             audience: _config["Jwt: Audience"],

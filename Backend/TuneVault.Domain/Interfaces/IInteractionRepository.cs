@@ -9,7 +9,7 @@ namespace TuneVault.Domain.Interfaces
     {
         // Chức năng 10: Yêu thích bài hát
         Task<int> AddFavoriteAsync(Favorite favorite);
-        Task<int> RemoveFavoriteAsync(string userId, string songId);
+        Task<int> RemoveFavoriteAsync(string userId, int mediaItemId);
         Task<IEnumerable<MediaItem>> GetUserFavoritesAsync(string userId);
 
         // Chức năng 10: Lịch sử nghe nhạc (Lấy 10 bài mới nhất)
@@ -18,6 +18,7 @@ namespace TuneVault.Domain.Interfaces
 
         // Theo dõi (Follow)
         Task<int> FollowAsync(Follow follow);
-        Task<int> UnfollowAsync(string followerId, string followingId);
+        Task<int> UnfollowUserAsync(string followerId, string followingUserId);
+        Task<int> UnfollowArtistAsync(string followerId, int followingArtistId);
     }
 }

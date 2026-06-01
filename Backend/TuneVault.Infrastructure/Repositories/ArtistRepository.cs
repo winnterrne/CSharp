@@ -16,9 +16,9 @@ namespace TuneVault.Infrastructure.Repositories
         }
         public async Task<Artist> GetArtistByIdAsync(string artistId)
         {
-            string sql = @"SELECT *  FROM TuneVault.Artist WHERE ArtistId = @ArtistId";
+            string sql = @"SELECT *  FROM TuneVault.Artist WHERE ArtistID = @ArtistID";
 
-            return await _db.LoadDataSingleAsync<Artist>(sql, new { ArtistId = artistId});
+            return await _db.LoadDataSingleAsync<Artist>(sql, new { ArtistID = artistId});
         }
         public async Task<IEnumerable<Artist>> GetAllArtistsAsync()
         {
@@ -32,18 +32,18 @@ namespace TuneVault.Infrastructure.Repositories
             string sql = @" 
                 INSERT INTO TuneVault.Artist 
                     (ArtistName, ArtistImage, CreateAt, IsDeleted)
-                OUTPUT INSERT @ArtistID
+                OUTPUT INSERTED.ArtistID
                 VALUES
                     (@ArtistName, @ArtistImage, @CreateAt, 0)";
             
-            return await _db.ExecuteDataAsync(sql, artist);
+            return await _db.ExecuteScalarAsync<int>(sql, artist);
         }
         public async Task<int> UpdateArtistAsync(Artist artist)
         {
             string sql = @"UPDATE TuneVault.Artist 
                            SET ArtistName = @ArtistName,
                            SET ArtistImage = @ArtistImage
-                           WHERE IDArtist = @IDArtist AND IsDelete = 0";
+                           WHERE ArtistID = @ArtistID AND IsDeleted= 0";
                            
             return await _db.ExecuteDataAsync(sql, artist);
         }
@@ -51,9 +51,9 @@ namespace TuneVault.Infrastructure.Repositories
         {
             string sql = @"UPDATE TuneVault.Artist 
                            SET IsDeleted = 1
-                           WHERE ArtistId = @ArtistID";
+                           WHERE ArtistID = @ArtistID";
                            
-            return await _db.ExecuteDataAsync(sql, new { ArtistId = artistId });
+            return await _db.ExecuteDataAsync(sql, new { ArtistID = artistId});
         }
     }
 }

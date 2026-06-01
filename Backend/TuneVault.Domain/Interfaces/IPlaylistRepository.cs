@@ -7,14 +7,14 @@ namespace TuneVault.Domain.Interfaces
 {
     public interface IPlaylistRepository
     {
-        Task<Playlist> GetPlaylistByIdAsync(string playlistId);
+        Task<Playlist> GetPlaylistByIdAsync(int playlistId);
         Task<IEnumerable<Playlist>> GetUserPlaylistsAsync(string userId);
         Task<int> CreatePlaylistAsync(Playlist playlist);
         Task<int> UpdatePlaylistAsync(Playlist playlist);
-        Task<int> DeletePlaylistAsync(string playlistId);
+        Task<int> DeletePlaylistAsync(int playlistId);
 
         // Thao tác với bảng trung gian PlaylistTrack (Chức năng 6)
-        Task<int> AddTrackToPlaylistAsync(string playlistId, string songId);
-        Task<int> RemoveTrackFromPlaylistAsync(string playlistId, string songId);
+        Task<int> AddTrackToPlaylistAsync(int playlistId, int mediaItemId);
+        Task<int> RemoveTrackFromPlaylistAsync(int playlistId, int mediaItemId);
     }
 }
