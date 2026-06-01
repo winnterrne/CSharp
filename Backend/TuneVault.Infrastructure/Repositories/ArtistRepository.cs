@@ -32,7 +32,7 @@ namespace TuneVault.Infrastructure.Repositories
             string sql = @" 
                 INSERT INTO TuneVault.Artist 
                     (ArtistName, ArtistImage, CreateAt, IsDeleted)
-                OUTPUT INSERT @ArtistID
+                OUTPUT INSERTED.@ArtistID
                 VALUES
                     (@ArtistName, @ArtistImage, @CreateAt, 0)";
             

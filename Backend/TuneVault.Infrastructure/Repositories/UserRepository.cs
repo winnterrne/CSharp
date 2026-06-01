@@ -93,11 +93,26 @@ namespace TuneVault.Infrastructure.Repositories
         // XÓA MỀM TÀI KHOẢN
         public async Task<int> DeleteUserAsync(string userId)
         {
-            string sql = @"UPDATE AspNetUsers 
+            string sql = @"UPDATE TuneVault.AspNetUsers 
                            SET IsDeleted = 1
                            WHERE UserID = @UserID";
                            
             return await _db.ExecuteDataAsync(sql, new { UserID = userId });
+        }
+
+        public async Task<AspNetUsers?> GetProfileAsync(string userID) {
+            string sql = @"SELECT * UserID, UserName, UserImage, Email, Phone, Role
+                            FROM TuneVault.AspNetUsers
+                            WHERE UserID = @UserID";
+            return await _db.LoadDataSingleAsync<AspNetUsers> (sql, new {UserID = userID});
+        }
+        public async Task<int> UpdateProfileAsync(AspNetUsers user) {
+            string sql = @"UPDATE TuneVault.AspNetUsers
+                            SET UserName = @UserName,
+                                UserImage = @UserImage,
+                                Phone = @Phone,
+                            WHERE UserID = @UserID";
+            return await _db.ExecuteDataAsync(sql, user);
         }
     }
 }
