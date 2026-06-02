@@ -7,7 +7,7 @@ namespace TuneVault.Domain.Interfaces
 {
     public interface IMediaItemRepository
     {
-        public Task<MediaItem> GetMediaByIdAsync(string mediaId);
+        public Task<MediaItem> GetMediaByIdAsync(int mediaId);
         public Task<IEnumerable<MediaItem>> GetAllMediaAsync();
         
         // Chức năng 7: Tìm kiếm theo tên bài hát
@@ -16,5 +16,6 @@ namespace TuneVault.Domain.Interfaces
         public Task<int> CreateMediaAsync(MediaItem media);
         public Task<int> UpdateMediaAsync(MediaItem media);
         public Task<int> DeleteMediaAsync(string mediaId); // Dùng xóa mềm (IsDelete = 1)
+        public Task<MediaItem> GetMediaInfoAsync(int mediaId);
     }
 }

@@ -19,6 +19,7 @@ namespace TuneVault.Domain.Entities
         public required string UserID{get; set;} //Foreign Key to AspNetUsers
         public required int AlbumID{get; set;} //Foreign Key to Album
         public required int ArtistID{get; set;} //Foreign Key to Artist
+        public string? ArtistName { get; set; }
         public bool? IsDeleted{get; set;}
     }
 }
