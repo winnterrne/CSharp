@@ -16,13 +16,13 @@ namespace TuneVault.Infrastructure.Repositories
         }
         public async Task<Artist> GetArtistByIdAsync(string artistId)
         {
-            string sql = @"SELECT *  FROM TuneVault.Artist WHERE ArtistID = @ArtistID";
+            string sql = @"SELECT *  FROM Artist WHERE ArtistID = @ArtistID";
 
             return await _db.LoadDataSingleAsync<Artist>(sql, new { ArtistID = artistId});
         }
         public async Task<IEnumerable<Artist>> GetAllArtistsAsync()
         {
-            string sql = @"SELECT *  FROM TuneVault.Artist";
+            string sql = @"SELECT *  FROM Artist";
 
             return await _db.LoadAllDataSingleAsync<Artist>(sql);
         }
@@ -30,7 +30,7 @@ namespace TuneVault.Infrastructure.Repositories
         public async Task<int> CreateArtistAsync(Artist artist)
         {
             string sql = @" 
-                INSERT INTO TuneVault.Artist 
+                INSERT INTO Artist 
                     (ArtistName, ArtistImage, CreateAt, IsDeleted)
                 OUTPUT INSERTED.ArtistID
                 VALUES
@@ -40,7 +40,7 @@ namespace TuneVault.Infrastructure.Repositories
         }
         public async Task<int> UpdateArtistAsync(Artist artist)
         {
-            string sql = @"UPDATE TuneVault.Artist 
+            string sql = @"UPDATE Artist 
                            SET ArtistName = @ArtistName,
                            SET ArtistImage = @ArtistImage
                            WHERE ArtistID = @ArtistID AND IsDeleted= 0";
@@ -49,7 +49,7 @@ namespace TuneVault.Infrastructure.Repositories
         }
         public async Task<int> DeleteArtistAsync(string artistId)
         {
-            string sql = @"UPDATE TuneVault.Artist 
+            string sql = @"UPDATE Artist 
                            SET IsDeleted = 1
                            WHERE ArtistID = @ArtistID";
                            
