@@ -17,5 +17,7 @@ namespace TuneVault.Domain.Interfaces
         Task<int> UpdateUserImageAsync(AspNetUsers user);
         Task<int> UpdateUserProfileAsync(AspNetUsers user);
         Task<int> DeleteUserAsync(string userId);
+        Task<AspNetUsers?> GetProfileAsync(string userID);
+        Task<int> UpdateProfileAsync(AspNetUsers user);
     }
 }
