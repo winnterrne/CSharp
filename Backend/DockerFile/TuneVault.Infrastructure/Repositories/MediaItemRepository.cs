@@ -11,7 +11,7 @@ public class MediaItemRepository : IMediaItemRepository
         _db = db;
     }
     // Query trả về 1 dòng dữ liệu 
-    public async Task<MediaItem> GetMediaByIdAsync(string mediaId)
+    public async Task<MediaItem> GetMediaByIdAsync(int mediaId)
     {
         string sql = @"SELECT * FROM MediaItem WHERE MediaItemID = @MediaItemID AND IsDeleted = 0";
         return await _db.LoadDataSingleAsync<MediaItem>(sql, new { MediaItem = mediaId});
@@ -53,7 +53,7 @@ public class MediaItemRepository : IMediaItemRepository
         return await _db.ExecuteScalarAsync<int>(sql, media);
     }
     // Xoa mem 
-    public async Task<int> DeleteMediaAsync(string mediaId)
+    public async Task<int> DeleteMediaAsync(int mediaId)
     {
         string sql = @"UPDATE MediaItem
                         SET IsDeleted = 1
@@ -65,5 +65,17 @@ public class MediaItemRepository : IMediaItemRepository
     {
         string sql = @"UPDATE MediaItem SET filePath = @filePath WHERE MediaItemID = @MediaItemID AND IsDeleted = 0";
         return await _db.ExecuteDataAsync(sql, new {MediaItem = mediaID,  filePath = newfilePath});
+
     }
+    public async Task<MediaItem> GetMediaInfoAsync(int mediaId)
+    {
+        string sql = @"SELECT 
+                        m.MediaItemID, m.TitleName, m.MediaItemImage, m.Duration, m.MediaType, m.filePath, a.ArtistName
+                        FROM MediaItem m
+                        JOIN Artist a ON m.ArtistID = a.ArtistID
+                        WHERE m.MediaItemID = @Id AND m.IsDeleted = 0";
+        return await _db.LoadDataSingleAsync<MediaItem>(sql, new { MediaItem = mediaId});
+    }
+
+
 }
