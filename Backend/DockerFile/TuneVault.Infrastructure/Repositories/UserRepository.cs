@@ -102,12 +102,12 @@ namespace TuneVault.Infrastructure.Repositories
 
         public async Task<AspNetUsers?> GetProfileAsync(string userID) {
             string sql = @"SELECT * UserID, UserName, UserImage, Email, Phone, Role
-                            FROM TuneVault.AspNetUsers
+                            FROM AspNetUsers
                             WHERE UserID = @UserID";
             return await _db.LoadDataSingleAsync<AspNetUsers> (sql, new {UserID = userID});
         }
         public async Task<int> UpdateProfileAsync(AspNetUsers user) {
-            string sql = @"UPDATE TuneVault.AspNetUsers
+            string sql = @"UPDATE AspNetUsers
                             SET UserName = @UserName,
                                 UserImage = @UserImage,
                                 Phone = @Phone,
