@@ -16,3 +16,12 @@ C:\CODE\C Sharp\DoanCsharp\CSharp\backend\TuneVault.Infrastructure\obj\Debug\net
 C:\CODE\C Sharp\DoanCsharp\CSharp\backend\TuneVault.Infrastructure\obj\Debug\net10.0\refint\TuneVault.Infrastructure.dll
 C:\CODE\C Sharp\DoanCsharp\CSharp\backend\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVault.Infrastructure.pdb
 C:\CODE\C Sharp\DoanCsharp\CSharp\backend\TuneVault.Infrastructure\obj\Debug\net10.0\ref\TuneVault.Infrastructure.dll
+D:\TuneVault\CSharp\Backend\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVault.Infrastructure.csproj.AssemblyReference.cache
+D:\TuneVault\CSharp\Backend\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVault.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+D:\TuneVault\CSharp\Backend\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVault.Infrastructure.AssemblyInfoInputs.cache
+D:\TuneVault\CSharp\Backend\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVault.Infrastructure.AssemblyInfo.cs
+D:\TuneVault\CSharp\Backend\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVault.Infrastructure.csproj.CoreCompileInputs.cache
+D:\TuneVault\CSharp\Backend\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVault.Infrastructure.sourcelink.json
+D:\TuneVault\CSharp\Backend\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVault.Infrastructure.dll
+D:\TuneVault\CSharp\Backend\TuneVault.Infrastructure\obj\Debug\net10.0\refint\TuneVault.Infrastructure.dll
+D:\TuneVault\CSharp\Backend\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVault.Infrastructure.pdb

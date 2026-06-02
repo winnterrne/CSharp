@@ -2,22 +2,37 @@
 import { useState, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/layout/Header";
-import Sidebar from "../components/layout/LeftPanel";
+import LeftPanel from "../components/layout/LeftPanel";
 import RightPanel from "../components/layout/RightPanel";
 import PlayerBar from "../components/layout/PlayerBar";
 import { usePlayer } from "../hooks/usePlayer";
 import { useAuth } from "../hooks/useAuth";
+import { useSearch } from "../hooks/useSearch";
 
 const MainLayout = ({ children }: { children: ReactNode }) => {
   const navigate = useNavigate();
-  const [searchValue, setSearchValue] = useState("");
 
+  const [searchInput, setSearchInput] = useState("");
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const { results, loading, error } = useSearch(searchKeyword);
   const { user } = useAuth();
 
   const {
-    currentTrack, isPlaying, progress, volume, shuffle, repeat, liked,
-    togglePlay, prev, next, seek, setVolume,
-    toggleShuffle, toggleRepeat, toggleLike,
+    currentTrack,
+    isPlaying,
+    progress,
+    volume,
+    shuffle,
+    repeat,
+    liked,
+    togglePlay,
+    prev,
+    next,
+    seek,
+    setVolume,
+    toggleShuffle,
+    toggleRepeat,
+    toggleLike,
   } = usePlayer();
 
   return (
@@ -28,13 +43,22 @@ const MainLayout = ({ children }: { children: ReactNode }) => {
         height: "100vh",
         background: "#121212",
         overflow: "hidden",
-        fontFamily: "'Circular', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+        fontFamily:
+          "'Circular', 'Helvetica Neue', Helvetica, Arial, sans-serif",
       }}
     >
       <Header
-        searchValue={searchValue}
-        user={user ? { displayName: user.username, avatarUrl: user.avatarUrl } : null}
-        onSearchChange={setSearchValue}
+        searchValue={searchInput}
+        searchResults={results}
+        searchLoading={loading}
+        searchError={error}
+        user={
+          user ?
+            { displayName: user.username, avatarUrl: user.avatarUrl }
+          : null
+        }
+        onSearchChange={setSearchInput}
+        onSearch={() => setSearchKeyword(searchInput)}
         onHomeClick={() => navigate("/")}
         onNotificationClick={() => navigate("/notifications")}
         onAvatarClick={() => navigate("/profile")}
@@ -46,19 +70,51 @@ const MainLayout = ({ children }: { children: ReactNode }) => {
           flex: 1,
           minHeight: 0,
           overflow: "hidden",
-          gap: "8px",
-          padding: "0 8px",
+          gap: "10px",
+            padding: "0px 12px 0px 10px",
         }}
       >
-        <div style={{ borderRadius: "8px", overflow: "hidden", background: "#121212", flexShrink: 0, display: "flex", flexDirection: "column", height: "100%" }}>
-          <Sidebar />
+        <div
+          style={{
+            borderRadius: "12px 12px 0 0",
+            paddingTop: 0,
+
+            overflow: "hidden",
+            background: "#121212",
+            flexShrink: 0,
+            display: "flex",
+            flexDirection: "column",
+            height: "100%",
+          }}
+        >
+          <LeftPanel />
         </div>
 
-        <div style={{ borderRadius: "8px", overflow: "hidden", background: "#121212", minWidth: 0, height: "100%", display: "flex" }}>
+        <div
+          style={{
+            borderRadius: "12px",
+            overflow: "hidden",
+            background: "#121212",
+            minWidth: 0,
+            height: "100%",
+            display: "flex",
+            flex: 1,
+          }}
+        >
           {children}
         </div>
 
-        <div style={{ borderRadius: "8px", overflow: "hidden", background: "#121212", flexShrink: 0, display: "flex", flexDirection: "column", height: "100%" }}>
+        <div
+          style={{
+            borderRadius: "12px",
+            overflow: "hidden",
+            background: "#121212",
+            flexShrink: 0,
+            display: "flex",
+            flexDirection: "column",
+            height: "100%",
+          }}
+        >
           <RightPanel />
         </div>
       </div>

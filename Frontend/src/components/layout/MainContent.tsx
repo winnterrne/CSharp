@@ -455,19 +455,15 @@ const MainContent = () => {
       <style>{`@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }`}</style>
 
       <main
-        style={{
-          background: "linear-gradient(180deg, #1a1a2e 0%, #121212 300px)",
-          height: "100%",
-          color: "#fff",
-          fontFamily:
-            "'Circular', 'Helvetica Neue', Helvetica, Arial, sans-serif",
-          overflowY: "auto",
-          overflowX: "hidden",
-          padding: "24px",
-          scrollbarWidth: "thin",
-          scrollbarColor: "#555 transparent",
-        }}
-      >
+  style={{
+    flex: 1,
+    width: "100%",
+    height: "100%",
+    overflowY: "auto",
+    padding: "30px",
+    background: "linear-gradient(180deg, #1a1a2e 0%, #121212 300px)",
+  }}
+>
         {/* Tab Bar */}
         <div style={{ display: "flex", gap: "8px", marginBottom: "24px" }}>
           {tabs.map((tab) => (

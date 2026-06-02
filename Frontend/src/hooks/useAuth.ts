@@ -3,6 +3,10 @@ import { AuthContext } from "../contexts/AuthContext";
 
 export const useAuth = () => {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth phải dùng trong AuthProvider");
+
+  if (!ctx) {
+    throw new Error("useAuth phải dùng trong AuthProvider");
+  }
+
   return ctx;
 };

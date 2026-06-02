@@ -1,10 +1,12 @@
-// src/hooks/usePlayer.ts
 import { useContext } from "react";
 import { PlayerContext } from "../contexts/PlayerContext";
-import type { PlayerContextType } from "../contexts/PlayerContext";
 
-export const usePlayer = (): PlayerContextType => {
+export const usePlayer = () => {
   const ctx = useContext(PlayerContext);
-  if (!ctx) throw new Error("usePlayer phải dùng trong <PlayerProvider>");
+
+  if (!ctx) {
+    throw new Error("usePlayer phải dùng trong PlayerProvider");
+  }
+
   return ctx;
 };

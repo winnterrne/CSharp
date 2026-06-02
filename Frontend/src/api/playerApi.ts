@@ -1,6 +1,30 @@
 import api from "./axios";
 
 export const playerApi = {
-  getQueue: () => api.get("/player/queue"),
-  getArtists: (trackId: string) => api.get(`/tracks/${trackId}/artists`),
+  getCurrentTrack: () =>
+    api.get("/player/current"),
+
+  play: (trackId: number) =>
+    api.post("/player/play", {
+      trackId,
+    }),
+
+  pause: () =>
+    api.post("/player/pause"),
+
+  next: () =>
+    api.post("/player/next"),
+
+  previous: () =>
+    api.post("/player/previous"),
+
+  seek: (position: number) =>
+    api.post("/player/seek", {
+      position,
+    }),
+
+  setVolume: (volume: number) =>
+    api.post("/player/volume", {
+      volume,
+    }),
 };
