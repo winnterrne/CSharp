@@ -18,3 +18,18 @@ public record AuthResponseDTO (
     string Role,
     string Token
 );
+
+public record UserProfileDTO (
+    string UserID, 
+    string? UserName, 
+    string? UserImage,
+    string? Email, 
+    string? Role,
+    string? Phone
+);
+
+public record UpdateProfileDTO (
+    string? UserName,
+    string? UserImage,
+    string? Phone
+);
