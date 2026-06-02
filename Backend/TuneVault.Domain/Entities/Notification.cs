@@ -13,6 +13,7 @@ namespace TuneVault.Domain.Entities
         public string? Payload{get; set;}
         public bool? IsRead{get; set;}
         public required string UserID{get; set;} //Foreign Key to AspNetUsers
+        public DateTime? NoticedAT{get; set;}
         public bool? IsDeleted{get; set;}
     }
 }
