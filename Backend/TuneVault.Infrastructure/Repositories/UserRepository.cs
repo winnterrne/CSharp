@@ -33,7 +33,10 @@ namespace TuneVault.Infrastructure.Repositories
         public async Task<bool> EmailExistsAsync(string email)
         {
             string sql = "SELECT COUNT(1) FROM AspNetUsers WHERE Email = @Email AND IsDeleted = 0";
-            int count = await _db.LoadDataSingleAsync<int>(sql, new {Email = email});
+            int count = await _db.LoadDataSingleAsync<int>(
+                sql,
+                new {Email = email}
+            );
             return count>0;
         }
 
@@ -90,11 +93,26 @@ namespace TuneVault.Infrastructure.Repositories
         // XÓA MỀM TÀI KHOẢN
         public async Task<int> DeleteUserAsync(string userId)
         {
-            string sql = @"UPDATE AspNetUsers 
+            string sql = @"UPDATE TuneVault.AspNetUsers 
                            SET IsDeleted = 1
                            WHERE UserID = @UserID";
                            
             return await _db.ExecuteDataAsync(sql, new { UserID = userId });
+        }
+
+        public async Task<AspNetUsers?> GetProfileAsync(string userID) {
+            string sql = @"SELECT * UserID, UserName, UserImage, Email, Phone, Role
+                            FROM TuneVault.AspNetUsers
+                            WHERE UserID = @UserID";
+            return await _db.LoadDataSingleAsync<AspNetUsers> (sql, new {UserID = userID});
+        }
+        public async Task<int> UpdateProfileAsync(AspNetUsers user) {
+            string sql = @"UPDATE TuneVault.AspNetUsers
+                            SET UserName = @UserName,
+                                UserImage = @UserImage,
+                                Phone = @Phone,
+                            WHERE UserID = @UserID";
+            return await _db.ExecuteDataAsync(sql, user);
         }
     }
 }
