@@ -62,7 +62,7 @@ CREATE TABLE Notification(
     Payload NVARCHAR(MAX), 
     IsRead BIT DEFAULT 0,
     UserID NVARCHAR(450) FOREIGN KEY REFERENCES AspNetUsers(UserID),
-    CreatedAt NoticedAt DEFAULT GETDATE(),
+    NoticedAt DATETIME DEFAULT GETDATE(),
     IsDeleted BIT NOT NULL CONSTRAINT DF_Artist_IsDeleted DEFAULT(0)
 );
 
