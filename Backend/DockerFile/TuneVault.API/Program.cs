@@ -10,6 +10,7 @@ using TuneVault.Application.Validators;
 using TuneVault.Domain.Interfaces;
 using TuneVault.Infrastructure.Auth;
 using TuneVault.Infrastructure.Dapper;
+using TuneVault.Infrastructure.FileStorage;
 using TuneVault.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -28,8 +29,10 @@ builder.Services.AddScoped<IInteractionRepository, InteractionRepository>();
 builder.Services.AddScoped<IShareRepository, ShareRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 
+
 // ── JWT Service ───────────────────────────────────────
 builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
 
 // ── MediatR ───────────────────────────────────────────
 builder.Services.AddMediatR(cfg =>
@@ -75,6 +78,12 @@ builder.Services.AddCors(options =>
     });
 });
 
+// ── File Upload ───────────────────────────────────────
+builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(opt =>
+{
+    opt.MultipartBodyLengthLimit = 500 * 1024 * 1024; // 500MB
+});
+
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -85,6 +94,7 @@ var app = builder.Build();
 // ── Middleware Pipeline ───────────────────────────────
 app.UseSwagger();
 app.UseSwaggerUI();
+app.UseStaticFiles();         // ← serve file mp3/mp4
 app.UseCors("AllowReact");    // ← phải trước Authentication
 app.UseAuthentication();      // ← phải trước Authorization
 app.UseAuthorization();
