@@ -9,7 +9,6 @@
   <ItemGroup>
     <ProjectReference Include="..\TuneVault.Application\TuneVault.Application.csproj" />
     <ProjectReference Include="..\TuneVault.Domain\TuneVault.Domain.csproj" />
-    <ProjectReference Include="..\TuneVault.Infrastructure\TuneVault.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -21,6 +20,8 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.2.0" />
   </ItemGroup>
 
-  
+  <ItemGroup>
+    <ProjectReference Include="..\TuneVault.Infrastructure\TuneVault.Infrastructure.csproj" />
+  </ItemGroup>
 
 </Project>

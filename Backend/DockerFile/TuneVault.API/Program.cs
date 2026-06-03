@@ -19,6 +19,14 @@ builder.Services.AddSingleton<DataContextDapper>();
 
 // ── Repositories ──────────────────────────────────────
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+// Register other repositories required by application handlers
+builder.Services.AddScoped<IMediaItemRepository, MediaItemRepository>();
+builder.Services.AddScoped<IAlbumRepository, AlbumRepository>();
+builder.Services.AddScoped<IArtistRepository, ArtistRepository>();
+builder.Services.AddScoped<IPlaylistRepository, PlaylistRepository>();
+builder.Services.AddScoped<IInteractionRepository, InteractionRepository>();
+builder.Services.AddScoped<IShareRepository, ShareRepository>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 
 // ── JWT Service ───────────────────────────────────────
 builder.Services.AddScoped<IJwtService, JwtService>();
