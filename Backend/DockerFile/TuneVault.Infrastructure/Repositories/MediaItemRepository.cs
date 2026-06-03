@@ -14,13 +14,20 @@ public class MediaItemRepository : IMediaItemRepository
     public async Task<MediaItem> GetMediaByIdAsync(int mediaId)
     {
         string sql = @"SELECT * FROM MediaItem WHERE MediaItemID = @MediaItemID AND IsDeleted = 0";
-        return await _db.LoadDataSingleAsync<MediaItem>(sql, new { MediaItem = mediaId});
+        return await _db.LoadDataSingleAsync<MediaItem>(sql, new { MediaItemID = mediaId});
     }
     // Query trả về 1 list dữ liệu 
     public async Task<IEnumerable<MediaItem>> GetAllMediaAsync()
     {
         string sql = @"SELECT * FROM MediaItem WHERE IsDeleted = 0";
         return await _db.LoadAllDataSingleAsync<MediaItem>(sql);
+    }
+
+    public async Task<IEnumerable<MediaItem>> GetMediaByUserIdAsync(string userID) {
+        string sql = @"SELECT * FROM MediaItem 
+                    WHERE UserID = @UserID AND IsDeleted = 0
+                    ORDER BY UploadAt DESC";
+        return await _db.LoadAllDataSingleAsync<MediaItem> (sql, new {UserID = userID});
     }
     // Query tra ve 1 list ten bai hat 
     public async Task<IEnumerable<MediaItem>> SearchMediaByNameAsync(string keyword)
@@ -33,7 +40,7 @@ public class MediaItemRepository : IMediaItemRepository
     {
         string sql = @"INSERT INTO MediaItem (TitleName, MediaItemImage, filePath, MediaItemTag, MediaItemType, Duration, UploadAT, Description, ArtistID, AlbumID, UserID, IsDeleted )
                      OUTPUT INSERTED.MediaItemID   
-                     VALUES (@TitleName, @MediaItemImage, @filePath, @MediaItemTag, @MediaItemType, @Duration, @UploadAT, @Description, @ArtistID, @AlbumID, @UserID,0 )";
+                     VALUES (@TitleName, @MediaItemImage, @filePath, @MediaTag, @MediaType, @Duration, @UploadAt, @Description, @ArtistID, @AlbumID, @UserID,0 )";
         return await _db.ExecuteScalarAsync<int>(sql, media);
     }
     // 
@@ -58,13 +65,13 @@ public class MediaItemRepository : IMediaItemRepository
         string sql = @"UPDATE MediaItem
                         SET IsDeleted = 1
                         Where MediaItemID = @MediaItemID";
-        return await _db.ExecuteDataAsync(sql, new {MediaItem = mediaId});
+        return await _db.ExecuteDataAsync(sql, new {MediaItemID = mediaId});
     }
     // Update file nhac     
     public async Task<int> UpdateMediaItemFilePath(int mediaID, string newfilePath)
     {
         string sql = @"UPDATE MediaItem SET filePath = @filePath WHERE MediaItemID = @MediaItemID AND IsDeleted = 0";
-        return await _db.ExecuteDataAsync(sql, new {MediaItem = mediaID,  filePath = newfilePath});
+        return await _db.ExecuteDataAsync(sql, new {MediaItemID = mediaID,  filePath = newfilePath});
 
     }
     public async Task<MediaItem> GetMediaInfoAsync(int mediaId)
@@ -74,7 +81,7 @@ public class MediaItemRepository : IMediaItemRepository
                         FROM MediaItem m
                         JOIN Artist a ON m.ArtistID = a.ArtistID
                         WHERE m.MediaItemID = @Id AND m.IsDeleted = 0";
-        return await _db.LoadDataSingleAsync<MediaItem>(sql, new { MediaItem = mediaId});
+        return await _db.LoadDataSingleAsync<MediaItem>(sql, new { MediaItemID = mediaId});
     }
 
 

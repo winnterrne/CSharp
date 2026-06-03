@@ -14,12 +14,12 @@ namespace TuneVault.Domain.Entities
         public string? MediaType{get; set;}
         public string? MediaTag{get; set;}
         public int? Duration{get; set;}
-        public DateTime? UploadAt{get; set;}
+        public DateTime UploadAt{get; set;}
         public string? Description{get; set;}
-        public required string UserID{get; set;} //Foreign Key to AspNetUsers
-        public required int AlbumID{get; set;} //Foreign Key to Album
-        public required int ArtistID{get; set;} //Foreign Key to Artist
+        public required string? UserID{get; set;} //Foreign Key to AspNetUsers
+        public required int? AlbumID{get; set;} //Foreign Key to Album
+        public required int? ArtistID{get; set;} //Foreign Key to Artist
         public string? ArtistName { get; set; }
-        public bool? IsDeleted{get; set;}
+        public bool IsDeleted{get; set;} = false;
     }
 }

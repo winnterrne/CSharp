@@ -7,7 +7,7 @@ using TuneVault.Application.UseCases.User;
 namespace TuneVault.API.Controllers;
 
 [ApiController]
-[Route("api/controller")]
+[Route("api/[controller]")]
 public class UserController : ControllerBase
 {
     private readonly IMediator _mediator;
