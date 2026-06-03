@@ -9,6 +9,8 @@ namespace TuneVault.Domain.Interfaces
     {
         public Task<MediaItem> GetMediaByIdAsync(int mediaId);
         public Task<IEnumerable<MediaItem>> GetAllMediaAsync();
+
+        public Task<IEnumerable<MediaItem>> GetMediaByUserIdAsync(string userId);
         
         // Chức năng 7: Tìm kiếm theo tên bài hát
         public Task<IEnumerable<MediaItem>> SearchMediaByNameAsync(string keyword); 

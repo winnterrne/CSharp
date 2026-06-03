@@ -101,7 +101,7 @@ namespace TuneVault.Infrastructure.Repositories
         }
 
         public async Task<AspNetUsers?> GetProfileAsync(string userID) {
-            string sql = @"SELECT * UserID, UserName, UserImage, Email, Phone, Role
+            string sql = @"SELECT UserID, UserName, UserImage, Email, Phone, Role 
                             FROM AspNetUsers
                             WHERE UserID = @UserID";
             return await _db.LoadDataSingleAsync<AspNetUsers> (sql, new {UserID = userID});
