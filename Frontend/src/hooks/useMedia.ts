@@ -1,48 +1,65 @@
-import { useState, useEffect } from "react";
-import { mediaApi } from "../api/mediaApi";
-
-interface MediaItem {
-  id: number;
-  title: string;
-  color: string;
-  emoji: string;
-}
-
-interface AlbumCard {
-  id: number;
-  title: string;
-  artist: string;
-  color: string;
-  tag?: string;
-}
+import { useCallback } from "react";
+import { mediaStore } from "../store/mediaStore";
+import type { Media } from "../types/media";
 
 export const useMedia = () => {
-  const [recommended, setRecommended] = useState<MediaItem[]>([]);
-  const [forYou, setForYou]           = useState<AlbumCard[]>([]);
-  const [upcoming, setUpcoming]       = useState<AlbumCard[]>([]);
-  const [loading, setLoading]         = useState(true);
-  const [error, setError]             = useState<string | null>(null);
+  const recommended = mediaStore((state) => state.recommended);
+  const forYou = mediaStore((state) => state.forYou);
+  const upcoming = mediaStore((state) => state.upcoming);
+  const searchResults = mediaStore((state) => state.searchResults);
+  const searchQuery = mediaStore((state) => state.searchQuery);
+  const selectedMedia = mediaStore((state) => state.selectedMedia);
+  const isLoading = mediaStore((state) => state.isLoading);
+  const error = mediaStore((state) => state.error);
 
-  useEffect(() => {
-    const fetchAll = async () => {
-      try {
-        setLoading(true);
-        const [rec, fy, up] = await Promise.all([
-          mediaApi.getRecommended(),
-          mediaApi.getForYou(),
-          mediaApi.getUpcoming(),
-        ]);
-        setRecommended(rec.data);
-        setForYou(fy.data);
-        setUpcoming(up.data);
-      } catch {
-        setError("Không thể tải dữ liệu");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchAll();
+  const setRecommended = useCallback((media: Media[]) => {
+    mediaStore.getState().setRecommended(media);
   }, []);
 
-  return { recommended, forYou, upcoming, loading, error };
+  const setForYou = useCallback((media: Media[]) => {
+    mediaStore.getState().setForYou(media);
+  }, []);
+
+  const setUpcoming = useCallback((media: Media[]) => {
+    mediaStore.getState().setUpcoming(media);
+  }, []);
+
+  const setSearchResults = useCallback((results: Media[], query: string) => {
+    mediaStore.getState().setSearchResults(results, query);
+  }, []);
+
+  const setSelectedMedia = useCallback((media: Media | null) => {
+    mediaStore.getState().setSelectedMedia(media);
+  }, []);
+
+  const setLoading = useCallback((loading: boolean) => {
+    mediaStore.getState().setLoading(loading);
+  }, []);
+
+  const setError = useCallback((error: string | null) => {
+    mediaStore.getState().setError(error);
+  }, []);
+
+  const clear = useCallback(() => {
+    mediaStore.getState().clear();
+  }, []);
+
+  return {
+    recommended,
+    forYou,
+    upcoming,
+    searchResults,
+    searchQuery,
+    selectedMedia,
+    isLoading,
+    error,
+    setRecommended,
+    setForYou,
+    setUpcoming,
+    setSearchResults,
+    setSelectedMedia,
+    setLoading,
+    setError,
+    clear,
+  };
 };

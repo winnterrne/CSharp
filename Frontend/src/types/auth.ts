@@ -1,9 +1,16 @@
 export interface User {
-  id: string;
+  id: number;
   username: string;
   email: string;
   avatarUrl?: string;
-  role: "user" | "admin";
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface AuthTokens {
+  accessToken: string;
+  refreshToken?: string;
+  expiresIn?: number;
 }
 
 export interface LoginRequest {
@@ -17,7 +24,15 @@ export interface RegisterRequest {
   password: string;
 }
 
-export interface AuthResponse {
-  token: string;
+export interface LoginResponse {
   user: User;
+  accessToken: string;
+  refreshToken?: string;
+}
+
+export interface AuthState {
+  user: User | null;
+  token: string | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
 }

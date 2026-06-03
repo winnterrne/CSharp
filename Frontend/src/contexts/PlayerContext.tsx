@@ -1,28 +1,39 @@
-// src/contexts/PlayerContext.tsx
 import { createContext } from "react";
-import type { Track } from "../types/media";
+import type { Media } from "../types/media";
+import type { RepeatMode } from "../types/player";
 
 export interface PlayerContextType {
-  // state
-  currentTrack: Track | null;
-  queue: Track[];
+  // State
+  currentTrack: Media | null;
+  queue: Media[];
   isPlaying: boolean;
-  progress: number;   // 0–100
-  volume: number;     // 0–100
-  shuffle: boolean;
-  repeat: boolean;
-  liked: boolean;
-  // actions
-  playTrack: (track: Track) => void;
-  setQueue: (tracks: Track[]) => void;
+  position: number; // seconds
+  duration: number; // seconds
+  volume: number; // 0–100
+  isMuted: boolean;
+  isShuffle: boolean;
+  repeatMode: RepeatMode;
+  isLoading: boolean;
+
+  // Actions
+  playTrack: (track: Media) => void;
+  setQueue: (tracks: Media[]) => void;
   togglePlay: () => void;
-  seek: (pct: number) => void;
-  setVolume: (pct: number) => void;
+  play: () => void;
+  pause: () => void;
+  seek: (position: number) => void;
+  setDuration: (duration: number) => void;
+  setVolume: (volume: number) => void;
+  setMuted: (muted: boolean) => void;
   toggleShuffle: () => void;
-  toggleRepeat: () => void;
-  toggleLike: () => void;
-  prev: () => void;
+  toggleRepeatMode: () => void;
   next: () => void;
+  previous: () => void;
+  addToQueue: (track: Media) => void;
+  removeFromQueue: (trackId: string) => void;
+  clearQueue: () => void;
 }
 
-export const PlayerContext = createContext<PlayerContextType | null>(null);
+export const PlayerContext = createContext<PlayerContextType | undefined>(
+  undefined,
+);

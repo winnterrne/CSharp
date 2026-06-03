@@ -1,43 +1,71 @@
-import { useEffect, useState } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { useDebounce } from "./useDebounce";
 import { mediaApi } from "../api/mediaApi";
+import { mediaStore } from "../store/mediaStore";
+import type { Media } from "../types/media";
 
-export interface SearchResult {
-  id: number;
-  title: string;
-  artist?: string;
-  artistName?: string;
-  thumbnail?: string;
-  coverUrl?: string;
-  imageUrl?: string;
-}
+export const useSearch = () => {
+  const [query, setQuery] = useState("");
+  const debouncedQuery = useDebounce(query, 300);
 
-export const useSearch = (keyword: string) => {
-  const [results, setResults] = useState<SearchResult[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
+  const searchResults = mediaStore((state) => state.searchResults);
+  const isLoading = mediaStore((state) => state.isLoading);
+  const error = mediaStore((state) => state.error);
 
+  // Auto-search khi debouncedQuery thay đổi
   useEffect(() => {
-    const fetchData = async () => {
-      if (!keyword.trim()) {
-        setResults([]);
-        return;
-      }
+    if (!debouncedQuery.trim()) {
+      mediaStore.getState().setSearchResults([], "");
+      return;
+    }
+    runSearch(debouncedQuery);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedQuery]);
 
-      try {
-        setLoading(true);
-        setError(false);
+  const runSearch = useCallback(async (searchQuery: string) => {
+    if (!searchQuery.trim()) return;
 
-        const res = await mediaApi.getSearch(keyword);
-        setResults(res.data);
-      } catch {
-        setError(true);
-      } finally {
-        setLoading(false);
-      }
-    };
+    mediaStore.getState().setLoading(true);
+    mediaStore.getState().setError(null);
 
-    fetchData();
-  }, [keyword]);
+    try {
+      const res = await mediaApi.getSearch(searchQuery);
+      const results: Media[] = Array.isArray(res.data)
+        ? res.data
+        : res.data?.items ?? [];
+      mediaStore.getState().setSearchResults(results, searchQuery);
+    } catch (err) {
+      mediaStore
+        .getState()
+        .setError(err instanceof Error ? err.message : "Tìm kiếm thất bại");
+      mediaStore.getState().setSearchResults([], searchQuery);
+    } finally {
+      mediaStore.getState().setLoading(false);
+    }
+  }, []);
 
-  return { results, loading, error };
+  const search = useCallback(
+    (searchQuery: string) => {
+      setQuery(searchQuery);
+      runSearch(searchQuery);
+    },
+    [runSearch]
+  );
+
+  const clearSearch = useCallback(() => {
+    setQuery("");
+    mediaStore.getState().setSearchResults([], "");
+    mediaStore.getState().setError(null);
+  }, []);
+
+  return {
+    query,
+    setQuery,
+    debouncedQuery,
+    searchResults,
+    isLoading,
+    error,
+    search,
+    clearSearch,
+  };
 };

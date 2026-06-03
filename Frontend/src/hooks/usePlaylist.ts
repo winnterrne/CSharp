@@ -1,41 +1,74 @@
-import { useEffect, useState } from "react";
-import { playlistApi } from "../api/playlistApi";
-
-export interface Playlist {
-  id: number;
-  name: string;
-  description?: string;
-  imageUrl?: string;
-  trackCount?: number;
-}
+import { useCallback } from "react";
+import { playlistStore } from "../store/playlistStore";
+import type { Playlist, PlaylistTrack } from "../types/playlist";
 
 export const usePlaylist = () => {
-  const [playlists, setPlaylists] = useState<Playlist[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const myPlaylists = playlistStore((state) => state.myPlaylists);
+  const selectedPlaylist = playlistStore((state) => state.selectedPlaylist);
+  const playlistTracks = playlistStore((state) => state.playlistTracks);
+  const isLoading = playlistStore((state) => state.isLoading);
+  const error = playlistStore((state) => state.error);
 
-  const fetchPlaylists = async () => {
-    try {
-      setLoading(true);
-      setError(false);
+  const setMyPlaylists = useCallback((playlists: Playlist[]) => {
+    playlistStore.getState().setMyPlaylists(playlists);
+  }, []);
 
-      const res = await playlistApi.getMyPlaylists();
-      setPlaylists(res.data);
-    } catch {
-      setError(true);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const addPlaylist = useCallback((playlist: Playlist) => {
+    playlistStore.getState().addPlaylist(playlist);
+  }, []);
 
-  useEffect(() => {
-    fetchPlaylists();
+  const updatePlaylist = useCallback((id: number, playlist: Partial<Playlist>) => {
+    playlistStore.getState().updatePlaylist(id, playlist);
+  }, []);
+
+  const deletePlaylist = useCallback((id: number) => {
+    playlistStore.getState().deletePlaylist(id);
+  }, []);
+
+  const setSelectedPlaylist = useCallback((playlist: Playlist | null) => {
+    playlistStore.getState().setSelectedPlaylist(playlist);
+  }, []);
+
+  const setPlaylistTracks = useCallback((tracks: PlaylistTrack[]) => {
+    playlistStore.getState().setPlaylistTracks(tracks);
+  }, []);
+
+  const addTrackToPlaylist = useCallback((track: PlaylistTrack) => {
+    playlistStore.getState().addTrackToPlaylist(track);
+  }, []);
+
+  const removeTrackFromPlaylist = useCallback((trackId: number) => {
+    playlistStore.getState().removeTrackFromPlaylist(trackId);
+  }, []);
+
+  const setLoading = useCallback((loading: boolean) => {
+    playlistStore.getState().setLoading(loading);
+  }, []);
+
+  const setError = useCallback((error: string | null) => {
+    playlistStore.getState().setError(error);
+  }, []);
+
+  const clear = useCallback(() => {
+    playlistStore.getState().clear();
   }, []);
 
   return {
-    playlists,
-    loading,
+    myPlaylists,
+    selectedPlaylist,
+    playlistTracks,
+    isLoading,
     error,
-    refetch: fetchPlaylists,
+    setMyPlaylists,
+    addPlaylist,
+    updatePlaylist,
+    deletePlaylist,
+    setSelectedPlaylist,
+    setPlaylistTracks,
+    addTrackToPlaylist,
+    removeTrackFromPlaylist,
+    setLoading,
+    setError,
+    clear,
   };
 };

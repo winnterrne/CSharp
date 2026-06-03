@@ -1,18 +1,15 @@
-// src/pages/Home/MainContent.tsx
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { usePlayer } from "../../hooks/usePlayer";
-import { mediaApi } from "../../api/mediaApi";
-import type { Track } from "../../types/media";
+import type { Media } from "../../types/media";
+import { mockTracks } from "../../data/mockTracks";
+import {
+  mockRecommended,
+  mockForYou,
+  mockUpcoming,
+} from "../../data/mockMedia";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-// AlbumCard dùng đúng Track từ backend, không tự định nghĩa lại
-type AlbumCard = Track;
+const getThumb = (track: Media) => track.thumbnailUrl ?? null;
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-const getTrackColor = (track: Track) => track.color ?? "#1a3050";
-const getTrackEmoji = (track: Track) => track.emoji ?? "🎵";
-
-// ─── PlayButton ───────────────────────────────────────────────────────────────
 const PlayButton = ({
   onClick,
 }: {
@@ -49,7 +46,6 @@ const PlayButton = ({
   </button>
 );
 
-// ─── Skeleton ─────────────────────────────────────────────────────────────────
 const SkeletonCard = ({ height = 56 }: { height?: number }) => (
   <div
     style={{
@@ -62,277 +58,6 @@ const SkeletonCard = ({ height = 56 }: { height?: number }) => (
   />
 );
 
-// ─── QuickPlayCard ────────────────────────────────────────────────────────────
-const QuickPlayCard = ({ track }: { track: Track }) => {
-  const [hovered, setHovered] = useState(false);
-  const { playTrack } = usePlayer();
-  const color = getTrackColor(track);
-
-  return (
-    <div
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        background:
-          hovered ?
-            `linear-gradient(135deg, ${color}dd, ${color}99)`
-          : `linear-gradient(135deg, ${color}bb, ${color}66)`,
-        borderRadius: "6px",
-        display: "flex",
-        alignItems: "center",
-        overflow: "hidden",
-        cursor: "pointer",
-        transition: "background 0.2s ease",
-        position: "relative",
-        height: "56px",
-      }}
-    >
-      {/* Thumbnail */}
-      <div
-        style={{
-          width: "56px",
-          height: "56px",
-          background: color,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontSize: "22px",
-          flexShrink: 0,
-          boxShadow: "4px 0 12px rgba(0,0,0,0.3)",
-          overflow: "hidden",
-        }}
-      >
-        {track.albumArt ?
-          <img
-            src={track.albumArt}
-            alt={track.title}
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
-          />
-        : getTrackEmoji(track)}
-      </div>
-
-      <span
-        style={{
-          color: "#fff",
-          fontSize: "13px",
-          fontWeight: 700,
-          padding: "0 12px",
-          flex: 1,
-          lineHeight: 1.3,
-          letterSpacing: "-0.01em",
-          whiteSpace: "nowrap",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-        }}
-      >
-        {track.title}
-      </span>
-
-      <div
-        style={{
-          position: "absolute",
-          right: "12px",
-          opacity: hovered ? 1 : 0,
-          transform: hovered ? "translateY(0)" : "translateY(4px)",
-          transition: "opacity 0.2s, transform 0.2s",
-        }}
-      >
-        <PlayButton
-          onClick={(e) => {
-            e.stopPropagation();
-            playTrack(track);
-          }}
-        />
-      </div>
-    </div>
-  );
-};
-
-// ─── AlbumCardLarge ───────────────────────────────────────────────────────────
-const AlbumCardLarge = ({ track }: { track: AlbumCard }) => {
-  const [hovered, setHovered] = useState(false);
-  const { playTrack } = usePlayer();
-  const color = getTrackColor(track);
-
-  return (
-    <div
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        background: hovered ? "#282828" : "#181818",
-        borderRadius: "8px",
-        padding: "16px",
-        cursor: "pointer",
-        transition: "background 0.2s ease",
-        position: "relative",
-        minWidth: "180px",
-      }}
-    >
-      {/* Cover */}
-      <div
-        style={{
-          width: "100%",
-          paddingBottom: "100%",
-          borderRadius: "4px",
-          background:
-            track.albumArt ? "transparent" : (
-              `linear-gradient(135deg, ${color}, ${color}88)`
-            ),
-          position: "relative",
-          marginBottom: "12px",
-          boxShadow: "0 8px 24px rgba(0,0,0,0.5)",
-          overflow: "hidden",
-        }}
-      >
-        {track.albumArt ?
-          <img
-            src={track.albumArt}
-            alt={track.title}
-            style={{
-              position: "absolute",
-              inset: 0,
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-            }}
-          />
-        : <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexDirection: "column",
-              gap: "4px",
-            }}
-          >
-            <div
-              style={{
-                fontSize: "13px",
-                fontWeight: 900,
-                color: "rgba(255,255,255,0.9)",
-                letterSpacing: "0.1em",
-                textAlign: "center",
-                padding: "0 12px",
-                lineHeight: 1.2,
-                textTransform: "uppercase",
-              }}
-            >
-              {track.title}
-            </div>
-            <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)" }}>
-              {track.artist}
-            </div>
-          </div>
-        }
-
-        <div
-          style={{
-            position: "absolute",
-            bottom: "8px",
-            right: "8px",
-            opacity: hovered ? 1 : 0,
-            transform: hovered ? "translateY(0)" : "translateY(8px)",
-            transition: "opacity 0.2s, transform 0.2s",
-          }}
-        >
-          <PlayButton
-            onClick={(e) => {
-              e.stopPropagation();
-              playTrack(track);
-            }}
-          />
-        </div>
-      </div>
-
-      <div
-        style={{
-          color: "#fff",
-          fontSize: "14px",
-          fontWeight: 700,
-          marginBottom: "4px",
-          whiteSpace: "nowrap",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-        }}
-      >
-        {track.title}
-      </div>
-      <div style={{ color: "#b3b3b3", fontSize: "12px" }}>{track.artist}</div>
-    </div>
-  );
-};
-
-// ─── SectionHeader ────────────────────────────────────────────────────────────
-const SectionHeader = ({
-  label,
-  title,
-  onShowAll,
-}: {
-  label?: string;
-  title: string;
-  onShowAll?: () => void;
-}) => (
-  <div
-    style={{
-      display: "flex",
-      alignItems: label ? "flex-start" : "center",
-      justifyContent: "space-between",
-      marginBottom: label ? "4px" : "16px",
-    }}
-  >
-    <div>
-      {label && (
-        <p
-          style={{
-            color: "#b3b3b3",
-            fontSize: "12px",
-            margin: "0 0 2px",
-            textTransform: "uppercase",
-            letterSpacing: "0.08em",
-            fontWeight: 600,
-          }}
-        >
-          {label}
-        </p>
-      )}
-      <h2
-        style={{
-          fontSize: "22px",
-          fontWeight: 700,
-          color: "#fff",
-          margin: label ? "0 0 16px" : 0,
-          letterSpacing: "-0.02em",
-        }}
-      >
-        {title}
-      </h2>
-    </div>
-    {onShowAll && (
-      <button
-        onClick={onShowAll}
-        style={{
-          background: "none",
-          border: "none",
-          color: "#b3b3b3",
-          fontSize: "13px",
-          fontWeight: 700,
-          cursor: "pointer",
-          letterSpacing: "0.05em",
-          textTransform: "uppercase",
-          transition: "color 0.15s",
-        }}
-        onMouseEnter={(e) => (e.currentTarget.style.color = "#fff")}
-        onMouseLeave={(e) => (e.currentTarget.style.color = "#b3b3b3")}
-      >
-        Hiện tất cả
-      </button>
-    )}
-  </div>
-);
-
-// ─── Error Message ────────────────────────────────────────────────────────────
 const ErrorMsg = ({ onRetry }: { onRetry: () => void }) => (
   <div
     style={{
@@ -362,86 +87,308 @@ const ErrorMsg = ({ onRetry }: { onRetry: () => void }) => (
   </div>
 );
 
-// ─── Main Component ───────────────────────────────────────────────────────────
+const QuickPlayCard = ({
+  track,
+  tracks,
+}: {
+  track: Media;
+  tracks: Media[];
+}) => {
+  const [hovered, setHovered] = useState(false);
+  const { playTrack, setQueue } = usePlayer();
+  const thumb = getThumb(track);
+
+  return (
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        background: hovered ? "#2a2a2a" : "#181818",
+        borderRadius: "6px",
+        display: "flex",
+        alignItems: "center",
+        overflow: "hidden",
+        cursor: "pointer",
+        transition: "background 0.2s ease",
+        position: "relative",
+        height: "56px",
+      }}
+    >
+      <div
+        style={{
+          width: "56px",
+          height: "56px",
+          background: "#2a2a2a",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: "22px",
+          flexShrink: 0,
+          boxShadow: "4px 0 12px rgba(0,0,0,0.3)",
+          overflow: "hidden",
+        }}
+      >
+        {thumb ? (
+          <img
+            src={thumb}
+            alt={track.title}
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          />
+        ) : (
+          "🎵"
+        )}
+      </div>
+
+      <span
+        style={{
+          color: "#fff",
+          fontSize: "13px",
+          fontWeight: 700,
+          padding: "0 12px",
+          flex: 1,
+          lineHeight: 1.3,
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+        }}
+      >
+        {track.title}
+      </span>
+
+      <div
+        style={{
+          position: "absolute",
+          right: "12px",
+          opacity: hovered ? 1 : 0,
+          transform: hovered ? "translateY(0)" : "translateY(4px)",
+          transition: "opacity 0.2s, transform 0.2s",
+        }}
+      >
+        {/* QUEUE */}
+        <PlayButton
+          onClick={(e) => {
+            e.stopPropagation();
+            setQueue(tracks);
+            playTrack(track);
+          }}
+        />
+      </div>
+    </div>
+  );
+};
+
+const AlbumCardLarge = ({
+  track,
+  tracks,
+}: {
+  track: Media;
+  tracks: Media[];
+}) => {
+  const [hovered, setHovered] = useState(false);
+  const { playTrack, setQueue } = usePlayer();
+  const thumb = getThumb(track);
+
+  return (
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        background: hovered ? "#282828" : "#181818",
+        borderRadius: "8px",
+        padding: "16px",
+        cursor: "pointer",
+        transition: "background 0.2s ease",
+        position: "relative",
+      }}
+    >
+      <div
+        style={{
+          width: "100%",
+          paddingBottom: "100%",
+          borderRadius: "4px",
+          background: "#2a2a2a",
+          position: "relative",
+          marginBottom: "12px",
+          boxShadow: "0 8px 24px rgba(0,0,0,0.5)",
+          overflow: "hidden",
+        }}
+      >
+        {thumb ? (
+          <img
+            src={thumb}
+            alt={track.title}
+            style={{
+              position: "absolute",
+              inset: 0,
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+            }}
+          />
+        ) : (
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "40px",
+            }}
+          >
+            🎵
+          </div>
+        )}
+
+        <div
+          style={{
+            position: "absolute",
+            bottom: "8px",
+            right: "8px",
+            opacity: hovered ? 1 : 0,
+            transform: hovered ? "translateY(0)" : "translateY(8px)",
+            transition: "opacity 0.2s, transform 0.2s",
+          }}
+        >
+          {/* QUEUE */}
+          <PlayButton
+            onClick={(e) => {
+              e.stopPropagation();
+              setQueue(tracks);
+              playTrack(track);
+            }}
+          />
+        </div>
+      </div>
+
+      <div
+        style={{
+          color: "#fff",
+          fontSize: "14px",
+          fontWeight: 700,
+          marginBottom: "4px",
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+        }}
+      >
+        {track.title}
+      </div>
+
+      <div style={{ color: "#b3b3b3", fontSize: "12px" }}>
+        {track.artist.name}
+      </div>
+    </div>
+  );
+};
+
+const SectionHeader = ({
+  label,
+  title,
+  onShowAll,
+}: {
+  label?: string;
+  title: string;
+  onShowAll?: () => void;
+}) => (
+  <div
+    style={{
+      display: "flex",
+      alignItems: label ? "flex-start" : "center",
+      justifyContent: "space-between",
+      marginBottom: "16px",
+    }}
+  >
+    <div>
+      {label && (
+        <p
+          style={{
+            color: "#b3b3b3",
+            fontSize: "12px",
+            fontWeight: 700,
+            textTransform: "uppercase",
+            letterSpacing: "0.08em",
+            marginBottom: "2px",
+          }}
+        >
+          {label}
+        </p>
+      )}
+
+      <h2
+        style={{
+          color: "#fff",
+          fontSize: "22px",
+          fontWeight: 700,
+          letterSpacing: "-0.02em",
+        }}
+      >
+        {title}
+      </h2>
+    </div>
+
+    {onShowAll && (
+      <button
+        onClick={onShowAll}
+        style={{
+          background: "none",
+          border: "none",
+          color: "#b3b3b3",
+          fontSize: "13px",
+          fontWeight: 700,
+          cursor: "pointer",
+          letterSpacing: "0.05em",
+          textTransform: "uppercase",
+          transition: "color 0.15s",
+        }}
+        onMouseEnter={(e) => (e.currentTarget.style.color = "#fff")}
+        onMouseLeave={(e) => (e.currentTarget.style.color = "#b3b3b3")}
+      >
+        Hiện tất cả
+      </button>
+    )}
+  </div>
+);
+
 const MainContent = () => {
+  const { playTrack, setQueue } = usePlayer();
+
   const [activeTab, setActiveTab] = useState<"all" | "music" | "podcast">(
     "all",
   );
 
-  const [recommended, setRecommended] = useState<Track[]>([]);
-  const [forYou, setForYou] = useState<Track[]>([]);
-  const [upcoming, setUpcoming] = useState<Track[]>([]);
+  // NEW: quản lý màn hình hiện tất cả
+  const [viewMode, setViewMode] = useState<
+    "home" | "recommended" | "upcoming" | "forYou"
+  >("home");
 
-  const [loadingRec, setLoadingRec] = useState(true);
-  const [loadingFY, setLoadingFY] = useState(true);
-  const [loadingUp, setLoadingUp] = useState(true);
+  const [recommended, setRecommended] = useState<Media[]>([]);
+  const [forYou, setForYou] = useState<Media[]>([]);
+  const [upcoming, setUpcoming] = useState<Media[]>([]);
 
+  const [loading, setLoading] = useState(true);
   const [errorRec, setErrorRec] = useState(false);
   const [errorFY, setErrorFY] = useState(false);
   const [errorUp, setErrorUp] = useState(false);
 
-  const fetchRecommended = async () => {
-    setLoadingRec(true);
+  const fetchAll = useCallback(async () => {
+    setLoading(true);
     setErrorRec(false);
-    try {
-      const res = await mediaApi.getRecommended();
-      setRecommended(res.data);
-    } catch {
-      setErrorRec(true);
-    } finally {
-      setLoadingRec(false);
-    }
-  };
-
-  const fetchForYou = async () => {
-    setLoadingFY(true);
     setErrorFY(false);
-    try {
-      const res = await mediaApi.getForYou();
-      setForYou(res.data);
-    } catch {
-      setErrorFY(true);
-    } finally {
-      setLoadingFY(false);
-    }
-  };
-
-  const fetchUpcoming = async () => {
-    setLoadingUp(true);
     setErrorUp(false);
-    try {
-      const res = await mediaApi.getUpcoming();
-      setUpcoming(res.data);
-    } catch {
-      setErrorUp(true);
-    } finally {
-      setLoadingUp(false);
-    }
-  };
+
+    // NEW: mock data khi chưa có backend
+    setTimeout(() => {
+      setRecommended(mockRecommended);
+      setForYou(mockForYou);
+      setUpcoming(mockUpcoming);
+      setLoading(false);
+    }, 500);
+  }, []);
 
   useEffect(() => {
-  const loadData = async () => {
-    try {
-      const [rec, fy, up] = await Promise.all([
-        mediaApi.getRecommended(),
-        mediaApi.getForYou(),
-        mediaApi.getUpcoming(),
-      ]);
-
-      setRecommended(rec.data);
-      setForYou(fy.data);
-      setUpcoming(up.data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoadingRec(false);
-      setLoadingFY(false);
-      setLoadingUp(false);
-    }
-  };
-
-  loadData();
-}, []);
+    fetchAll();
+  }, [fetchAll]);
 
   const tabs = [
     { key: "all", label: "Tất cả" },
@@ -449,134 +396,255 @@ const MainContent = () => {
     { key: "podcast", label: "Podcasts" },
   ] as const;
 
+  // NEW: dữ liệu cho màn hình hiện tất cả
+  const getFullViewData = () => {
+    if (viewMode === "recommended") {
+      return {
+        title: "Đề xuất cho bạn",
+        tracks: recommended,
+      };
+    }
+
+    if (viewMode === "upcoming") {
+      return {
+        title: "Bản phát hành sắp ra mắt",
+        tracks: upcoming,
+      };
+    }
+
+    if (viewMode === "forYou") {
+      return {
+        title: "Dành cho bạn",
+        tracks: forYou,
+      };
+    }
+
+    return {
+      title: "",
+      tracks: [],
+    };
+  };
+
+  const fullViewData = getFullViewData();
+
   return (
     <>
-      {/* shimmer keyframe */}
       <style>{`@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }`}</style>
 
       <main
-  style={{
-    flex: 1,
-    width: "100%",
-    height: "100%",
-    overflowY: "auto",
-    padding: "30px",
-    background: "linear-gradient(180deg, #1a1a2e 0%, #121212 300px)",
-  }}
->
-        {/* Tab Bar */}
-        <div style={{ display: "flex", gap: "8px", marginBottom: "24px" }}>
-          {tabs.map((tab) => (
+        style={{
+          flex: 1,
+          width: "100%",
+          height: "100%",
+          minHeight: 0,
+          overflowY: "auto",
+          overflowX: "hidden",
+          padding: "30px",
+          paddingBottom: "120px",
+          boxSizing: "border-box",
+          background: "linear-gradient(180deg, #1a1a2e 0%, #121212 300px)",
+        }}
+      >
+        {/* NEW: màn hình hiện tất cả */}
+        {viewMode !== "home" && (
+          <>
             <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
+              onClick={() => setViewMode("home")}
               style={{
-                background: activeTab === tab.key ? "#fff" : "#2a2a2a",
-                color: activeTab === tab.key ? "#000" : "#fff",
+                marginBottom: "20px",
+                background: "#2a2a2a",
+                color: "#fff",
                 border: "none",
-                borderRadius: "500px",
-                padding: "6px 16px",
-                fontSize: "14px",
-                fontWeight: 600,
+                borderRadius: "999px",
+                padding: "8px 14px",
                 cursor: "pointer",
-                transition: "background 0.15s, color 0.15s, transform 0.1s",
-                letterSpacing: "-0.01em",
-              }}
-              onMouseEnter={(e) => {
-                if (activeTab !== tab.key) {
-                  e.currentTarget.style.background = "#3a3a3a";
-                  e.currentTarget.style.transform = "scale(1.03)";
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (activeTab !== tab.key) {
-                  e.currentTarget.style.background = "#2a2a2a";
-                  e.currentTarget.style.transform = "scale(1)";
-                }
+                fontWeight: 700,
               }}
             >
-              {tab.label}
+              ← Quay lại
             </button>
-          ))}
-        </div>
 
-        {/* Quick Play Grid — recommended */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(4, 1fr)",
-            gap: "8px",
-            marginBottom: "32px",
-          }}
-        >
-          {loadingRec ?
-            Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)
-          : errorRec ?
-            <div style={{ gridColumn: "1/-1" }}>
-              <ErrorMsg onRetry={fetchRecommended} />
-            </div>
-          : recommended
-              .slice(0, 8)
-              .map((track) => <QuickPlayCard key={track.id} track={track} />)
-          }
-        </div>
+            <SectionHeader title={fullViewData.title} />
 
-        {/* Section: Sắp ra mắt */}
-        <section style={{ marginBottom: "32px" }}>
-          <SectionHeader
-            title="Lưu trước bản phát hành sắp ra mắt"
-            onShowAll={() => {}}
-          />
-          <div style={{ display: "flex", gap: "16px" }}>
-            {loadingUp ?
-              Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} style={{ width: "200px", flexShrink: 0 }}>
-                  <SkeletonCard height={220} />
-                </div>
-              ))
-            : errorUp ?
-              <ErrorMsg onRetry={fetchUpcoming} />
-            : upcoming.map((track) => (
-                <div key={track.id} style={{ width: "200px", flexShrink: 0 }}>
-                  <AlbumCardLarge track={track} />
-                </div>
-              ))
-            }
-          </div>
-        </section>
-
-        {/* Section: Dành Cho Bạn */}
-        <section style={{ marginBottom: "32px" }}>
-          <SectionHeader label="Dành Cho" title="Bạn" onShowAll={() => {}} />
-          <div
-            style={{
-              display: "flex",
-              gap: "16px",
-              overflowX: "auto",
-              paddingBottom: "8px",
-              scrollbarWidth: "thin",
-              scrollbarColor: "#555 transparent",
-            }}
-          >
-            {loadingFY ?
-              Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} style={{ minWidth: "180px", flex: "0 0 180px" }}>
-                  <SkeletonCard height={220} />
-                </div>
-              ))
-            : errorFY ?
-              <ErrorMsg onRetry={fetchForYou} />
-            : forYou.map((track) => (
-                <div
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
+                gap: "16px",
+              }}
+            >
+              {fullViewData.tracks.map((track) => (
+                <AlbumCardLarge
                   key={track.id}
-                  style={{ minWidth: "180px", flex: "0 0 180px" }}
+                  track={track}
+                  tracks={fullViewData.tracks}
+                />
+              ))}
+            </div>
+          </>
+        )}
+
+        {/* NEW: home chỉ hiện khi chưa bấm hiện tất cả */}
+        {viewMode === "home" && (
+          <>
+            <button
+              onClick={() => {
+                setQueue(mockTracks);
+                playTrack(mockTracks[0]);
+              }}
+              style={{
+                marginBottom: "16px",
+                padding: "10px 16px",
+                borderRadius: "999px",
+                border: "none",
+                cursor: "pointer",
+                fontWeight: 700,
+              }}
+            >
+              ▶ Test phát nhạc
+            </button>
+
+            <div style={{ display: "flex", gap: "8px", marginBottom: "24px" }}>
+              {tabs.map((tab) => (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key)}
+                  style={{
+                    background: activeTab === tab.key ? "#fff" : "#2a2a2a",
+                    color: activeTab === tab.key ? "#000" : "#fff",
+                    border: "none",
+                    borderRadius: "500px",
+                    padding: "6px 16px",
+                    fontSize: "14px",
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    transition: "background 0.15s, color 0.15s",
+                  }}
+                  onMouseEnter={(e) => {
+                    if (activeTab !== tab.key) {
+                      e.currentTarget.style.background = "#3a3a3a";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (activeTab !== tab.key) {
+                      e.currentTarget.style.background = "#2a2a2a";
+                    }
+                  }}
                 >
-                  <AlbumCardLarge track={track} />
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            <SectionHeader
+              title="Đề xuất cho bạn"
+              onShowAll={() => setViewMode("recommended")} // NEW
+            />
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+                gap: "8px",
+                marginBottom: "32px",
+              }}
+            >
+              {loading ? (
+                Array.from({ length: 8 }).map((_, i) => (
+                  <SkeletonCard key={i} />
+                ))
+              ) : errorRec ? (
+                <div style={{ gridColumn: "1/-1" }}>
+                  <ErrorMsg onRetry={fetchAll} />
                 </div>
-              ))
-            }
-          </div>
-        </section>
+              ) : (
+                recommended.slice(0, 8).map((track) => (
+                  <QuickPlayCard
+                    key={track.id}
+                    track={track}
+                    tracks={recommended}
+                  />
+                ))
+              )}
+            </div>
+
+            <section style={{ marginBottom: "32px" }}>
+              <SectionHeader
+                title="Lưu trước bản phát hành sắp ra mắt"
+                onShowAll={() => setViewMode("upcoming")} // NEW
+              />
+
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
+                  gap: "16px",
+                }}
+              >
+                {loading ? (
+                  Array.from({ length: 5 }).map((_, i) => (
+                    <SkeletonCard key={i} height={220} />
+                  ))
+                ) : errorUp ? (
+                  <ErrorMsg onRetry={fetchAll} />
+                ) : (
+                  upcoming.slice(0, 5).map((track) => (
+                    <AlbumCardLarge
+                      key={track.id}
+                      track={track}
+                      tracks={upcoming}
+                    />
+                  ))
+                )}
+              </div>
+            </section>
+
+            <section style={{ marginBottom: "32px" }}>
+              <SectionHeader
+                label="Dành Cho"
+                title="Bạn"
+                onShowAll={() => setViewMode("forYou")} // NEW
+              />
+
+              <div
+                style={{
+                  display: "flex",
+                  gap: "16px",
+                  overflowX: "auto",
+                  paddingBottom: "8px",
+                  scrollbarWidth: "thin",
+                  scrollbarColor: "#555 transparent",
+                }}
+              >
+                {loading ? (
+                  Array.from({ length: 6 }).map((_, i) => (
+                    <div
+                      key={i}
+                      style={{ minWidth: "180px", flex: "0 0 180px" }}
+                    >
+                      <SkeletonCard height={220} />
+                    </div>
+                  ))
+                ) : errorFY ? (
+                  <ErrorMsg onRetry={fetchAll} />
+                ) : (
+                  forYou.map((track) => (
+                    <div
+                      key={track.id}
+                      style={{
+                        minWidth: "160px",
+                        maxWidth: "220px",
+                        flex: "0 0 clamp(160px, 18vw, 220px)",
+                      }}
+                    >
+                      <AlbumCardLarge track={track} tracks={forYou} />
+                    </div>
+                  ))
+                )}
+              </div>
+            </section>
+          </>
+        )}
       </main>
     </>
   );

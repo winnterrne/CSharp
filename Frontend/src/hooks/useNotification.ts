@@ -1,42 +1,55 @@
-import { useEffect, useState } from "react";
-import { notificationApi } from "../api/notificationApi";
-
-export interface NotificationItem {
-  id: number;
-  title: string;
-  message?: string;
-  isRead?: boolean;
-  createdAt?: string;
-}
+import { useCallback } from "react";
+import { notificationStore } from "../store/notificationStore";
+import type { Notification } from "../types/notification";
 
 export const useNotification = () => {
-  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const notifications = notificationStore((state) => state.notifications);
+  const unreadCount = notificationStore((state) => state.unreadCount);
+  const isLoading = notificationStore((state) => state.isLoading);
 
-  const fetchNotifications = async () => {
-    try {
-      setLoading(true);
-      setError(false);
+  const setNotifications = useCallback((notifs: Notification[]) => {
+    notificationStore.getState().setNotifications(notifs);
+  }, []);
 
-      const res = await notificationApi.getAll();
-      setNotifications(res.data);
-    } catch {
-      setError(true);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const addNotification = useCallback((notif: Notification) => {
+    notificationStore.getState().addNotification(notif);
+  }, []);
 
-  useEffect(() => {
-    fetchNotifications();
+  const removeNotification = useCallback((id: number) => {
+    notificationStore.getState().removeNotification(id);
+  }, []);
+
+  const updateNotification = useCallback((id: number, updates: Partial<Notification>) => {
+    notificationStore.getState().updateNotification(id, updates);
+  }, []);
+
+  const markAsRead = useCallback((id: number) => {
+    notificationStore.getState().markAsRead(id);
+  }, []);
+
+  const markAllAsRead = useCallback(() => {
+    notificationStore.getState().markAllAsRead();
+  }, []);
+
+  const setLoading = useCallback((loading: boolean) => {
+    notificationStore.getState().setLoading(loading);
+  }, []);
+
+  const clearAll = useCallback(() => {
+    notificationStore.getState().clearAll();
   }, []);
 
   return {
     notifications,
-    loading,
-    error,
-    unreadCount: notifications.filter((item) => !item.isRead).length,
-    refetch: fetchNotifications,
+    unreadCount,
+    isLoading,
+    setNotifications,
+    addNotification,
+    removeNotification,
+    updateNotification,
+    markAsRead,
+    markAllAsRead,
+    setLoading,
+    clearAll,
   };
 };

@@ -1,7 +1,5 @@
 import { useState } from "react";
-import { useSearch } from "../../hooks/useSearch";
-import type { SearchResult } from "../../hooks/useSearch";
-
+import type { Media } from "../../types/media";
 
 export interface HeaderUser {
   displayName: string;
@@ -11,32 +9,30 @@ export interface HeaderUser {
 
 export interface HeaderProps {
   searchValue: string;
-
-  searchResults: SearchResult[];
+  searchResults: Media[];
   searchLoading: boolean;
-  searchError: boolean;
-
+  searchError: string | null;
   user?: HeaderUser | null;
-
   onSearchChange: (value: string) => void;
   onSearch: () => void;
-
   onHomeClick: () => void;
   onBrowseClick?: () => void;
   onNotificationClick?: () => void;
   onFriendsClick?: () => void;
   onAvatarClick?: () => void;
-  onPlayTrack?: (track: SearchResult) => void;
-  onSelectTrack?: (track: SearchResult) => void;
+  onPlayTrack?: (track: Media) => void;
+  onSelectTrack?: (track: Media) => void;
 }
 
 const Header = ({
   searchValue,
+  searchResults,
+  searchLoading,
+  searchError,
   user,
   onSearch,
   onSearchChange,
   onHomeClick,
-  //onBrowseClick,
   onNotificationClick,
   onFriendsClick,
   onAvatarClick,
@@ -45,12 +41,10 @@ const Header = ({
 }: HeaderProps) => {
   const [searchFocused, setSearchFocused] = useState(false);
   const [showAccountMenu, setShowAccountMenu] = useState(false);
-  const { results, loading, error } = useSearch(searchValue);
 
   const avatarInitial = user?.displayName?.charAt(0).toUpperCase() ?? "?";
   const avatarBg = user?.avatarColor ?? "#e91429";
-
-  const showDropdown = searchValue.trim().length > 0;
+  const showDropdown = searchFocused && searchValue.trim().length > 0;
 
   return (
     <header
@@ -65,8 +59,7 @@ const Header = ({
         top: 0,
         zIndex: 100,
         minHeight: "64px",
-        fontFamily:
-          "'Circular', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+        fontFamily: "'Circular', 'Helvetica Neue', Helvetica, Arial, sans-serif",
       }}
     >
       {/* Logo */}
@@ -76,7 +69,7 @@ const Header = ({
         </svg>
       </div>
 
-      {/* Center */}
+      {/* Center: Home + Search */}
       <div
         style={{
           flex: 1,
@@ -118,12 +111,7 @@ const Header = ({
         </button>
 
         {/* Search Wrapper */}
-        <div
-          style={{
-            position: "relative",
-            flex: 1,
-          }}
-        >
+        <div style={{ position: "relative", flex: 1 }}>
           {/* Search Bar */}
           <div
             style={{
@@ -145,27 +133,22 @@ const Header = ({
                 cursor: "pointer",
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "center",
                 padding: 0,
               }}
             >
-              <svg
-                role="img"
-                height="24"
-                width="24"
-                viewBox="0 0 24 24"
-                fill="#b3b3b3"
-              >
+              <svg role="img" height="24" width="24" viewBox="0 0 24 24" fill="#b3b3b3">
                 <path d="M10.5 3a7.5 7.5 0 1 0 4.74 13.32l4.22 4.22a1 1 0 0 0 1.42-1.42l-4.22-4.22A7.5 7.5 0 0 0 10.5 3Zm0 2a5.5 5.5 0 1 1 0 11a5.5 5.5 0 0 1 0-11Z" />
               </svg>
             </button>
+
             <input
               type="text"
               placeholder="Bạn muốn phát nội dung gì?"
               value={searchValue}
               onChange={(e) => onSearchChange(e.target.value)}
               onFocus={() => setSearchFocused(true)}
-              onBlur={() => setSearchFocused(false)}
+              onBlur={() => setTimeout(() => setSearchFocused(false), 150)}
+              onKeyDown={(e) => { if (e.key === "Enter") onSearch(); }}
               style={{
                 background: "transparent",
                 border: "none",
@@ -175,42 +158,10 @@ const Header = ({
                 width: "100%",
                 caretColor: "#1DB954",
               }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  onSearch?.();
-                }
-              }}
             />
-
-            <div
-              style={{
-                width: "1px",
-                height: "20px",
-                background: "#666",
-                flexShrink: 0,
-              }}
-            />
-
-            {/* <button
-              onClick={onBrowseClick}
-              title="Duyệt"
-              style={{
-                background: "none",
-                border: "none",
-                padding: 0,
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                flexShrink: 0,
-              }}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="#b3b3b3">
-                <path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h8v-2H3v2zm16 0h2v-2h-2v2zm0-8v2h2V9h-2zm0 4h2v-2h-2v2z" />
-              </svg>
-            </button> */}
           </div>
 
-          {/* Dropdown search */}
+          {/* Search Dropdown */}
           {showDropdown && (
             <div
               style={{
@@ -227,40 +178,38 @@ const Header = ({
                 overflowY: "auto",
               }}
             >
-              {loading && (
+              {searchLoading && (
                 <div style={{ padding: "12px", color: "#b3b3b3" }}>
                   Đang tìm kiếm...
                 </div>
               )}
 
-              {error && (
+              {searchError && (
                 <div style={{ padding: "12px", color: "#ff4d4f" }}>
                   Có lỗi xảy ra
                 </div>
               )}
 
-              {!loading && !error && results.length === 0 && (
+              {!searchLoading && !searchError && searchResults.length === 0 && (
                 <div style={{ padding: "12px", color: "#b3b3b3" }}>
                   Không tìm thấy kết quả
                 </div>
               )}
 
-              {!loading &&
-                !error &&
-                results.map((item) => (
+              {!searchLoading &&
+                !searchError &&
+                searchResults.map((item) => (
                   <div
                     key={item.id}
-                    onClick={() => {
-                      onSelectTrack?.(item);
-                    }}
+                    onClick={() => onSelectTrack?.(item)}
                     style={{
                       display: "flex",
                       alignItems: "center",
                       gap: "12px",
-                      padding: "10px",
-                      borderRadius: "8px",
+                      padding: "8px",
+                      borderRadius: "6px",
                       cursor: "pointer",
-                      transition: "background 0.2s",
+                      transition: "background 0.15s",
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.background = "#3a3a3a";
@@ -269,6 +218,7 @@ const Header = ({
                       e.currentTarget.style.background = "transparent";
                     }}
                   >
+                    {/* Thumbnail */}
                     <div
                       style={{
                         width: "48px",
@@ -277,19 +227,22 @@ const Header = ({
                         overflow: "hidden",
                         flexShrink: 0,
                         background: "#444",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: "20px",
                       }}
                     >
-                      <img
-                        src={item.thumbnail || item.coverUrl || item.imageUrl}
-                        alt={item.title}
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                        }}
-                      />
+                      {item.thumbnailUrl ? (
+                        <img
+                          src={item.thumbnailUrl}
+                          alt={item.title}
+                          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                        />
+                      ) : "🎵"}
                     </div>
 
+                    {/* Info */}
                     <div style={{ flex: 1, overflow: "hidden" }}>
                       <div
                         style={{
@@ -302,7 +255,6 @@ const Header = ({
                       >
                         {item.title}
                       </div>
-
                       <div
                         style={{
                           color: "#b3b3b3",
@@ -312,10 +264,11 @@ const Header = ({
                           textOverflow: "ellipsis",
                         }}
                       >
-                        Bài hát • {item.artist || item.artistName || "Unknown"}
+                        Bài hát • {item.artist.name}
                       </div>
                     </div>
 
+                    {/* Play button */}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -332,6 +285,9 @@ const Header = ({
                         cursor: "pointer",
                         fontWeight: "bold",
                         flexShrink: 0,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
                       }}
                     >
                       ▶
@@ -344,119 +300,82 @@ const Header = ({
       </div>
 
       {/* Right */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "8px",
-          flexShrink: 0,
-        }}
-      >
+      <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
         <IconActionBtn title="Thông báo" onClick={onNotificationClick}>
-          <svg width="50" height="50" viewBox="0 0 24 24" fill="currentColor">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6V11c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
           </svg>
         </IconActionBtn>
 
         <IconActionBtn title="Bạn bè" onClick={onFriendsClick}>
-          <svg width="50" height="50" viewBox="0 0 24 24" fill="currentColor">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
             <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
           </svg>
         </IconActionBtn>
 
-        <button
-          onClick={() => setShowAccountMenu(!showAccountMenu)}
-          title={user?.displayName ?? "Tài khoản"}
-          style={{
-            background: avatarBg,
-            border: "none",
-            borderRadius: "50%",
-            width: "32px",
-            height: "32px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            cursor: "pointer",
-            color: "#fff",
-            fontSize: "13px",
-            fontWeight: 700,
-            transition: "transform 0.1s ease",
-            letterSpacing: "0.01em",
-            padding: 0,
-            overflow: "hidden",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = "scale(1.08)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = "scale(1)";
-          }}
-        >
-          {user?.avatarUrl ?
-            <img
-              src={user.avatarUrl}
-              alt={user.displayName}
-              style={{ width: "100%", height: "100%", objectFit: "cover" }}
-            />
-          : avatarInitial}
-        </button>
-        {showAccountMenu && (
-  <div
-    style={{
-      position: "absolute",
-      top: "56px",
-      right: "24px",
-      width: "220px",
-      background: "#282828",
-      borderRadius: "8px",
-      padding: "4px",
-      boxShadow: "0 8px 24px rgba(0,0,0,0.5)",
-      zIndex: 9999,
-      color: "#fff",
-    }}
-  >
-    <MenuItem
-      label="Tài khoản"
-      onClick={() => {
-        setShowAccountMenu(false);
-        onAvatarClick?.();
-      }}
-    />
+        {/* Avatar + Account Menu */}
+        <div style={{ position: "relative" }}>
+          <button
+            onClick={() => setShowAccountMenu(!showAccountMenu)}
+            title={user?.displayName ?? "Tài khoản"}
+            style={{
+              background: avatarBg,
+              border: "none",
+              borderRadius: "50%",
+              width: "32px",
+              height: "32px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              color: "#fff",
+              fontSize: "13px",
+              fontWeight: 700,
+              transition: "transform 0.1s ease",
+              padding: 0,
+              overflow: "hidden",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.08)")}
+            onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+          >
+            {user?.avatarUrl ? (
+              <img
+                src={user.avatarUrl}
+                alt={user.displayName}
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              />
+            ) : avatarInitial}
+          </button>
 
-    <MenuItem
-      label="Hồ sơ"
-      onClick={() => {
-        setShowAccountMenu(false);
-        onAvatarClick?.();
-      }}
-    />
-
-    <MenuItem label="Gần đây" />
-
-    <MenuItem label="Cài đặt" />
-
-    <div
-      style={{
-        height: "1px",
-        background: "#3e3e3e",
-        margin: "4px 0",
-      }}
-    />
-
-    <MenuItem
-      label="Đăng xuất"
-      onClick={() => {
-        setShowAccountMenu(false);
-        console.log("logout");
-      }}
-    />
-  </div>
-)}
+          {showAccountMenu && (
+            <div
+              style={{
+                position: "absolute",
+                top: "40px",
+                right: 0,
+                width: "220px",
+                background: "#282828",
+                borderRadius: "8px",
+                padding: "4px",
+                boxShadow: "0 8px 24px rgba(0,0,0,0.5)",
+                zIndex: 9999,
+              }}
+            >
+              <MenuItem label="Tài khoản" onClick={() => { setShowAccountMenu(false); onAvatarClick?.(); }} />
+              <MenuItem label="Hồ sơ" onClick={() => { setShowAccountMenu(false); onAvatarClick?.(); }} />
+              <MenuItem label="Gần đây" />
+              <MenuItem label="Cài đặt" />
+              <div style={{ height: "1px", background: "#3e3e3e", margin: "4px 0" }} />
+              <MenuItem label="Đăng xuất" onClick={() => setShowAccountMenu(false)} />
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );
 };
 
+// ─── Sub-components ────────────────────────────────────────────────────────────
 const IconActionBtn = ({
   children,
   title,
@@ -482,23 +401,14 @@ const IconActionBtn = ({
       color: "#b3b3b3",
       transition: "color 0.2s",
     }}
-    onMouseEnter={(e) => {
-      e.currentTarget.style.color = "#fff";
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.color = "#b3b3b3";
-    }}
+    onMouseEnter={(e) => (e.currentTarget.style.color = "#fff")}
+    onMouseLeave={(e) => (e.currentTarget.style.color = "#b3b3b3")}
   >
     {children}
   </button>
 );
-const MenuItem = ({
-  label,
-  onClick,
-}: {
-  label: string;
-  onClick?: () => void;
-}) => (
+
+const MenuItem = ({ label, onClick }: { label: string; onClick?: () => void }) => (
   <button
     onClick={onClick}
     style={{
@@ -513,12 +423,8 @@ const MenuItem = ({
       fontSize: "14px",
       fontWeight: 600,
     }}
-    onMouseEnter={(e) => {
-      e.currentTarget.style.background = "#3e3e3e";
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.background = "transparent";
-    }}
+    onMouseEnter={(e) => (e.currentTarget.style.background = "#3e3e3e")}
+    onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
   >
     {label}
   </button>

@@ -7,10 +7,10 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const [email, setEmail]       = useState("");
+  const [email,    setEmail]    = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading]   = useState(false);
-  const [error, setError]       = useState("");
+  const [loading,  setLoading]  = useState(false);
+  const [error,    setError]    = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,7 +18,8 @@ const LoginPage = () => {
     setLoading(true);
     try {
       const res = await authService.login({ email, password });
-      login(res.token, res.user);
+      // FIX: login(user, token) — user first, token second
+      login(res.user, res.token);
       navigate("/");
     } catch {
       setError("Email hoặc mật khẩu không đúng");
@@ -60,16 +61,13 @@ const LoginPage = () => {
           Đăng nhập vào TuneVault
         </h1>
 
-        {/* Form */}
         <form
           onSubmit={handleSubmit}
           style={{ width: "100%", display: "flex", flexDirection: "column", gap: "16px" }}
         >
           {/* Email */}
           <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-            <label style={{ color: "#fff", fontSize: "14px", fontWeight: 600 }}>
-              Email
-            </label>
+            <label style={{ color: "#fff", fontSize: "14px", fontWeight: 600 }}>Email</label>
             <input
               type="email"
               value={email}
@@ -87,15 +85,13 @@ const LoginPage = () => {
                 transition: "border-color 0.2s",
               }}
               onFocus={(e) => (e.currentTarget.style.borderColor = "#fff")}
-              onBlur={(e) => (e.currentTarget.style.borderColor = "#3a3a3a")}
+              onBlur={(e)  => (e.currentTarget.style.borderColor = "#3a3a3a")}
             />
           </div>
 
           {/* Password */}
           <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-            <label style={{ color: "#fff", fontSize: "14px", fontWeight: 600 }}>
-              Mật khẩu
-            </label>
+            <label style={{ color: "#fff", fontSize: "14px", fontWeight: 600 }}>Mật khẩu</label>
             <input
               type="password"
               value={password}
@@ -113,7 +109,7 @@ const LoginPage = () => {
                 transition: "border-color 0.2s",
               }}
               onFocus={(e) => (e.currentTarget.style.borderColor = "#fff")}
-              onBlur={(e) => (e.currentTarget.style.borderColor = "#3a3a3a")}
+              onBlur={(e)  => (e.currentTarget.style.borderColor = "#3a3a3a")}
             />
           </div>
 
@@ -146,29 +142,18 @@ const LoginPage = () => {
               fontSize: "15px",
               fontWeight: 700,
               cursor: loading ? "not-allowed" : "pointer",
-              transition: "background 0.2s, transform 0.1s",
+              transition: "background 0.2s",
               marginTop: "8px",
             }}
-            onMouseEnter={(e) => {
-              if (!loading) e.currentTarget.style.background = "#1ed760";
-            }}
-            onMouseLeave={(e) => {
-              if (!loading) e.currentTarget.style.background = "#1DB954";
-            }}
+            onMouseEnter={(e) => { if (!loading) e.currentTarget.style.background = "#1ed760"; }}
+            onMouseLeave={(e) => { if (!loading) e.currentTarget.style.background = "#1DB954"; }}
           >
             {loading ? "Đang đăng nhập..." : "Đăng nhập"}
           </button>
         </form>
 
         {/* Divider */}
-        <div
-          style={{
-            width: "100%",
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-          }}
-        >
+        <div style={{ width: "100%", display: "flex", alignItems: "center", gap: "12px" }}>
           <div style={{ flex: 1, height: "1px", background: "#3a3a3a" }} />
           <span style={{ color: "#b3b3b3", fontSize: "12px" }}>hoặc</span>
           <div style={{ flex: 1, height: "1px", background: "#3a3a3a" }} />
@@ -179,12 +164,7 @@ const LoginPage = () => {
           Chưa có tài khoản?{" "}
           <span
             onClick={() => navigate("/register")}
-            style={{
-              color: "#fff",
-              fontWeight: 700,
-              cursor: "pointer",
-              textDecoration: "underline",
-            }}
+            style={{ color: "#fff", fontWeight: 700, cursor: "pointer", textDecoration: "underline" }}
           >
             Đăng ký
           </span>

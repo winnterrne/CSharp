@@ -1,140 +1,120 @@
-// src/layouts/MainLayout.tsx
-import { useState, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
-import Header from "../components/layout/Header";
-import LeftPanel from "../components/layout/LeftPanel";
-import RightPanel from "../components/layout/RightPanel";
+import Sidebar from "../components/layout/SideBar";
 import PlayerBar from "../components/layout/PlayerBar";
+import Header from "../components/layout/Header";
+import NowPlaying from "../components/layout/NowPlaying";
 import { usePlayer } from "../hooks/usePlayer";
 import { useAuth } from "../hooks/useAuth";
 import { useSearch } from "../hooks/useSearch";
 
 const MainLayout = ({ children }: { children: ReactNode }) => {
   const navigate = useNavigate();
-
-  const [searchInput, setSearchInput] = useState("");
-  const [searchKeyword, setSearchKeyword] = useState("");
-  const { results, loading, error } = useSearch(searchKeyword);
   const { user } = useAuth();
+  const { query, setQuery, search, searchResults, isLoading, error } =
+    useSearch();
 
   const {
     currentTrack,
     isPlaying,
-    progress,
+    position,
+    duration,
     volume,
-    shuffle,
-    repeat,
-    liked,
+    isMuted,
+    isShuffle,
+    repeatMode,
     togglePlay,
-    prev,
+    previous,
     next,
     seek,
     setVolume,
+    setMuted,
     toggleShuffle,
-    toggleRepeat,
-    toggleLike,
+    toggleRepeatMode,
+    playTrack,
   } = usePlayer();
+
+  const handleSearch = () => {
+    if (query.trim()) {
+      search(query);
+      navigate(`/search?q=${encodeURIComponent(query)}`);
+    }
+  };
 
   return (
     <div
       style={{
+        height: "100vh",
+        background: "#0a0a0a",
+        overflow: "hidden",
         display: "flex",
         flexDirection: "column",
-        height: "100vh",
-        background: "#121212",
-        overflow: "hidden",
-        fontFamily:
-          "'Circular', 'Helvetica Neue', Helvetica, Arial, sans-serif",
       }}
     >
       <Header
-        searchValue={searchInput}
-        searchResults={results}
-        searchLoading={loading}
+        searchValue={query}
+        searchResults={searchResults}
+        searchLoading={isLoading}
         searchError={error}
         user={
-          user ?
-            { displayName: user.username, avatarUrl: user.avatarUrl }
-          : null
+          user
+            ? { displayName: user.username, avatarUrl: user.avatarUrl }
+            : null
         }
-        onSearchChange={setSearchInput}
-        onSearch={() => setSearchKeyword(searchInput)}
+        onSearchChange={setQuery}
+        onSearch={handleSearch}
         onHomeClick={() => navigate("/")}
         onNotificationClick={() => navigate("/notifications")}
         onAvatarClick={() => navigate("/profile")}
+        onPlayTrack={(track) => playTrack(track)}
+        onSelectTrack={(track) => playTrack(track)}
       />
 
       <div
         style={{
-          display: "flex",
           flex: 1,
           minHeight: 0,
           overflow: "hidden",
-          gap: "10px",
-            padding: "0px 12px 0px 10px",
+          display: "grid",
+          // FIX: cột NowPlaying lấy width theo component
+gridTemplateColumns: "280px minmax(0, 1fr) auto",
+          gap: "8px",
+          padding: "8px 8px 0",
         }}
       >
-        <div
-          style={{
-            borderRadius: "12px 12px 0 0",
-            paddingTop: 0,
-
-            overflow: "hidden",
-            background: "#121212",
-            flexShrink: 0,
-            display: "flex",
-            flexDirection: "column",
-            height: "100%",
-          }}
-        >
-          <LeftPanel />
-        </div>
+        <Sidebar />
 
         <div
           style={{
-            borderRadius: "12px",
-            overflow: "hidden",
-            background: "#121212",
             minWidth: 0,
-            height: "100%",
-            display: "flex",
-            flex: 1,
+            overflow: "hidden",
+            background: "#121212",
+            borderRadius: "12px",
           }}
         >
           {children}
         </div>
 
-        <div
-          style={{
-            borderRadius: "12px",
-            overflow: "hidden",
-            background: "#121212",
-            flexShrink: 0,
-            display: "flex",
-            flexDirection: "column",
-            height: "100%",
-          }}
-        >
-          <RightPanel />
-        </div>
+        <NowPlaying />
       </div>
 
       <PlayerBar
         currentTrack={currentTrack}
         isPlaying={isPlaying}
-        progress={progress}
+        position={position}
+        duration={duration}
         volume={volume}
-        shuffle={shuffle}
-        repeat={repeat}
-        liked={liked}
+        isShuffle={isShuffle}
+        repeatMode={repeatMode}
+        isMuted={isMuted}
         onTogglePlay={togglePlay}
-        onPrev={prev}
+        onPrev={previous}
         onNext={next}
         onSeek={seek}
         onVolumeChange={setVolume}
         onToggleShuffle={toggleShuffle}
-        onToggleRepeat={toggleRepeat}
-        onToggleLike={toggleLike}
+        onToggleRepeatMode={toggleRepeatMode}
+        onToggleMuted={() => setMuted(!isMuted)}
       />
     </div>
   );
