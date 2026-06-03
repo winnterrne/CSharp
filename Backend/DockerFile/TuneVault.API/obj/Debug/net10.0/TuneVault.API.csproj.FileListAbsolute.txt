@@ -170,3 +170,4 @@ C:\DoAnMonHoc\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\refint\T
 C:\DoAnMonHoc\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.pdb
 C:\DoAnMonHoc\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.genruntimeconfig.cache
 C:\DoAnMonHoc\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\ref\TuneVault.API.dll
+C:\DoAnMonHoc\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\TuneVault.API.staticwebassets.runtime.json
