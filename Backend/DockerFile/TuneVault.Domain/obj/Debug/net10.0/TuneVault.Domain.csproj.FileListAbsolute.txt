@@ -22,3 +22,15 @@ C:\DoAnMonHoc\CSharp\Backend\DockerFile\TuneVault.Domain\obj\Debug\net10.0\TuneV
 C:\DoAnMonHoc\CSharp\Backend\DockerFile\TuneVault.Domain\obj\Debug\net10.0\refint\TuneVault.Domain.dll
 C:\DoAnMonHoc\CSharp\Backend\DockerFile\TuneVault.Domain\obj\Debug\net10.0\TuneVault.Domain.pdb
 C:\DoAnMonHoc\CSharp\Backend\DockerFile\TuneVault.Domain\obj\Debug\net10.0\ref\TuneVault.Domain.dll
+C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Domain\bin\Debug\net10.0\TuneVault.Domain.deps.json
+C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Domain\bin\Debug\net10.0\TuneVault.Domain.dll
+C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Domain\bin\Debug\net10.0\TuneVault.Domain.pdb
+C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Domain\obj\Debug\net10.0\TuneVault.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Domain\obj\Debug\net10.0\TuneVault.Domain.AssemblyInfoInputs.cache
+C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Domain\obj\Debug\net10.0\TuneVault.Domain.AssemblyInfo.cs
+C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Domain\obj\Debug\net10.0\TuneVault.Domain.csproj.CoreCompileInputs.cache
+C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Domain\obj\Debug\net10.0\TuneVault.Domain.sourcelink.json
+C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Domain\obj\Debug\net10.0\TuneVault.Domain.dll
+C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Domain\obj\Debug\net10.0\refint\TuneVault.Domain.dll
+C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Domain\obj\Debug\net10.0\TuneVault.Domain.pdb
+C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Domain\obj\Debug\net10.0\ref\TuneVault.Domain.dll
