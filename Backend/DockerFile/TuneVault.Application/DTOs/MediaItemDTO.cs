@@ -48,7 +48,7 @@ public record MediaStreamInfoDto
     string? TitleName,
     string? MediaItemImage,
     int? Duration,
-    string? MediaType,
-    string StreamUrl,      
+    string? MediaItemType,
+    string filePath,      
     string? ArtistName 
 );

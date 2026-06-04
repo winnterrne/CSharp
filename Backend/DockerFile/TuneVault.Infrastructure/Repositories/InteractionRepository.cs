@@ -45,9 +45,15 @@ namespace TuneVault.Infrastructure.Repositories
         public async Task<int> RecordPlayHistoryAsync(PlayHistory history)
         {
             string sql = @"
-                            INSERT INTO PlayHistory (UserID, MediaItemID, PlayedAt) 
+                            INSERT INTO PlayHistory (UserID, MediaItemID, PlayedAt)
+                            OUTPUT INSERTED.HistoryID 
                             VALUES (@UserID, @MediaItemID, @PlayedAt)";
-            return await _db.ExecuteDataAsync(sql, history);
+            return await _db.ExecuteScalarAsync<int>(sql, new 
+            { 
+                UserID = history.UserID,         
+                MediaItemID = history.MediaItemID, 
+                PlayedAt = history.PlayedAt 
+            });
         }
         //Lấy 10 bài mới nhất trong lịch sử nghe nhạc của người dùng
         public async Task<IEnumerable<PlayHistory>> GetRecentPlayHistoryAsync(string userId, int limit = 10)

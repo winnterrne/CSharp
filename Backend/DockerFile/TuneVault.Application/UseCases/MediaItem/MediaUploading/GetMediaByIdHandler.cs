@@ -23,7 +23,7 @@ public class GetMediaByIdHandler : IRequestHandler<GetMediaByIdQuery, MediaItemD
             media.filePath,
             media.MediaItemImage,
             media.MediaTag,
-            media.MediaType,
+            media.MediaItemType,
             media.Duration,
             media.Description,
             media.ArtistID,
