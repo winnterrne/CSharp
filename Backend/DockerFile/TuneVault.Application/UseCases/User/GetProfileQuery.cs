@@ -1,0 +1,8 @@
+using MediatR;
+using TuneVault.Application.DTOs;
+
+namespace TuneVault.Application.UseCases.User;
+
+public record GetProfileQuery(
+    string UserID
+) : IRequest<UserProfileDTO>;
