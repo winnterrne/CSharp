@@ -12,7 +12,7 @@ namespace TuneVault.Domain.Entities
         public string? MediaItemImage{get; set;}
         public string? filePath{get; set;}
         public string? MediaItemType{get; set;}
-        public string? MediaTag{get; set;}
+        public string? MediaItemTag{get; set;}
         public int? Duration{get; set;}
         public DateTime UploadAt{get; set;}
         public string? Description{get; set;}

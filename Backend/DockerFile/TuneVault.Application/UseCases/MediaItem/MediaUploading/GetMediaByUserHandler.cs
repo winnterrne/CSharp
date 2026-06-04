@@ -24,7 +24,7 @@ public class GetMediaByUserHandler : IRequestHandler<GetMediaByUserQuery, IEnume
             media.TitleName,
             media.filePath,
             media.MediaItemImage,
-            media.MediaTag,
+            media.MediaItemTag,
             media.MediaItemType,
             media.Duration,
             media.Description,
