@@ -21,7 +21,7 @@ public class PlaylistRepository : IPlaylistRepository
 
     public async Task<IEnumerable<Playlist>> GetUserPlaylistsAsync(string userId)
     {
-        string sql = "SELECT * FROM Playlist WHERE UserID = @userId AND IsDeleted = 0";
+        string sql = "SELECT * FROM Playlist WHERE UserID = @UserId AND IsDeleted = 0";
         return await _db.LoadAllDataSingleAsync<Playlist> (sql, new {UserID = userId});
     }
 
