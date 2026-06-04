@@ -2,7 +2,7 @@ using MediatR;
 using TuneVault.Application.DTOs;
 using TuneVault.Domain.Interfaces;
 
-namespace TuneVault.Application.UseCases.MediaItem;
+namespace TuneVault.Application.UseCases.MediaItem.MediaStreaming;
 
 public class GetMediaInfoQueryHandler : IRequestHandler<GetMediaInfoQuery, MediaStreamInfoDto>
 {
@@ -17,15 +17,15 @@ public class GetMediaInfoQueryHandler : IRequestHandler<GetMediaInfoQuery, Media
     {
         var media =  await _mediaItem.GetMediaInfoAsync(request.MediaItemID);
         if(media == null) throw new Exception("Media không tồn tại");
-        string streamUrl = $"/api/media/{media.MediaItemID}/stream";
+        var filePath = media.filePath ?? string.Empty;
         return new MediaStreamInfoDto(
-                media.MediaItemID,
-                media.TitleName,
-                media.MediaItemImage,
-                media.Duration,
-                media.MediaType,
-                streamUrl,      
-                media.ArtistName 
+            media.MediaItemID,
+            media.TitleName,
+            media.MediaItemImage,
+            media.Duration,
+            media.MediaItemType,
+            filePath,
+            media.ArtistName
         );
     }
 

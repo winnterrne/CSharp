@@ -77,10 +77,10 @@ public class MediaItemRepository : IMediaItemRepository
     public async Task<MediaItem> GetMediaInfoAsync(int mediaId)
     {
         string sql = @"SELECT 
-                        m.MediaItemID, m.TitleName, m.MediaItemImage, m.Duration, m.MediaType, m.filePath, a.ArtistName
+                        m.MediaItemID, m.TitleName, m.MediaItemImage, m.Duration, m.MediaItemType, m.filePath, a.ArtistName
                         FROM MediaItem m
                         JOIN Artist a ON m.ArtistID = a.ArtistID
-                        WHERE m.MediaItemID = @Id AND m.IsDeleted = 0";
+                        WHERE m.MediaItemID = @MediaItemID AND m.IsDeleted = 0";
         return await _db.LoadDataSingleAsync<MediaItem>(sql, new { MediaItemID = mediaId});
     }
 
