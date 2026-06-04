@@ -28,7 +28,7 @@ public class UploadMediaHandler : IRequestHandler<UploadMediaCommand, MediaItemD
             MediaItemID = 0,  // DB sẽ tự tăng IDENTITY
             TitleName = request.TitleName,
             Description = request.Description,
-            MediaTag = request.MediaItemTag,
+            MediaItemTag = request.MediaItemTag,
             MediaItemType = request.MediaItemType,
             Duration = request.Duration,
             filePath = filePath,
@@ -47,7 +47,7 @@ public class UploadMediaHandler : IRequestHandler<UploadMediaCommand, MediaItemD
             media.TitleName,
             media.filePath,
             media.MediaItemImage,
-            media.MediaTag,
+            media.MediaItemTag,
             media.MediaItemType,
             media.Duration,
             media.Description,

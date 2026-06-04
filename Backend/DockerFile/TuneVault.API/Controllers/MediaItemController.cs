@@ -75,7 +75,7 @@ namespace TuneVault.API.Controllers
             return Ok(new { success = true, data = result});
         }
 
-        [Authorize]
+        // [Authorize]
         [HttpGet("{id}/stream")]
         public async Task<IActionResult> Streaming(int id)
         {
@@ -85,7 +85,8 @@ namespace TuneVault.API.Controllers
                 return NotFound(new { success = false, message = "File media không tồn tại" });
             }
             var fileName = mediaItem.filePath.Trim().TrimStart('/','\\');
-            bool isVideo = mediaItem.MediaItemType?.ToLower() ==  "video" || mediaItem.MediaItemType?.ToLower() == "song" == false;
+            var type = mediaItem.MediaItemType?.ToLower();
+            bool isVideo = type == "video";
             string subFolder = isVideo ? "video" : "audio";
             string contentType = mediaItem.MediaItemType?.ToLower() == "video" ? "video/mp4" : "audio/mpeg";
 

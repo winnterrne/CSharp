@@ -38,9 +38,33 @@ public class MediaItemRepository : IMediaItemRepository
     // Create 1 bai nhac 
     public async Task<int> CreateMediaAsync(MediaItem media)
     {
-        string sql = @"INSERT INTO MediaItem (TitleName, MediaItemImage, filePath, MediaItemTag, MediaItemType, Duration, UploadAT, Description, ArtistID, AlbumID, UserID, IsDeleted )
-                     OUTPUT INSERTED.MediaItemID   
-                     VALUES (@TitleName, @MediaItemImage, @filePath, @MediaTag, @MediaType, @Duration, @UploadAt, @Description, @ArtistID, @AlbumID, @UserID,0 )";
+        string sql = @"
+        INSERT INTO MediaItem 
+        (
+            TitleName, MediaItemImage, filePath, MediaItemTag, MediaItemType, 
+            Duration, UploadAT, Description, ArtistID, AlbumID, UserID, IsDeleted 
+        )
+        OUTPUT INSERTED.MediaItemID   
+        VALUES 
+        (
+            @TitleName, 
+            @MediaItemImage, 
+            CASE 
+                WHEN @filePath LIKE '%_%' THEN 
+                    RIGHT(@filePath, CHARINDEX('_', REVERSE(@filePath)) - 1)
+                ELSE 
+                    RIGHT(@filePath, CHARINDEX('/', REVERSE(REPLACE(@filePath, '\', '/'))) - 1)
+            END, 
+            @MediaItemTag, 
+            @MediaItemType, 
+            @Duration, 
+            @UploadAt, 
+            @Description, 
+            @ArtistID, 
+            @AlbumID, 
+            @UserID,
+            0 
+        )";
         return await _db.ExecuteScalarAsync<int>(sql, media);
     }
     // 
