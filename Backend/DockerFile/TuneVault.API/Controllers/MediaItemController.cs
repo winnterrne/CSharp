@@ -75,7 +75,7 @@ namespace TuneVault.API.Controllers
             return Ok(new { success = true, data = result});
         }
 
-        // [Authorize]
+        [Authorize]
         [HttpGet("{id}/stream")]
         public async Task<IActionResult> Streaming(int id)
         {
