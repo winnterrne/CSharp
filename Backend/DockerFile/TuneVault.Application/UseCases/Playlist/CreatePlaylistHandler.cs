@@ -21,6 +21,7 @@ public class CreatePlaylistHandler
     {
         var playlist = new TuneVault.Domain.Entities.Playlist
         {
+            PlaylistID = 0,
             PlaylistName = request.PlaylistName,
             IsPublic = request.IsPublic,
             Description = request.Description,

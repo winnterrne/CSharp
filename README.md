@@ -1,110 +1,432 @@
-<div align="center">
+# 🎵 TuneVault — Backend
 
-<!-- Galaxy Animated Background -->
-<img src="[[data:image/jpeg;base64,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](https://www.google.com/imgres?q=anh%20lap%20trinh&imgurl=https%3A%2F%2Fcdn2.fptshop.com.vn%2Funsafe%2F1920x0%2Ffilters%3Aformat(webp)%3Aquality(75)%2Flap_trinh_la_gi_c31d27001b.jpg&imgrefurl=https%3A%2F%2Ffptshop.com.vn%2Ftin-tuc%2Fdanh-gia%2Flap-trinh-la-gi-155527&docid=9WmQpif0mMXb_M&tbnid=ZNg6BaoL3dUoAM&vet=12ahUKEwj4ppe0uM-UAxVL1jgGHRYEHycQnPAOegQIGhAB..i&w=1920&h=1280&hcb=2&ved=2ahUKEwj4ppe0uM-UAxVL1jgGHRYEHycQnPAOegQIGhAB)](https://www.google.com/imgres?q=anh%20lap%20trinh&imgurl=https%3A%2F%2Fcdn2.fptshop.com.vn%2Funsafe%2F1920x0%2Ffilters%3Aformat(webp)%3Aquality(75)%2Flap_trinh_la_gi_c31d27001b.jpg&imgrefurl=https%3A%2F%2Ffptshop.com.vn%2Ftin-tuc%2Fdanh-gia%2Flap-trinh-la-gi-155527&docid=9WmQpif0mMXb_M&tbnid=ZNg6BaoL3dUoAM&vet=12ahUKEwj4ppe0uM-UAxVL1jgGHRYEHycQnPAOegQIGhAB..i&w=1920&h=1280&hcb=2&ved=2ahUKEwj4ppe0uM-UAxVL1jgGHRYEHycQnPAOegQIGhAB)" 
-width="100%" 
-/>
-
-# ✨🌌 PROJECT README 🌌✨
-
-<img src="https://readme-typing-svg.demolab.com?font=Orbitron&size=32&pause=1000&color=7DF9FF&center=true&vCenter=true&width=900&lines=Welcome+to+our+Galaxy+Project+🚀;Stars+are+shining+through+the+code+✨;Code+không+bug+-+Project+đẹp+long+lẫy+🌌" />
-
-</div>
+> **Môn học / Course:** C# and .NET Development — Học kỳ 3 2026  
+> **Trường / University:** Trường Đại học Sài Gòn — Khoa Công nghệ Thông tin  
+> **Loại hình / Type:** Bài tập lớn nhóm (tối đa 6 sinh viên)
 
 ---
 
-<div align="center">
+## 📑 Mục lục / Table of Contents
 
-# 👨‍🚀 THÀNH VIÊN NHÓM
-
-<table>
-<tr>
-<th>🚀 MSSV</th>
-<th>🌟 Họ và tên</th>
-</tr>
-
-<tr>
-<td><code>3124560024</code></td>
-<td><b>Trần Việt Đức</b></td>
-</tr>
-
-<tr>
-<td><code>3124560022</code></td>
-<td><b>Lê Khánh Đăng</b></td>
-</tr>
-
-<tr>
-<td><code>3124550065</code></td>
-<td><b>Nguyễn Thành Nhân</b></td>
-</tr>
-
-<tr>
-<td><code>3124560076</code></td>
-<td><b>Dương Chí Tài</b></td>
-</tr>
-
-<tr>
-<td><code>3124560098</code></td>
-<td><b>Phan Ngọc Vinh</b></td>
-</tr>
-
-</table>
-
-</div>
+- [Giới thiệu / Overview](#giới-thiệu--overview)
+- [Công nghệ sử dụng / Tech Stack](#công-nghệ-sử-dụng--tech-stack)
+- [Kiến trúc / Architecture](#kiến-trúc--architecture)
+- [Cấu trúc thư mục / Project Structure](#cấu-trúc-thư-mục--project-structure)
+- [Cài đặt & Chạy local / Setup & Run](#cài-đặt--chạy-local--setup--run)
+- [Cấu hình Database / Database Setup](#cấu-hình-database--database-setup)
+- [Tài khoản mẫu / Seed Accounts](#tài-khoản-mẫu--seed-accounts)
+- [Danh sách API / API Endpoints](#danh-sách-api--api-endpoints)
+- [10 Chức năng bắt buộc / 10 Required Features](#10-chức-năng-bắt-buộc--10-required-features)
+- [Application Pipeline](#application-pipeline)
+- [Thành viên nhóm / Team Members](#thành-viên-nhóm--team-members)
 
 ---
 
-<div align="center">
+## Giới thiệu / Overview
 
-<img 
-src="https://i.gifer.com/7efs.gif" 
-width="100%" 
-/>
+**VI:** TuneVault là nền tảng phát nhạc và video trực tuyến, xây dựng theo mô hình Spotify. Backend cung cấp RESTful API cho phép người dùng tải lên, phát, chia sẻ media, và nhận thông báo real-time.
 
-# 🌠 GIỚI THIỆU DỰ ÁN
-
- 
-🌌 Comming soon
-
-</div>
+**EN:** TuneVault is an online music and video streaming platform modelled after Spotify. The backend exposes a RESTful API that allows users to upload, stream, share media files, and receive real-time notifications.
 
 ---
 
-<div align="center">
+## Công nghệ sử dụng / Tech Stack
 
-# ⚡ CÔNG NGHỆ SỬ DỤNG
-
-<img src="https://skillicons.dev/icons?i=cs,dotnet,git,vscode,github" />
-
-</div>
-
----
-
-<div align="center">
-
-<img 
-src="https://media.tenor.com/2uyENRmiUt0AAAAC/stars-space.gif" 
-width="100%" 
-/>
-
-# 🌌 CHỨC NĂNG CHÍNH
-
-🛰️ Quản lý dữ liệu  
-🌠 Xử lý thông tin  
-🚀 Giao diện application  
-👨‍🚀 Làm việc nhóm với GitHub  
-
-</div>
+| Thành phần / Component | Công nghệ / Technology |
+|---|---|
+| Framework | ASP.NET Core 8 Web API |
+| Kiến trúc / Architecture | Clean Architecture (4 layers) |
+| ORM / Data Access | Dapper |
+| Cơ sở dữ liệu / Database | SQL Server (LocalDB) |
+| Xác thực / Authentication | JWT Bearer Token + ASP.NET Core Identity |
+| Real-time | SignalR |
+| Tài liệu API / API Docs | Swagger / OpenAPI |
+| Lưu file / File Storage | Local Disk (`/wwwroot/media`) |
+| Validation | FluentValidation |
+| Pattern | MediatR (CQRS Pipeline) |
 
 ---
 
-<div align="center">
+## Kiến trúc / Architecture
 
-# 🛠️ CÁCH CHẠY PROJECT
+**VI:** Dự án tuân theo Clean Architecture với 4 project độc lập. Quy tắc phụ thuộc: Domain không phụ thuộc ai; Application chỉ phụ thuộc Domain; Infrastructure implement interface từ Domain/Application; API chỉ gọi Application.
 
-</div>
+**EN:** The project follows Clean Architecture with 4 independent projects. Dependency rule: Domain has no outward dependencies; Application depends only on Domain; Infrastructure implements Domain/Application interfaces; API calls only Application.
+
+```
+React Frontend
+      │  HTTP / SignalR
+      ▼
+┌─────────────────────┐
+│   TuneVault.API     │  Controllers, Middleware, Swagger, DI
+└────────┬────────────┘
+         │ calls
+┌────────▼────────────┐
+│ TuneVault.Application│  Use Cases, DTOs, Validators, Pipeline Behaviors
+└────────┬────────────┘
+         │ depends on
+┌────────▼────────────┐
+│  TuneVault.Domain   │  Entities, Interfaces, Enums
+└────────▲────────────┘
+         │ implements
+┌────────┴────────────┐
+│TuneVault.Infrastructure│ Dapper Repositories, File Storage, SignalR Hub
+└─────────────────────┘
+```
+
+---
+
+## Cấu trúc thư mục / Project Structure
+
+```
+TuneVault.sln
+│
+├── TuneVault.Domain/
+│   ├── Entities/
+│   │   ├── User.cs
+│   │   ├── MediaItem.cs          # bài hát / video
+│   │   ├── Album.cs
+│   │   ├── Playlist.cs
+│   │   ├── PlaylistTrack.cs
+│   │   ├── MediaShare.cs         # chia sẻ media giữa users
+│   │   ├── Notification.cs       # thông báo real-time
+│   │   ├── Favorite.cs
+│   │   ├── PlayHistory.cs
+│   │   └── Follow.cs
+│   └── Interfaces/
+│       ├── IMediaRepository.cs
+│       ├── IUserRepository.cs
+│       ├── IPlaylistRepository.cs
+│       ├── IShareRepository.cs
+│       └── INotificationRepository.cs
+│
+├── TuneVault.Application/
+│   ├── DTOs/
+│   │   ├── MediaDto.cs
+│   │   ├── UserDto.cs
+│   │   ├── PlaylistDto.cs
+│   │   ├── ShareMediaDto.cs
+│   │   └── NotificationDto.cs
+│   ├── UseCases/
+│   │   ├── Auth/
+│   │   │   ├── RegisterCommand.cs
+│   │   │   └── LoginCommand.cs
+│   │   ├── Media/
+│   │   │   ├── UploadMediaCommand.cs
+│   │   │   └── StreamMediaQuery.cs
+│   │   ├── Playlist/
+│   │   │   ├── CreatePlaylistCommand.cs
+│   │   │   └── AddTrackToPlaylistCommand.cs
+│   │   ├── Share/
+│   │   │   ├── ShareMediaCommand.cs
+│   │   │   └── GetSharedMediaQuery.cs
+│   │   └── Notify/
+│   │       ├── GetNotificationsQuery.cs
+│   │       └── MarkNotificationReadCommand.cs
+│   └── Validators/
+│       ├── RegisterValidator.cs
+│       └── UploadMediaValidator.cs
+│
+├── TuneVault.Infrastructure/
+│   ├── Data/
+│   │   ├── DapperContext.cs       # IDbConnection → SQL Server
+│   │   └── Scripts/
+│   │       ├── schema.sql         # tạo toàn bộ bảng
+│   │       └── seed.sql           # dữ liệu mẫu
+│   ├── Repositories/
+│   │   ├── MediaRepository.cs
+│   │   ├── UserRepository.cs
+│   │   ├── PlaylistRepository.cs
+│   │   ├── ShareRepository.cs
+│   │   └── NotificationRepository.cs
+│   ├── Storage/
+│   │   └── LocalFileStorage.cs    # lưu mp3 / mp4 lên disk
+│   └── Hubs/
+│       └── NotificationHub.cs     # SignalR Hub
+│
+└── TuneVault.API/
+    ├── Controllers/
+    │   ├── AuthController.cs
+    │   ├── MediaController.cs
+    │   ├── PlaylistController.cs
+    │   ├── ShareController.cs
+    │   ├── NotificationController.cs
+    │   └── UserController.cs
+    ├── Middleware/
+    │   └── ExceptionMiddleware.cs
+    ├── Program.cs                  # DI, JWT, Swagger, CORS, SignalR
+    └── appsettings.json
+```
+
+---
+
+## Cài đặt & Chạy local / Setup & Run
+
+### Yêu cầu / Requirements
+
+- [.NET 8 SDK](https://dotnet.microsoft.com/download)
+- [SQL Server Express](https://www.microsoft.com/sql-server) hoặc SQL Server LocalDB
+- [Node.js 20+](https://nodejs.org) (để chạy Frontend)
+
+### Bước 1 — Clone repository
 
 ```bash
-git clone <repository-link>
-cd <project-name>
+git clone https://github.com/<your-org>/tunevault.git
+cd tunevault
+```
+
+### Bước 2 — Cấu hình connection string
+
+Mở file `TuneVault.API/appsettings.json` và chỉnh `ConnectionStrings`:
+
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=(localdb)\\mssqllocaldb;Database=TuneVaultDb;Trusted_Connection=True;"
+  },
+  "Jwt": {
+    "Key": "your-secret-key-at-least-32-characters",
+    "Issuer": "TuneVaultAPI",
+    "Audience": "TuneVaultClient",
+    "ExpireMinutes": 60
+  }
+}
+```
+
+### Bước 3 — Tạo database & seed data
+
+**VI:** Dự án dùng Dapper nên không có EF migration. Chạy script SQL thủ công:
+
+**EN:** The project uses Dapper (no EF migrations). Run the SQL scripts manually:
+
+```bash
+# Dùng sqlcmd hoặc mở trong SSMS
+sqlcmd -S (localdb)\mssqllocaldb -i TuneVault.Infrastructure/Data/Scripts/schema.sql
+sqlcmd -S (localdb)\mssqllocaldb -i TuneVault.Infrastructure/Data/Scripts/seed.sql
+```
+
+Hoặc / Or: mở SSMS → kết nối `(localdb)\mssqllocaldb` → mở và chạy 2 file `.sql` theo thứ tự.
+
+### Bước 4 — Chạy backend
+
+```bash
+cd TuneVault.API
 dotnet run
+```
+
+Backend chạy tại / Backend runs at: `https://localhost:5001`  
+Swagger UI: `https://localhost:5001/swagger`
+
+---
+
+## Cấu hình Database / Database Setup
+
+**VI:** Dự án sử dụng Dapper với SQL Server. Toàn bộ schema được định nghĩa trong `schema.sql`.
+
+**EN:** The project uses Dapper with SQL Server. The full schema is defined in `schema.sql`.
+
+### Các bảng chính / Main Tables
+
+| Bảng / Table | Mô tả / Description |
+|---|---|
+| `AspNetUsers` | Tài khoản người dùng (ASP.NET Identity) |
+| `UserProfiles` | Thông tin profile mở rộng (avatar, bio) |
+| `MediaItems` | Bài hát & video (đường dẫn file, thời lượng, loại) |
+| `Albums` | Album nhạc |
+| `Playlists` | Danh sách phát (công khai / riêng tư) |
+| `PlaylistTracks` | Quan hệ nhiều-nhiều Playlist ↔ MediaItem |
+| `MediaShares` | Lịch sử chia sẻ media giữa người dùng |
+| `Notifications` | Thông báo (JSON payload, trạng thái đã đọc) |
+| `Favorites` | Bài hát yêu thích của người dùng |
+| `PlayHistories` | Lịch sử nghe gần đây |
+| `Follows` | Theo dõi user / nghệ sĩ |
+
+---
+
+## Tài khoản mẫu / Seed Accounts
+
+**VI:** Sau khi chạy `seed.sql`, các tài khoản sau sẵn sàng để test:
+
+**EN:** After running `seed.sql`, the following accounts are ready for testing:
+
+| Email | Mật khẩu / Password | Vai trò / Role |
+|---|---|---|
+| `admin@tunevault.com` | `Admin@123` | Admin |
+| `user1@tunevault.com` | `User@123` | User |
+| `user2@tunevault.com` | `User@123` | User |
+
+**Dữ liệu seed bao gồm / Seed data includes:**
+- 3 người dùng / users
+- 10 media items (6 audio mp3, 4 video mp4)
+- 2 playlist (1 công khai, 1 riêng tư)
+- Dữ liệu chia sẻ và thông báo mẫu / Sample share & notification records
+
+---
+
+## Danh sách API / API Endpoints
+
+**VI:** Tổng cộng 20+ endpoints. Xem chi tiết tại Swagger: `https://localhost:5001/swagger`
+
+**EN:** 20+ endpoints in total. Full details available at Swagger: `https://localhost:5001/swagger`
+
+### Authentication
+| Method | Endpoint | Mô tả |
+|---|---|---|
+| `POST` | `/api/auth/register` | Đăng ký tài khoản |
+| `POST` | `/api/auth/login` | Đăng nhập, nhận JWT |
+| `POST` | `/api/auth/logout` | Đăng xuất |
+
+### User / Profile
+| Method | Endpoint | Mô tả |
+|---|---|---|
+| `GET` | `/api/users/{id}` | Xem profile |
+| `PUT` | `/api/users/{id}` | Cập nhật profile, avatar |
+| `POST` | `/api/users/{id}/follow` | Theo dõi người dùng |
+
+### Media
+| Method | Endpoint | Mô tả |
+|---|---|---|
+| `POST` | `/api/media/upload` | Upload file audio/video |
+| `GET` | `/api/media` | Danh sách media |
+| `GET` | `/api/media/{id}` | Chi tiết media |
+| `GET` | `/api/media/{id}/stream` | Stream audio/video (Range header) |
+| `DELETE` | `/api/media/{id}` | Xóa media (chủ sở hữu) |
+
+### Playlist
+| Method | Endpoint | Mô tả |
+|---|---|---|
+| `POST` | `/api/playlists` | Tạo playlist |
+| `GET` | `/api/playlists/{id}` | Xem playlist |
+| `PUT` | `/api/playlists/{id}` | Sửa playlist |
+| `DELETE` | `/api/playlists/{id}` | Xóa playlist |
+| `POST` | `/api/playlists/{id}/tracks` | Thêm bài vào playlist |
+| `DELETE` | `/api/playlists/{id}/tracks/{trackId}` | Xóa bài khỏi playlist |
+
+### Search
+| Method | Endpoint | Mô tả |
+|---|---|---|
+| `GET` | `/api/search?q=&type=&page=&size=` | Tìm kiếm media, playlist, user |
+
+### Share ⭐
+| Method | Endpoint | Mô tả |
+|---|---|---|
+| `POST` | `/api/shares` | Chia sẻ media/playlist cho user |
+| `GET` | `/api/shares/received` | Danh sách "Chia sẻ với tôi" |
+| `GET` | `/api/shares/sent` | Danh sách "Tôi đã chia sẻ" |
+
+### Notifications ⭐
+| Method | Endpoint | Mô tả |
+|---|---|---|
+| `GET` | `/api/notifications` | Danh sách thông báo |
+| `PUT` | `/api/notifications/{id}/read` | Đánh dấu đã đọc |
+| `PUT` | `/api/notifications/read-all` | Đánh dấu tất cả đã đọc |
+
+### Interactions
+| Method | Endpoint | Mô tả |
+|---|---|---|
+| `POST` | `/api/media/{id}/favorite` | Thêm/bỏ yêu thích |
+| `GET` | `/api/users/me/history` | Lịch sử nghe gần đây |
+
+> ⭐ Chức năng 8 (Share) và 9 (Notifications) được chấm kỹ hơn theo rubric.
+
+---
+
+## 10 Chức năng bắt buộc / 10 Required Features
+
+| # | Chức năng | Endpoint chính | Trạng thái |
+|---|---|---|---|
+| 1 | Xác thực (Register/Login/Logout) | `POST /api/auth/*` | ✅ |
+| 2 | Hồ sơ người dùng | `GET/PUT /api/users/{id}` | ✅ |
+| 3 | Thư viện Media (Upload metadata + file) | `POST /api/media/upload` | ✅ |
+| 4 | Audio Player (Stream + Play History) | `GET /api/media/{id}/stream` | ✅ |
+| 5 | Video Player (Stream + Range requests) | `GET /api/media/{id}/stream` | ✅ |
+| 6 | Playlist CRUD | `POST/GET/PUT/DELETE /api/playlists` | ✅ |
+| 7 | Tìm kiếm & Khám phá | `GET /api/search` | ✅ |
+| 8 | Chia sẻ Media ⭐ | `POST /api/shares` | ✅ |
+| 9 | Thông báo real-time ⭐ | `GET /api/notifications` + SignalR | ✅ |
+| 10 | Like / Lịch sử nghe | `POST /api/media/{id}/favorite` | ✅ |
+
+---
+
+## Application Pipeline
+
+**VI:** Mỗi chức năng đi qua pipeline xử lý thống nhất tại tầng Application:
+
+**EN:** Every feature goes through a unified processing pipeline in the Application layer:
+
+```
+HTTP Request
+     │
+     ▼
+Controller (API layer)
+     │  gọi MediatR
+     ▼
+1. Validation         ← FluentValidation kiểm tra DTO đầu vào
+     │
+     ▼
+2. Authorization      ← Kiểm tra JWT, quyền sở hữu tài nguyên
+     │
+     ▼
+3. Handler / Use Case ← Logic nghiệp vụ, gọi Repository qua Interface
+     │
+     ▼
+4. Repository (Dapper) ← Thực thi SQL thuần tới SQL Server
+     │
+     ▼
+5. Side Effects       ← Tạo Notification, push SignalR (nếu có)
+     │
+     ▼
+6. Response Mapping   ← Trả DTO chuẩn hóa (không trả Entity thô)
+     │
+     ▼
+HTTP Response { success, data, errors }
+```
+
+### Ví dụ pipeline — Chia sẻ bài hát / Example pipeline — Share Track
+
+```
+POST /api/shares
+     │
+     ▼
+ShareController.ShareAsync(ShareMediaDto dto)
+     │  Send(new ShareMediaCommand(dto))
+     ▼
+ShareMediaValidator       → validate receiverId, mediaId không rỗng
+     │
+     ▼
+ShareMediaAuthBehavior    → sender != receiver; media thuộc sender
+     │
+     ▼
+ShareMediaHandler         → INSERT vào MediaShares
+                          → INSERT vào Notifications
+                          → push SignalR tới receiver
+     │
+     ▼
+ShareMediaResponseDto     → { success: true, data: { shareId, sharedAt } }
+```
+
+---
+
+## Thành viên nhóm / Team Members
+
+| Họ tên | MSSV | Phân công / Role |
+|---|---|---|
+| Nguyễn Văn A | 123456 | Backend: Auth, Media Upload, Streaming |
+| Trần Thị B | 123457 | Backend: Playlist, Search, Favorites |
+| Lê Văn C | 123458 | Backend: Share Media, Notifications, SignalR |
+| Phạm Thị D | 123459 | Frontend: Layout, Audio Player, Video Player |
+| Hoàng Văn E | 123460 | Frontend: API Integration, Auth, SignalR Client |
+
+---
+
+## Ghi chú / Notes
+
+- File media được lưu tại `TuneVault.API/wwwroot/media/` và phục vụ qua endpoint `/api/media/{id}/stream`
+- Giới hạn kích thước upload: audio tối đa 50MB, video tối đa 500MB (cấu hình trong `Program.cs`)
+- Định dạng file cho phép: `.mp3`, `.wav`, `.mp4`, `.webm`
+- API key và connection string không được commit lên Git — dùng `appsettings.Development.json` (đã thêm vào `.gitignore`)
+- SignalR Hub URL: `/hubs/notifications`
+
+---
+
+*TuneVault — Đại học Sài Gòn — Học kỳ 3 2026*

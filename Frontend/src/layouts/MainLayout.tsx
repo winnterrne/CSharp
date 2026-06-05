@@ -1,37 +1,49 @@
-import Sidebar from "../components/layout/Sidebar";
 import Header from "../components/layout/Header";
+import LeftPanel from "../components/layout/LeftPanel";
+import RightPanel from "../components/layout/RightPanel";
 import PlayerBar from "../components/layout/PlayerBar";
+import type { ReactNode } from "react";
 
-type Props = {
-  children: React.ReactNode;
-};
-
-export default function MainLayout({
-  children,
-}: Props) {
+const MainLayout = ({ children }: { children: ReactNode }) => {
   return (
-    <div className="h-screen bg-black text-white flex flex-col">
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100vh",
+         background: "linear-gradient(180deg, #121212 100%, #121212 100%)",
+        overflow: "hidden",
+        fontFamily: "'Circular', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+      }}
+    >
       <Header />
+      <div
+        style={{
+          display: "flex",
+          flex: 1,
+          minHeight: 0,
+          overflow: "hidden",
+          gap: "8px",
+          padding: "0 8px",
+        }}
+      >
+        <div style={{ borderRadius: "8px", overflow: "hidden", background: "#121212", flexShrink: 0, display: "flex", flexDirection: "column", height: "100%" }}>
+          <LeftPanel />
+        </div>
 
-      <div className="flex flex-1 overflow-hidden p-2 gap-2">
-        <Sidebar />
-
-        <main
-          className="
-            flex-1
-            overflow-y-auto
-            rounded-2xl
-            bg-gradient-to-b
-            from-[#1f1f1f]
-            to-[#121212]
-            p-8
-          "
-        >
+        {/* ← children thay cho MainContent hardcode */}
+        <div style={{  borderRadius: "8px", overflow: "hidden", background: "#121212", minWidth: 0, height: "100%" , display:"flex" }}>
           {children}
-        </main>
+        </div>
+
+        <div style={{ borderRadius: "8px", overflow: "hidden", background: "#121212", flexShrink: 0, display: "flex", flexDirection: "column", height: "100%" }}>
+          <RightPanel />
+        </div>
       </div>
 
       <PlayerBar />
     </div>
   );
-}
+};
+
+export default MainLayout;

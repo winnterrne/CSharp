@@ -38,9 +38,33 @@ public class MediaItemRepository : IMediaItemRepository
     // Create 1 bai nhac 
     public async Task<int> CreateMediaAsync(MediaItem media)
     {
-        string sql = @"INSERT INTO MediaItem (TitleName, MediaItemImage, filePath, MediaItemTag, MediaItemType, Duration, UploadAT, Description, ArtistID, AlbumID, UserID, IsDeleted )
-                     OUTPUT INSERTED.MediaItemID   
-                     VALUES (@TitleName, @MediaItemImage, @filePath, @MediaTag, @MediaType, @Duration, @UploadAt, @Description, @ArtistID, @AlbumID, @UserID,0 )";
+        string sql = @"
+        INSERT INTO MediaItem 
+        (
+            TitleName, MediaItemImage, filePath, MediaItemTag, MediaItemType, 
+            Duration, UploadAT, Description, ArtistID, AlbumID, UserID, IsDeleted 
+        )
+        OUTPUT INSERTED.MediaItemID   
+        VALUES 
+        (
+            @TitleName, 
+            @MediaItemImage, 
+            CASE 
+                WHEN @filePath LIKE '%_%' THEN 
+                    RIGHT(@filePath, CHARINDEX('_', REVERSE(@filePath)) - 1)
+                ELSE 
+                    RIGHT(@filePath, CHARINDEX('/', REVERSE(REPLACE(@filePath, '\', '/'))) - 1)
+            END, 
+            @MediaItemTag, 
+            @MediaItemType, 
+            @Duration, 
+            @UploadAt, 
+            @Description, 
+            @ArtistID, 
+            @AlbumID, 
+            @UserID,
+            0 
+        )";
         return await _db.ExecuteScalarAsync<int>(sql, media);
     }
     // 
@@ -77,10 +101,10 @@ public class MediaItemRepository : IMediaItemRepository
     public async Task<MediaItem> GetMediaInfoAsync(int mediaId)
     {
         string sql = @"SELECT 
-                        m.MediaItemID, m.TitleName, m.MediaItemImage, m.Duration, m.MediaType, m.filePath, a.ArtistName
+                        m.MediaItemID, m.TitleName, m.MediaItemImage, m.Duration, m.MediaItemType, m.filePath, a.ArtistName
                         FROM MediaItem m
                         JOIN Artist a ON m.ArtistID = a.ArtistID
-                        WHERE m.MediaItemID = @Id AND m.IsDeleted = 0";
+                        WHERE m.MediaItemID = @MediaItemID AND m.IsDeleted = 0";
         return await _db.LoadDataSingleAsync<MediaItem>(sql, new { MediaItemID = mediaId});
     }
 
