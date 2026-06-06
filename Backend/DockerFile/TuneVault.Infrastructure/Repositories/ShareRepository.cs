@@ -11,7 +11,7 @@ public class ShareRepository : IShareRepository
         _db = db;
     }
     // Share cho ng khac
-    public async Task<int> ShareMediaAsync(MediaShare share)
+    public async Task<int> CreateShareMediaAsync(MediaShare share)
     {
         string sql = @"INSERT INTO MediaShare(SenderID, ReceiverID, MediaItemID, PlaylistID, SharedAt)
                         OUTPUT INSERTED.ShareID
@@ -37,5 +37,22 @@ public class ShareRepository : IShareRepository
                         WHERE ms.SenderID = @SenderID
                         ORDER BY ms.SharedAt desc";
         return await _db.LoadAllDataSingleAsync<MediaShare>(sql, new {SenderID = senderId});
+    }
+
+    public async Task<bool> AlreadySharedAsync(string senderID, string receiverID, int mediaItemID, int playlistID)
+    {
+        string sql = @"SELECT COUNT(1) FROM MediaShare
+                        WHERE SenderID = @SenderID
+                        AND ReceiverID = @ReceiverID
+                        AND (@MediaItemID IS NULL OR MediaItemID = @MediaItemID)
+                        AND (@PlaylistID IS NULL OR PlaylistID = @PlaylistID)";
+        int count =  await _db.ExecuteScalarAsync<int>(sql, new
+        {
+            SenderID    = senderID,
+            ReceiverID  = receiverID,
+            MediaItemID = mediaItemID,
+            PlaylistID  = playlistID
+        });
+        return count > 0;
     }
 }

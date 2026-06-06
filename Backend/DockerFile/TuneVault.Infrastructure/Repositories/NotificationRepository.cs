@@ -32,4 +32,12 @@ public class NotificationRepository : INotificationRepository
         return await _db.ExecuteDataAsync(sql, new { NotificationID = notificationId });
     }
 
+    public async Task<int> MarkAllAsReadAsync(string userId)
+    {
+        string sql = @"
+            UPDATE Notification 
+            SET IsRead = 1 
+            WHERE UserID = @UserID";
+        return await _db.ExecuteDataAsync(sql, new {UserID = userId});
+    }
 }
