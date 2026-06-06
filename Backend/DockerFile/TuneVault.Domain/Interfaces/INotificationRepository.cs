@@ -12,5 +12,6 @@ namespace TuneVault.Domain.Interfaces
         
         // Đánh dấu thông báo đã đọc (Cập nhật cột IsRead = 1)
         Task<int> MarkAsReadAsync(int notificationId); 
+        Task<int> MarkAllAsReadAsync(string userId);
     }
 }
