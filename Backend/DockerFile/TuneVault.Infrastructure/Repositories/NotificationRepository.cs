@@ -15,10 +15,10 @@ public class NotificationRepository : INotificationRepository
 
     public async Task<int> CreateNotificationAsync(Notification notification) {
         string sql = @"INSERT INTO Notification
-                            (NotificationID, Title, Type, Payload, IsRead, UserID, IsDeleted)
+                            (Title, Type, Payload, IsRead, UserID, IsDeleted)
                         OUTPUT INSERTED.NotificationID
                         VALUES
-                            (@NotificationID, @Title, @Type, @Payload, @IsRead, @UserID, @IsDeleted)";
+                            (@Title, @Type, @Payload, @IsRead, @UserID, 0)";
         return await _db.ExecuteScalarAsync<int>(sql, notification);
     }
     public async Task<IEnumerable<Notification>> GetUserNotificationsAsync(string userId) {

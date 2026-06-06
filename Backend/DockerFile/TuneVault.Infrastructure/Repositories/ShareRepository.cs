@@ -31,7 +31,7 @@ public class ShareRepository : IShareRepository
 
     public async Task<IEnumerable<MediaShare>> GetSharedByMeAsync(string senderId)
     {
-        string sql = @"SELECT  
+        string sql = @"SELECT *
                         FROM MediaShare ms 
                         INNER JOIN MediaItem mi on mi.MediaItemID = ms.MediaItemID
                         WHERE ms.SenderID = @SenderID
@@ -39,7 +39,7 @@ public class ShareRepository : IShareRepository
         return await _db.LoadAllDataSingleAsync<MediaShare>(sql, new {SenderID = senderId});
     }
 
-    public async Task<bool> AlreadySharedAsync(string senderID, string receiverID, int mediaItemID, int playlistID)
+    public async Task<bool> AlreadySharedAsync(string senderID, string receiverID, int? mediaItemID, int? playlistID)
     {
         string sql = @"SELECT COUNT(1) FROM MediaShare
                         WHERE SenderID = @SenderID

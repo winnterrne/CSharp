@@ -5,7 +5,7 @@ using TuneVault.Domain.Interfaces;
 namespace TuneVault.Application.UseCases.Notification;
 
 public class GetNotificationsHandler
-    : IRequestHandler<GetNotificationsQuery, IEnumerable<NotificationDTO>>
+    : IRequestHandler<GetNotificationsQuery, IEnumerable<NotificationDto>>
 {
     private readonly INotificationRepository _notifRepo;
 
@@ -14,12 +14,12 @@ public class GetNotificationsHandler
         _notifRepo = notifRepo;
     }
 
-    public async Task<IEnumerable<NotificationDTO>> Handle(
+    public async Task<IEnumerable<NotificationDto>> Handle(
         GetNotificationsQuery request,
         CancellationToken cancellationToken)
     {
         var notifs = await _notifRepo.GetUserNotificationsAsync(request.UserID);
-        return notifs.Select(n => new NotificationDTO(
+        return notifs.Select(n => new NotificationDto(
             n.NotificationID,
             n.Title,
             n.Type,
