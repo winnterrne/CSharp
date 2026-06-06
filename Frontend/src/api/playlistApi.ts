@@ -1,43 +1,27 @@
 import api from "./axios";
 
 export const playlistApi = {
-  getMyPlaylists: () =>
-    api.get("/playlist/my"),
+  // GET /api/Playlist/my-playlist
+  getMyPlaylists: () => api.get("/Playlist/my-playlist"),
 
-  getById: (id: number) =>
-    api.get(`/playlist/${id}`),
+  // GET /api/Playlist/{id}
+  getById: (id: number) => api.get(`/Playlist/${id}`),
 
+  // POST /api/Playlist
   create: (data: {
-    name: string;
+    playlistName: string;
     description?: string;
-  }) =>
-    api.post("/playlist", data),
+    isPublic: boolean;
+  }) => api.post("/Playlist", data),
 
-  update: (
-    id: number,
-    data: {
-      name?: string;
-      description?: string;
-    }
-  ) =>
-    api.put(`/playlist/${id}`, data),
+  // DELETE /api/Playlist/{id}
+  delete: (id: number) => api.delete(`/Playlist/${id}`),
 
-  delete: (id: number) =>
-    api.delete(`/playlist/${id}`),
+  // POST /api/Playlist/{playlistId}/tracks/{mediaItemId}
+  addTrack: (playlistId: number, mediaItemId: number) =>
+    api.post(`/Playlist/${playlistId}/tracks/${mediaItemId}`),
 
-  addTrack: (
-    playlistId: number,
-    trackId: number
-  ) =>
-    api.post(`/playlist/${playlistId}/tracks`, {
-      trackId,
-    }),
-
-  removeTrack: (
-    playlistId: number,
-    trackId: number
-  ) =>
-    api.delete(
-      `/playlist/${playlistId}/tracks/${trackId}`
-    ),
+  // DELETE /api/Playlist/{playlistId}/tracks/{mediaItemId}
+  removeTrack: (playlistId: number, mediaItemId: number) =>
+    api.delete(`/Playlist/${playlistId}/tracks/${mediaItemId}`),
 };

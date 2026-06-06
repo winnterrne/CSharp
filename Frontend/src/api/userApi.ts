@@ -7,6 +7,7 @@ export const userApi = {
   updateProfile: (data: {
     username?: string;
     email?: string;
+    //phoneNumber?: string;
     avatarUrl?: string;
   }) =>
     api.put("/users/profile", data),

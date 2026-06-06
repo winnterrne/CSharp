@@ -1,6 +1,7 @@
 using MediatR;
 using TuneVault.Application.DTOs;
-namespace TuneVault.Application.UseCases.MediaItem;
+
+namespace TuneVault.Application.UseCases.MediaItem.MediaStreaming;
 
 public record GetMediaInfoQuery(
     int MediaItemID

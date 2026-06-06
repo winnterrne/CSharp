@@ -5,8 +5,7 @@ services:
     container_name: TuneVault
     image: mcr.microsoft.com/mssql/server:2022-latest
     environment:
-      - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=TuneVault_12`3!@# 
+      - ConnectionStrings__DefaultConnection=Server=sqlserver_container;Database=TuneVaultDb;User Id=sa;Password=TuneVault_12`3!@# ;TrustServerCertificate=True
     ports:
       - "1433:1433" 
     volumes:
@@ -14,3 +13,4 @@ services:
 
 volumes:
   sql_data:
+

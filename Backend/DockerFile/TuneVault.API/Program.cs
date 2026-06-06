@@ -3,6 +3,7 @@ using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.SignalR;
 using TuneVault.Application.PipelineBehaviors;
 using TuneVault.Application.Interfaces;
 using TuneVault.Application.UseCases.Auth;
@@ -12,6 +13,9 @@ using TuneVault.Infrastructure.Auth;
 using TuneVault.Infrastructure.Dapper;
 using TuneVault.Infrastructure.FileStorage;
 using TuneVault.Infrastructure.Repositories;
+using TuneVault.Infrastructure.Services;
+using TuneVault.Infrastructure.SignalR;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +32,7 @@ builder.Services.AddScoped<IPlaylistRepository, PlaylistRepository>();
 builder.Services.AddScoped<IInteractionRepository, InteractionRepository>();
 builder.Services.AddScoped<IShareRepository, ShareRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+
 
 
 // ── JWT Service ───────────────────────────────────────
@@ -91,6 +96,10 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+// ── SignalR and Services───────────────────────────────
+builder.Services.AddSignalR();
+builder.Services.AddScoped<INotificationPushService, SignalRNotificationService>();
+
 // ── Middleware Pipeline ───────────────────────────────
 app.UseSwagger();
 app.UseSwaggerUI();
@@ -99,4 +108,7 @@ app.UseCors("AllowReact");    // ← phải trước Authentication
 app.UseAuthentication();      // ← phải trước Authorization
 app.UseAuthorization();
 app.MapControllers();
+app.MapHub<NotificationHub>("/notificationHub");
+
 app.Run();
+

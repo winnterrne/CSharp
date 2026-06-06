@@ -17,8 +17,6 @@ export interface Playlist {
 export interface PlaylistTrack {
   id: number;
   media: Media;
-  addedAt: string;
-  order: number;
 }
 
 export interface CreatePlaylistRequest {

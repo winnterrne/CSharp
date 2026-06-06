@@ -11,6 +11,7 @@ export const authApi = {
     username: string;
     email: string;
     password: string;
+    phone?: string;
   }) =>
     api.post("/auth/register", data),
 

@@ -1,4 +1,4 @@
-import { useState } from "react"; // NEW: quản lý trạng thái thu/mở panel
+
 import { usePlayer } from "../../hooks/usePlayer";
 
 const formatDuration = (seconds: number) => {
@@ -8,9 +8,15 @@ const formatDuration = (seconds: number) => {
   return `${min}:${String(sec).padStart(2, "0")}`;
 };
 
-const NowPlaying = () => {
-  // NEW: trạng thái thu gọn / mở rộng NowPlaying
-  const [isCollapsed, setIsCollapsed] = useState(false);
+interface NowPlayingProps {
+  isCollapsed: boolean;
+  onToggleCollapse: () => void;
+}
+
+const NowPlaying = ({
+  isCollapsed,
+  onToggleCollapse,
+}: NowPlayingProps) => {
 
   // NEW: lấy playTrack để click bài trong queue phát luôn
   const { currentTrack, queue, playTrack } = usePlayer();
@@ -38,7 +44,7 @@ const NowPlaying = () => {
         }}
       >
         <button
-          onClick={() => setIsCollapsed(false)}
+          onClick={() => onToggleCollapse()}
           title="Mở thông tin bài hát"
           style={{
             width: "60px",
@@ -74,7 +80,7 @@ const NowPlaying = () => {
       >
         {/* NEW: nút thu gọn khi chưa có bài */}
         <button
-          onClick={() => setIsCollapsed(true)}
+          onClick={() => onToggleCollapse()}
           title="Thu gọn"
           style={{
             position: "absolute",
@@ -130,7 +136,7 @@ const NowPlaying = () => {
       >
         {/* NEW: nút thu gọn ở góc trái */}
         <button
-          onClick={() => setIsCollapsed(true)}
+          onClick={() => onToggleCollapse()}
           title="Thu gọn thông tin bài hát"
           style={{
             width: "28px",

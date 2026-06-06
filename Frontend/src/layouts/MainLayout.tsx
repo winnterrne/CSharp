@@ -1,4 +1,3 @@
-import { type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/layout/SideBar";
 import PlayerBar from "../components/layout/PlayerBar";
@@ -7,12 +6,17 @@ import NowPlaying from "../components/layout/NowPlaying";
 import { usePlayer } from "../hooks/usePlayer";
 import { useAuth } from "../hooks/useAuth";
 import { useSearch } from "../hooks/useSearch";
+import { useState, type ReactNode } from "react";
 
 const MainLayout = ({ children }: { children: ReactNode }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { query, setQuery, search, searchResults, isLoading, error } =
     useSearch();
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
+  const sidebarWidth = isSidebarCollapsed ? "80px" : "280px";
+  const [isNowPlayingCollapsed, setIsNowPlayingCollapsed] = useState(false);
 
   const {
     currentTrack,
@@ -57,9 +61,9 @@ const MainLayout = ({ children }: { children: ReactNode }) => {
         searchLoading={isLoading}
         searchError={error}
         user={
-          user
-            ? { displayName: user.username, avatarUrl: user.avatarUrl }
-            : null
+          user ?
+            { displayName: user.username, avatarUrl: user.avatarUrl }
+          : null
         }
         onSearchChange={setQuery}
         onSearch={handleSearch}
@@ -76,14 +80,35 @@ const MainLayout = ({ children }: { children: ReactNode }) => {
           minHeight: 0,
           overflow: "hidden",
           display: "grid",
-          // FIX: cột NowPlaying lấy width theo component
-gridTemplateColumns: "280px minmax(0, 1fr) auto",
+          gridTemplateColumns: `${sidebarWidth} minmax(0,1fr) ${
+            isNowPlayingCollapsed ? "48px" : "320px"
+          }`,
           gap: "8px",
           padding: "8px 8px 0",
         }}
       >
-        <Sidebar />
-
+        {/* SIDEBAR COLUMN */}
+        <div
+          style={{
+            position: "relative",
+            width: sidebarWidth,
+            minWidth: sidebarWidth,
+            height: "100%",
+          }}
+        >
+          <Sidebar
+            isCollapsed={isSidebarCollapsed}
+            isExpanded={isSidebarExpanded}
+            onToggleCollapse={() => {
+              setIsSidebarCollapsed((prev) => !prev);
+              setIsSidebarExpanded(false);
+            }}
+            onToggleExpand={() => {
+              setIsSidebarCollapsed(false);
+              setIsSidebarExpanded((prev) => !prev);
+            }}
+          />
+        </div>
         <div
           style={{
             minWidth: 0,
@@ -95,7 +120,10 @@ gridTemplateColumns: "280px minmax(0, 1fr) auto",
           {children}
         </div>
 
-        <NowPlaying />
+        <NowPlaying
+          isCollapsed={isNowPlayingCollapsed}
+          onToggleCollapse={() => setIsNowPlayingCollapsed((prev) => !prev)}
+        />
       </div>
 
       <PlayerBar
