@@ -40,7 +40,7 @@ public async Task<IActionResult> GetUserPlaylist()
 // Tao 1 playlist
 [Authorize]
 [HttpPost]
-public async Task<IActionResult> CreatePlaylist(CreatePlaylistDto dto)
+public async Task<IActionResult> CreatePlaylist([FromBody] CreatePlaylistDto dto)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if(userId == null) return Unauthorized();
@@ -51,15 +51,15 @@ public async Task<IActionResult> CreatePlaylist(CreatePlaylistDto dto)
             userId
         );
         var result = await _mediator.Send(command);
-        return Ok(new {success = true, data = result});
+        return Ok(new {success = true, message = "Playlist created successfully", result});
     }
 // xoa 1 playlist
 [HttpDelete("{id}")]
 public async Task<IActionResult> DeletePlaylist(int id)
     {
         var result = await _mediator.Send(new DeletePlaylistCommand(id));
-        if(result <= 0) return NotFound(new {success = false, message = "K tim thay "});
-        return Ok(new {success = true, message = "Da xoa thanh cong"});
+        if(result <= 0) return NotFound(new {success = false, message = "Playlist not found"});
+        return Ok(new {success = true, message = "Playlist deleted successfully"});
     }
 
 // Add Track To List
@@ -67,7 +67,8 @@ public async Task<IActionResult> DeletePlaylist(int id)
 public async Task<IActionResult> AddTrackToLisst(int playlistId, int mediaItemId)
     {
         var result = await _mediator.Send(new AddTrackToPlaylistCommand(playlistId, mediaItemId));
-        return Ok(result);
+        if(result <= 0) return NotFound(new {success = false, message = "Playlist or Media Item not found"});
+        return Ok(new {success = true, message = "Track added to playlist successfully"});
     }
     
 // Remove Track From List
@@ -82,7 +83,8 @@ public async Task<IActionResult> RemoveTrack(
             mediaItemId
         ));
 
-    return Ok(result);
+    if(result <= 0) return NotFound(new {success = false, message = "Playlist or Media Item not found"});
+    return Ok(new {success = true, message = "Track removed from playlist successfully"});
 }
 
 }

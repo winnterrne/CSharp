@@ -94,12 +94,12 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-var app = builder.Build();
 
 // ── SignalR and Services───────────────────────────────
 builder.Services.AddSignalR();
 builder.Services.AddScoped<INotificationPushService, SignalRNotificationService>();
 
+var app = builder.Build();
 // ── Middleware Pipeline ───────────────────────────────
 app.UseSwagger();
 app.UseSwaggerUI();
