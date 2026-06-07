@@ -52,3 +52,4 @@ public record MediaStreamInfoDto
     string filePath,      
     string? ArtistName 
 );
+
