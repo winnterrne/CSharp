@@ -16,9 +16,9 @@ public class GetRecentPlayHistoryHandler : IRequestHandler<GetRecentPlayHistoryQ
         return result.Select(p => new PlayHistoryDTO
         {
             MediaItemID = p.MediaItemID,
-            TitleName = p.TitleName,
-            MediaItemImage = p.MediaItemImage,
-            PlayedAt = p.PlayedAt
+            TitleName = p.MediaItem.TitleName,
+            MediaItemImage = p.MediaItem.MediaItemImage,
+            PlayedAt = p.PlayedAt ?? DateTime.UtcNow
         });
     }
 }
