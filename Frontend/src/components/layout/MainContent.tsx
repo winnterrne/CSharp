@@ -44,21 +44,17 @@ useEffect(() => {
     try {
       setLoading(true);
 
-      // NEW: gọi dữ liệu thật từ backend
-      const [recommendedRes, forYouRes, upcomingRes] = await Promise.all([
-        mediaApi.getRecommended(),
-        mediaApi.getForYou(),
-        mediaApi.getUpcoming(),
-      ]);
+      const res = await mediaApi.getMyMedia();
 
-      // FIX: backend có thể trả res.data hoặc res.data.data
-      setRecommended(recommendedRes.data?.data ?? recommendedRes.data ?? []);
-      setForYou(forYouRes.data?.data ?? forYouRes.data ?? []);
-      setUpcoming(upcomingRes.data?.data ?? upcomingRes.data ?? []);
+      // BE trả: { success: true, data: [...] }
+      const mediaList: Media[] = res.data?.data ?? [];
+
+      setRecommended(mediaList);
+      setForYou(mediaList);
+      setUpcoming(mediaList);
     } catch (err) {
       console.error("FETCH HOME DATA ERROR:", err);
 
-      // NEW: nếu backend lỗi thì để mảng rỗng, không crash UI
       setRecommended([]);
       setForYou([]);
       setUpcoming([]);
@@ -69,6 +65,35 @@ useEffect(() => {
 
   fetchHomeData();
 }, []);
+  // const fetchHomeData = async () => {
+  //   try {
+  //     setLoading(true);
+
+      // NEW: gọi dữ liệu thật từ backend
+      // const [recommendedRes, forYouRes, upcomingRes] = await Promise.all([
+      //   mediaApi.getRecommended(),
+      //   mediaApi.getForYou(),
+      //   mediaApi.getUpcoming(),
+      // ]);
+
+      // FIX: backend có thể trả res.data hoặc res.data.data
+  //     setRecommended(recommendedRes.data?.data ?? recommendedRes.data ?? []);
+  //     setForYou(forYouRes.data?.data ?? forYouRes.data ?? []);
+  //     setUpcoming(upcomingRes.data?.data ?? upcomingRes.data ?? []);
+  //   } catch (err) {
+  //     console.error("FETCH HOME DATA ERROR:", err);
+
+  //     // NEW: nếu backend lỗi thì để mảng rỗng, không crash UI
+  //     setRecommended([]);
+  //     setForYou([]);
+  //     setUpcoming([]);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+//   fetchHomeData();
+// }, []);
 
 
   const handleOpenTrack = (track: Media) => {

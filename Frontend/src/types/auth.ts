@@ -1,9 +1,11 @@
 export interface User {
-  id: number;
+  id: string;
   username: string;
   email: string;
+  role?: string;
   avatarUrl?: string;
-  createdAt: string;
+  phone?: string;
+  createdAt?: string;
   updatedAt?: string;
 }
 
@@ -22,12 +24,18 @@ export interface RegisterRequest {
   username: string;
   email: string;
   password: string;
+  phone?: string;
 }
 
 export interface LoginResponse {
-  user: User;
-  accessToken: string;
-  refreshToken?: string;
+  success: boolean;
+  data: {
+    userID: string;
+    userName: string;
+    email: string;
+    role: string;
+    token: string;
+  };
 }
 
 export interface AuthState {

@@ -31,14 +31,24 @@ export const authStore = create<AuthStore>()(
       },
 
       logout: () => {
-        set({ user: null, token: null, isAuthenticated: false });
+        set({
+          user: null,
+          token: null,
+          isAuthenticated: false,
+          isLoading: false,
+        });
       },
 
       getUser: () => get().user,
       getToken: () => get().token,
 
       clear: () => {
-        set({ user: null, token: null, isAuthenticated: false });
+        set({
+          user: null,
+          token: null,
+          isAuthenticated: false,
+          isLoading: false,
+        });
       },
     }),
     {
@@ -47,6 +57,6 @@ export const authStore = create<AuthStore>()(
         user: state.user,
         token: state.token,
       }),
-    }
-  )
+    },
+  ),
 );

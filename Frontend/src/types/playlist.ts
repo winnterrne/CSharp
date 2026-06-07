@@ -3,14 +3,16 @@ import type { User } from "./auth";
 
 export interface Playlist {
   id: number;
-  name: string;
+  playlistID?: number;
+  name?: string;
+  playlistName?: string;
   description?: string;
   coverUrl?: string;
-  owner: User;
+  owner?: User;
   tracks: PlaylistTrack[];
   trackCount: number;
   isPublic: boolean;
-  createdAt: string;
+  createdAt?: string;
   updatedAt?: string;
 }
 

@@ -4,7 +4,7 @@ import { playlistApi } from "../../api/playlistApi";
 interface Props {
   open: boolean;
   onClose: () => void;
-  onCreated: () => void;
+ onCreated: () => void | Promise<void>;
 }
 
 const CreatePlaylistModal = ({ open, onClose, onCreated }: Props) => {
@@ -26,7 +26,7 @@ const CreatePlaylistModal = ({ open, onClose, onCreated }: Props) => {
         isPublic: true,
       });
 
-      onCreated();
+      await onCreated();
 
       setName("");
       setDescription("");

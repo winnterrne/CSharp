@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { playlistApi } from "../../api/playlistApi";
 import type { Playlist } from "../../types/playlist";
 import type { Media } from "../../types/media";
@@ -7,7 +7,6 @@ import { ROUTES } from "../../constant/routes";
 import CreatePlaylistModal from "../playlist/CreatePlaylistModal";
 import { usePlayer } from "../../hooks/usePlayer";
 import { useHistoryStore } from "../../store/historyStore";
-import { useLocation } from "react-router-dom";
 
 type FilterTab = "playlist" | "artist";
 
@@ -17,6 +16,19 @@ interface SidebarProps {
   onToggleCollapse: () => void;
   onToggleExpand: () => void;
 }
+
+// FIX: hỗ trợ cả field FE và field BE
+const getPlaylistId = (playlist: Playlist) => {
+  return playlist.id ?? playlist.playlistID ?? 0;
+};
+
+const getPlaylistName = (playlist: Playlist) => {
+  return playlist.name ?? playlist.playlistName ?? "Playlist chưa có tên";
+};
+
+const getPlaylistTrackCount = (playlist: Playlist) => {
+  return playlist.trackCount ?? playlist.tracks?.length ?? 0;
+};
 
 /* ================= ICON BUTTON ================= */
 const IconBtn = ({
@@ -77,18 +89,6 @@ const ExpandIcon = () => (
   </svg>
 );
 
-// const CollapseIcon = () => (
-//   <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-//     <path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
-//   </svg>
-// );
-
-// const OpenIcon = () => (
-//   <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-//     <path d="m8.59 16.59 1.41 1.41 6-6-6-6-1.41 1.41L13.17 12z" />
-//   </svg>
-// );
-
 const SearchIcon = () => (
   <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
     <path d="M10.5 3a7.5 7.5 0 1 0 4.74 13.32l4.22 4.22a1 1 0 0 0 1.42-1.42l-4.22-4.22A7.5 7.5 0 0 0 10.5 3Zm0 2a5.5 5.5 0 1 1 0 11a5.5 5.5 0 0 1 0-11Z" />
@@ -109,36 +109,35 @@ const Sidebar = ({
   onToggleExpand,
 }: SidebarProps) => {
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // EXPANDED MODE FLAG
   const isWide = isExpanded;
 
   const [activeTab, setActiveTab] = useState<FilterTab | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchVal, setSearchVal] = useState("");
-  const [activeItem, setActiveItem] = useState<number | null>(null);
-
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [loading, setLoading] = useState(true);
-
-  // MODAL CREATE PLAYLIST
   const [showCreateModal, setShowCreateModal] = useState(false);
-
-  // RECENT TRACKS LOCAL STORAGE
   const [showRecent, setShowRecent] = useState(false);
-  const recentTracks = useHistoryStore((state) => state.recentTracks);
 
-  // PLAYER ACTIONS
+  const recentTracks = useHistoryStore((state) => state.recentTracks);
   const { playTrack, setQueue } = usePlayer();
-  const location = useLocation();
-  /* ================= FETCH PLAYLISTS ================= */
+
   const fetchPlaylists = useCallback(async () => {
     try {
       setLoading(true);
+
       const res = await playlistApi.getMyPlaylists();
 
-      setPlaylists(Array.isArray(res.data) ? res.data : (res.data?.data ?? []));
-    } catch {
+      // BE trả { succes: true, data: [...] }
+      const data = Array.isArray(res.data)
+        ? res.data
+        : res.data?.data ?? [];
+
+      setPlaylists(data);
+    } catch (err) {
+      console.error("LOAD PLAYLISTS ERROR:", err);
       setPlaylists([]);
     } finally {
       setLoading(false);
@@ -149,15 +148,22 @@ const Sidebar = ({
     fetchPlaylists();
   }, [fetchPlaylists]);
 
-  /* ================= FILTER PLAYLISTS ================= */
-  const filteredPlaylists = playlists.filter((item) => {
-    const matchTab = true;
-    const matchSearch = item.name
-      .toLowerCase()
-      .includes(searchVal.toLowerCase());
+  const filteredPlaylists = playlists.filter((playlist) => {
+    // Artist tab chưa có backend nên tạm thời ẩn playlist khi chọn artist
+    if (activeTab === "artist") return false;
 
-    return matchTab && matchSearch;
+    const playlistName = getPlaylistName(playlist);
+
+    return playlistName.toLowerCase().includes(searchVal.toLowerCase());
   });
+
+  const handleOpenPlaylist = (playlist: Playlist) => {
+    const playlistId = getPlaylistId(playlist);
+
+    if (!playlistId) return;
+
+    navigate(ROUTES.PLAYLIST(playlistId));
+  };
 
   /* ================= COLLAPSED SIDEBAR ================= */
   if (isCollapsed) {
@@ -202,41 +208,47 @@ const Sidebar = ({
             scrollbarWidth: "none",
           }}
         >
-          {playlists.map((playlist) => (
-            <button
-              key={playlist.id}
-              title={playlist.name}
-              onClick={() => {
-                setActiveItem(playlist.id);
-                navigate(ROUTES.PLAYLIST(playlist.id));
-              }}
-              style={{
-                width: "52px",
-                height: "52px",
-                borderRadius: "10px",
-                border:
-                  activeItem === playlist.id ? "2px solid #1DB954" : "none",
-                background: "#2a2a2a",
-                overflow: "hidden",
-                cursor: "pointer",
-                color: "#fff",
-                flexShrink: 0,
-                padding: 0,
-              }}
-            >
-              {playlist.coverUrl ?
-                <img
-                  src={playlist.coverUrl}
-                  alt={playlist.name}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                  }}
-                />
-              : "🎵"}
-            </button>
-          ))}
+          {playlists.map((playlist) => {
+            const playlistId = getPlaylistId(playlist);
+            const playlistName = getPlaylistName(playlist);
+
+            return (
+              <button
+                key={playlistId}
+                title={playlistName}
+                onClick={() => handleOpenPlaylist(playlist)}
+                style={{
+                  width: "52px",
+                  height: "52px",
+                  borderRadius: "10px",
+                  border:
+                    location.pathname === ROUTES.PLAYLIST(playlistId)
+                      ? "2px solid #1DB954"
+                      : "none",
+                  background: "#2a2a2a",
+                  overflow: "hidden",
+                  cursor: "pointer",
+                  color: "#fff",
+                  flexShrink: 0,
+                  padding: 0,
+                }}
+              >
+                {playlist.coverUrl ? (
+                  <img
+                    src={playlist.coverUrl}
+                    alt={playlistName}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
+                  />
+                ) : (
+                  "🎵"
+                )}
+              </button>
+            );
+          })}
         </div>
 
         <CreatePlaylistModal
@@ -254,17 +266,14 @@ const Sidebar = ({
         width: isWide ? "calc(100vw - 380px)" : "100%",
         minWidth: 0,
         height: "100%",
-        background:
-          isWide ?
-            "linear-gradient(180deg, #181818 0%, #121212 100%)"
+        background: isWide
+          ? "linear-gradient(180deg, #181818 0%, #121212 100%)"
           : "#121212",
         borderRadius: "12px",
         display: "flex",
         flexDirection: "column",
         overflow: "hidden",
         boxSizing: "border-box",
-
-        // EXPANDED: sidebar đè lên MainContent
         position: isWide ? "absolute" : "relative",
         left: 0,
         top: 0,
@@ -274,7 +283,7 @@ const Sidebar = ({
         transition: "width 0.25s ease, box-shadow 0.25s ease",
       }}
     >
-      {/* ================= HEADER ================= */}
+      {/* HEADER */}
       <div
         style={{
           padding: isWide ? "16px 16px 12px" : "12px 12px 8px",
@@ -338,7 +347,6 @@ const Sidebar = ({
           </div>
         </div>
 
-        {/* Filter tabs */}
         <div style={{ display: "flex", gap: "8px" }}>
           {(["playlist", "artist"] as FilterTab[]).map((tab) => (
             <button
@@ -361,7 +369,7 @@ const Sidebar = ({
         </div>
       </div>
 
-      {/* ================= SEARCH + RECENT ================= */}
+      {/* SEARCH + RECENT */}
       <div
         style={{
           display: "flex",
@@ -372,22 +380,13 @@ const Sidebar = ({
           minWidth: 0,
         }}
       >
-        {/* Search box */}
         <div
           style={{
             position: "relative",
             flex: "1 1 auto",
             minWidth: 0,
-            width:
-              searchOpen ?
-                isWide ? "100%"
-                : "170px"
-              : "42px",
-            maxWidth:
-              searchOpen ?
-                isWide ? "360px"
-                : "170px"
-              : "42px",
+            width: searchOpen ? (isWide ? "100%" : "170px") : "42px",
+            maxWidth: searchOpen ? (isWide ? "360px" : "170px") : "42px",
             transition: "all .25s ease",
           }}
         >
@@ -436,7 +435,6 @@ const Sidebar = ({
           )}
         </div>
 
-        {/* Recent toggle */}
         <button
           onClick={() => setShowRecent((prev) => !prev)}
           title="Hiện bài hát gần đây"
@@ -463,7 +461,7 @@ const Sidebar = ({
         </button>
       </div>
 
-      {/* ================= LIST AREA ================= */}
+      {/* LIST */}
       <div
         style={{
           flex: 1,
@@ -473,10 +471,11 @@ const Sidebar = ({
           padding: isWide ? "0 16px 16px" : "0 8px 8px",
         }}
       >
-        {showRecent ?
-          recentTracks.length === 0 ?
+        {showRecent ? (
+          recentTracks.length === 0 ? (
             <EmptyText text="Chưa có bài hát gần đây" />
-          : recentTracks.map((track) => (
+          ) : (
+            recentTracks.map((track) => (
               <RecentTrackRow
                 key={track.id}
                 track={track}
@@ -487,24 +486,32 @@ const Sidebar = ({
                 }}
               />
             ))
-
-        : loading ?
+          )
+        ) : loading ? (
           <LoadingText />
-        : filteredPlaylists.length === 0 ?
-          <EmptyText text="Chưa có dữ liệu" />
-        : filteredPlaylists.map((playlist) => (
-            <PlaylistRow
-              key={playlist.id}
-              playlist={playlist}
-              active={location.pathname === ROUTES.PLAYLIST(playlist.id)}
-              isWide={isWide}
-              onClick={() => {
-                setActiveItem(playlist.id);
-                navigate(ROUTES.PLAYLIST(playlist.id));
-              }}
-            />
-          ))
-        }
+        ) : filteredPlaylists.length === 0 ? (
+          <EmptyText
+            text={
+              activeTab === "artist"
+                ? "Chưa có nghệ sĩ theo dõi"
+                : "Chưa có dữ liệu"
+            }
+          />
+        ) : (
+          filteredPlaylists.map((playlist) => {
+            const playlistId = getPlaylistId(playlist);
+
+            return (
+              <PlaylistRow
+                key={playlistId}
+                playlist={playlist}
+                active={location.pathname === ROUTES.PLAYLIST(playlistId)}
+                isWide={isWide}
+                onClick={() => handleOpenPlaylist(playlist)}
+              />
+            );
+          })
+        )}
       </div>
 
       <CreatePlaylistModal
@@ -530,6 +537,9 @@ const PlaylistRow = ({
 }) => {
   const [hovered, setHovered] = useState(false);
 
+  const playlistName = getPlaylistName(playlist);
+  const trackCount = getPlaylistTrackCount(playlist);
+
   return (
     <div
       onClick={onClick}
@@ -541,10 +551,7 @@ const PlaylistRow = ({
         gap: isWide ? "16px" : "12px",
         padding: isWide ? "12px" : "8px",
         borderRadius: "8px",
-        background:
-          active ? "#2a2a2a"
-          : hovered ? "#1a1a1a"
-          : "transparent",
+        background: active ? "#2a2a2a" : hovered ? "#1a1a1a" : "transparent",
         cursor: "pointer",
       }}
     >
@@ -562,13 +569,15 @@ const PlaylistRow = ({
           fontSize: isWide ? "24px" : "20px",
         }}
       >
-        {playlist.coverUrl ?
+        {playlist.coverUrl ? (
           <img
             src={playlist.coverUrl}
-            alt={playlist.name}
+            alt={playlistName}
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
-        : "🎵"}
+        ) : (
+          "🎵"
+        )}
       </div>
 
       <div style={{ minWidth: 0, flex: 1 }}>
@@ -582,7 +591,7 @@ const PlaylistRow = ({
             textOverflow: "ellipsis",
           }}
         >
-          {playlist.name}
+          {playlistName}
         </div>
 
         <div
@@ -592,7 +601,7 @@ const PlaylistRow = ({
             marginTop: "3px",
           }}
         >
-          Danh sách phát • {playlist.trackCount} bài
+          Danh sách phát • {trackCount} bài
         </div>
       </div>
     </div>
@@ -639,13 +648,15 @@ const RecentTrackRow = ({
           justifyContent: "center",
         }}
       >
-        {track.thumbnailUrl ?
+        {track.thumbnailUrl ? (
           <img
             src={track.thumbnailUrl}
             alt={track.title}
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
-        : "🎵"}
+        ) : (
+          "🎵"
+        )}
       </div>
 
       <div style={{ minWidth: 0, flex: 1 }}>

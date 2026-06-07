@@ -20,12 +20,23 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      // NEW: gọi backend thật
+      // BE trả: { success: true, data: { userID, userName, email, role, token } }
       const res = await authApi.login(email, password);
+      const authData = res.data.data;
 
-      login(res.data.user, res.data.accessToken);
+      login(
+        {
+          id: authData.userID,
+          username: authData.userName,
+          email: authData.email,
+          role: authData.role,
+        },
+        authData.token,
+      );
+
       navigate("/");
-    } catch {
+    } catch (err) {
+      console.error("LOGIN ERROR:", err);
       setError("Email hoặc mật khẩu không đúng");
     } finally {
       setLoading(false);
