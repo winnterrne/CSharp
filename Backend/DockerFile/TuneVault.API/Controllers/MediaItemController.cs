@@ -11,7 +11,7 @@ using TuneVault.Application.DTOs;
 using TuneVault.Application.UseCases.MediaItem;
 using TuneVault.Application.UseCases.MediaItem.MediaUploading;
 using TuneVault.Application.UseCases.MediaItem.MediaStreaming;
-using TuneVault.Application.UseCases.Playhistory;
+using TuneVault.Application.UseCases.Interaction;
 using System.IO;
 
 namespace TuneVault.API.Controllers
