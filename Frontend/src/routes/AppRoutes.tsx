@@ -1,35 +1,59 @@
 import { Routes, Route } from "react-router-dom";
 import MainLayout from "../layouts/MainLayout";
-import MainContent from "../components/layout/MainContent";
-// import HomePage from "../pages/Home/HomePage";
-// import LoginPage from "../pages/Auth/LoginPage";
-// import PublicRoute from "./PublicRoute";
-//import ProtectedRoute from "./ProtectedRoute";
+import ProtectedRoute from "./ProtectedRoute";
+import HomePage from "../pages/Home/HomePage";
+import LoginPage from "../pages/Auth/LoginPage";
+import RegisterPage from "../pages/Auth/RegisterPage";
+import ProfilePage from "../pages/Profile/ProfilePage";
+import SearchPage from "../pages/Search/SearchPage";
+import PlaylistDetailPage from "../pages/Playlist/PlaylistDetailPage";
 
 export default function AppRoutes() {
   return (
     <Routes>
-      {/* Public */}
-      <Route
-        path="/"
-        element={
-          <MainLayout>
-            <MainContent />
-          </MainLayout>
-        }
-      />
+      <Route path="/login" element={<LoginPage />} />
 
-      {/* Protected */}
-      {/* <Route
+      <Route path="/register" element={<RegisterPage />} />
+
+      <Route
         path="/"
         element={
           <ProtectedRoute>
             <MainLayout>
-              <MainContent />
+              <HomePage />
             </MainLayout>
           </ProtectedRoute>
         }
-      /> */}
+      />
+
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <MainLayout>
+              <ProfilePage />
+            </MainLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+  path="/search"
+  element={
+    <ProtectedRoute>
+      <MainLayout>
+        <SearchPage />
+      </MainLayout>
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/playlist/:id"
+  element={
+    <MainLayout>
+      <PlaylistDetailPage />
+    </MainLayout>
+  }
+/>
     </Routes>
   );
 }

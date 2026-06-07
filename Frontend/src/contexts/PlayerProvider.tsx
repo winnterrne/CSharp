@@ -1,46 +1,74 @@
-import { useState, useEffect } from "react";
 import type { ReactNode } from "react";
-import type { Track } from "../types/media";
+import type { Media } from "../types/media";
 import { PlayerContext } from "./PlayerContext";
+import { playerStore } from "../store/playerStore";
 
 export const PlayerProvider = ({ children }: { children: ReactNode }) => {
-  const [currentTrack, setCurrentTrack] = useState<Track | null>({
-    id: "1",
-    title: "Nhắc Máy",
-    artist: "Noo Phước Thịnh",
-    duration: 214,
-    color: "#1a3050",
-    emoji: "📱",
-  });
-  const [isPlaying, setIsPlaying] = useState(true);
-  const [progress, setProgress]   = useState(38);
-  const [volume, setVolume]       = useState(80);
-  const [shuffle, setShuffle]     = useState(false);
-  const [repeat, setRepeat]       = useState(false);
+  // Subscribe to playerStore
+  const currentTrack = playerStore((state) => state.currentTrack);
+  const queue = playerStore((state) => state.queue);
+  const isPlaying = playerStore((state) => state.isPlaying);
+  const position = playerStore((state) => state.position);
+  const duration = playerStore((state) => state.duration);
+  const volume = playerStore((state) => state.volume);
+  const isMuted = playerStore((state) => state.isMuted);
+  const isShuffle = playerStore((state) => state.isShuffle);
+  const repeatMode = playerStore((state) => state.repeatMode);
+  const isLoading = playerStore((state) => state.isLoading);
+  const setDuration = playerStore((state) => state.setDuration);
 
-  useEffect(() => {
-    if (!isPlaying) return;
-    const id = setInterval(() => {
-      setProgress((p) => (p >= 100 ? 0 : p + 0.05));
-    }, 300);
-    return () => clearInterval(id);
-  }, [isPlaying]);
+  // Actions from store
+  const playTrack = playerStore((state) => state.setCurrentTrack);
+  const setQueue = playerStore((state) => state.setQueue);
+  const togglePlay = playerStore((state) => state.togglePlay);
+  const play = playerStore((state) => state.play);
+  const pause = playerStore((state) => state.pause);
+  const seek = playerStore((state) => state.seek);
+  const setVolume = playerStore((state) => state.setVolume);
+  const setMuted = playerStore((state) => state.setMuted);
+  const toggleShuffle = playerStore((state) => state.toggleShuffle);
+  const toggleRepeatMode = playerStore((state) => state.toggleRepeatMode);
+  const next = playerStore((state) => state.next);
+  const previous = playerStore((state) => state.previous);
+  const addToQueue = playerStore((state) => state.addToQueue);
+  const removeFromQueue = playerStore((state) => state.removeFromQueue);
+  const clearQueue = playerStore((state) => state.clearQueue);
+
+  const handlePlayTrack = (track: Media) => {
+    playerStore.getState().setCurrentTrack(track);
+    playerStore.getState().play();
+    playerStore.getState().seek(0);
+  };
 
   return (
     <PlayerContext.Provider
       value={{
         currentTrack,
+        queue,
         isPlaying,
-        progress,
+        position,
+        duration,
         volume,
-        shuffle,
-        repeat,
-        setTrack: setCurrentTrack,
-        togglePlay: () => setIsPlaying((p) => !p),
-        setProgress,
+        isMuted,
+        isShuffle,
+        repeatMode,
+        isLoading,
+        playTrack: handlePlayTrack,
+        setQueue,
+        togglePlay,
+        play,
+        pause,
+        seek,
         setVolume,
-        toggleShuffle: () => setShuffle((s) => !s),
-        toggleRepeat: () => setRepeat((r) => !r),
+        setMuted,
+        toggleShuffle,
+        toggleRepeatMode,
+        next,
+        previous,
+        addToQueue,
+        removeFromQueue,
+        clearQueue,
+        setDuration,
       }}
     >
       {children}
