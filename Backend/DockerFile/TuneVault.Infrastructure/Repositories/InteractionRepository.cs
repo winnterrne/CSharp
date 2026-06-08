@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using TuneVault.Domain.Interfaces;
 using TuneVault.Domain.Entities;
 using TuneVault.Infrastructure.Dapper;
+using Dapper;
 namespace TuneVault.Infrastructure.Repositories
 {
     public class InteractionRepository : IInteractionRepository
@@ -56,14 +57,20 @@ namespace TuneVault.Infrastructure.Repositories
             });
         }
         //Lấy 10 bài mới nhất trong lịch sử nghe nhạc của người dùng
-        public async Task<IEnumerable<PlayHistoryDetail>> GetRecentPlayHistoryAsync(string userId, int limit = 10)
+        public async Task<IEnumerable<PlayHistory>> GetRecentPlayHistoryAsync(string userId, int limit = 10)
         {
-            string sql = @"SELECT TOP (@Limit) p.MediaItemID, m.TitleName, m.MediaItemImage, p.PlayedAt
-                            FROM PlayHistory as p
-                            JOIN MediaItem as m on p.MediaItemID = m.MediaItemID
-                            WHERE p.UserID = @UserID
-                            ORDER BY p.PlayedAt DESC";
-            return await _db.LoadAllDataSingleAsync<PlayHistoryDetail>(sql, new {UserID = userId, Limit = limit});
+            string sql = @"SELECT TOP (@Limit) p.historyID, p.UserID, p.MediaItemID, p.PlayedAt, m.TitleName, m.MediaItemID, m.MediaItemImage 
+                        FROM PlayHistory as p
+                        INNER JOIN MediaItem m on p.MediaItemID = m.MediaItemID
+                        WHERE p.UserID = @UserID
+                        ORDER BY p.PlayedAt DESC";
+            using var con = _db.CreateConnection();
+            var result = await con.QueryAsync<PlayHistory, MediaItem, PlayHistory>(sql, (history, media) => 
+            {
+                history.MediaItem = media;
+                return history;
+            }, new { UserID = userId, Limit = limit }, splitOn: "MediaItemID");
+            return result;
         }
 
     // Chức năng: Theo dõi (Follow)
