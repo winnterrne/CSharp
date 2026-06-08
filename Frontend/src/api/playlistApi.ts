@@ -1,27 +1,24 @@
 import api from "./axios";
+import type { CreatePlaylistRequest } from "../types/playlist";
 
 export const playlistApi = {
-  // GET /api/Playlist/my-playlist
+  // BE: [Route("api/[controller]")] => /api/Playlist
   getMyPlaylists: () => api.get("/Playlist/my-playlist"),
 
-  // GET /api/Playlist/{id}
   getById: (id: number) => api.get(`/Playlist/${id}`),
 
-  // POST /api/Playlist
-  create: (data: {
-    playlistName: string;
-    description?: string;
-    isPublic: boolean;
-  }) => api.post("/Playlist", data),
+  create: (data: CreatePlaylistRequest) =>
+    api.post("/Playlist", {
+      playlistName: data.playlistName,
+      description: data.description ?? "",
+      isPublic: data.isPublic,
+    }),
 
-  // DELETE /api/Playlist/{id}
   delete: (id: number) => api.delete(`/Playlist/${id}`),
 
-  // POST /api/Playlist/{playlistId}/tracks/{mediaItemId}
   addTrack: (playlistId: number, mediaItemId: number) =>
     api.post(`/Playlist/${playlistId}/tracks/${mediaItemId}`),
 
-  // DELETE /api/Playlist/{playlistId}/tracks/{mediaItemId}
   removeTrack: (playlistId: number, mediaItemId: number) =>
     api.delete(`/Playlist/${playlistId}/tracks/${mediaItemId}`),
 };

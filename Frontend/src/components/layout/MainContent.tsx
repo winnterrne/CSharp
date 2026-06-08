@@ -7,6 +7,7 @@ import HomeView from "../home/HomeView";
 import ArtistDetailView from "../home/ArtistDetailView";
 import AlbumCardLarge from "../home/AlbumCardLarge";
 import { mediaApi } from "../../api/mediaApi";
+import { mapMediaItemDtoToMedia, type MediaItemDto } from "../../types/media";
 
 type ViewMode =
   | "home"
@@ -39,44 +40,50 @@ const MainContent = () => {
     tracks: Media[];
   } | null>(null);
 
-useEffect(() => {
-  const fetchHomeData = async () => {
-    try {
-      setLoading(true);
+  useEffect(() => {
+    const fetchHomeData = async () => {
+      try {
+        setLoading(true);
 
-      const res = await mediaApi.getMyMedia();
+        const res = await mediaApi.getAll();
 
-      // BE trả: { success: true, data: [...] }
-      const mediaList: Media[] = res.data?.data ?? [];
+        console.log("API RESPONSE:", res.data);
 
-      setRecommended(mediaList);
-      setForYou(mediaList);
-      setUpcoming(mediaList);
-    } catch (err) {
-      console.error("FETCH HOME DATA ERROR:", err);
+        const mediaDtos: MediaItemDto[] =
+          Array.isArray(res.data?.data) ? res.data.data : [];
 
-      setRecommended([]);
-      setForYou([]);
-      setUpcoming([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+        const mediaList: Media[] = mediaDtos.map(mapMediaItemDtoToMedia);
 
-  fetchHomeData();
-}, []);
+        console.log("MEDIA LIST:", mediaList);
+
+        setRecommended(mediaList);
+        setForYou(mediaList);
+        setUpcoming(mediaList);
+      } catch (err) {
+        console.error("FETCH HOME DATA ERROR:", err);
+
+        setRecommended([]);
+        setForYou([]);
+        setUpcoming([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHomeData();
+  }, []);
   // const fetchHomeData = async () => {
   //   try {
   //     setLoading(true);
 
-      // NEW: gọi dữ liệu thật từ backend
-      // const [recommendedRes, forYouRes, upcomingRes] = await Promise.all([
-      //   mediaApi.getRecommended(),
-      //   mediaApi.getForYou(),
-      //   mediaApi.getUpcoming(),
-      // ]);
+  // NEW: gọi dữ liệu thật từ backend
+  // const [recommendedRes, forYouRes, upcomingRes] = await Promise.all([
+  //   mediaApi.getRecommended(),
+  //   mediaApi.getForYou(),
+  //   mediaApi.getUpcoming(),
+  // ]);
 
-      // FIX: backend có thể trả res.data hoặc res.data.data
+  // FIX: backend có thể trả res.data hoặc res.data.data
   //     setRecommended(recommendedRes.data?.data ?? recommendedRes.data ?? []);
   //     setForYou(forYouRes.data?.data ?? forYouRes.data ?? []);
   //     setUpcoming(upcomingRes.data?.data ?? upcomingRes.data ?? []);
@@ -92,9 +99,8 @@ useEffect(() => {
   //   }
   // };
 
-//   fetchHomeData();
-// }, []);
-
+  //   fetchHomeData();
+  // }, []);
 
   const handleOpenTrack = (track: Media) => {
     // NEW: mở màn hình chi tiết bài hát
@@ -153,7 +159,6 @@ useEffect(() => {
     };
   };
   const showAllData = getShowAllData();
-
   return (
     <main
       style={{

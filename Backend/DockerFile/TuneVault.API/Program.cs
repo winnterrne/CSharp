@@ -32,7 +32,7 @@ builder.Services.AddScoped<IPlaylistRepository, PlaylistRepository>();
 builder.Services.AddScoped<IInteractionRepository, InteractionRepository>();
 builder.Services.AddScoped<IShareRepository, ShareRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
-
+builder.Services.AddScoped<IAIService, AIService>();
 
 
 // ── JWT Service ───────────────────────────────────────
@@ -60,12 +60,12 @@ builder.Services
     {
         opt.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuer           = true,
-            ValidateAudience         = true,
-            ValidateLifetime         = true,
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer    = builder.Configuration["Jwt:Issuer"],
-            ValidAudience  = builder.Configuration["Jwt:Audience"],
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
         };
@@ -94,12 +94,12 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-var app = builder.Build();
 
 // ── SignalR and Services───────────────────────────────
 builder.Services.AddSignalR();
 builder.Services.AddScoped<INotificationPushService, SignalRNotificationService>();
 
+var app = builder.Build();
 // ── Middleware Pipeline ───────────────────────────────
 app.UseSwagger();
 app.UseSwaggerUI();

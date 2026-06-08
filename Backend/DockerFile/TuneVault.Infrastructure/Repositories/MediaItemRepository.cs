@@ -107,6 +107,7 @@ public class MediaItemRepository : IMediaItemRepository
                         WHERE m.MediaItemID = @MediaItemID AND m.IsDeleted = 0";
         return await _db.LoadDataSingleAsync<MediaItem>(sql, new { MediaItemID = mediaId});
     }
+    
 
 
 }

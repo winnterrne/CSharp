@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { playlistApi } from "../../api/playlistApi";
-import type { Playlist, PlaylistTrack } from "../../types/playlist";
+import type { Playlist, PlaylistTrack, PlaylistDetailDto } from "../../types/playlist";
+import { mapPlaylistDetailDtoToPlaylist } from "../../types/playlist";
 import type { Media } from "../../types/media";
 import { usePlayer } from "../../hooks/usePlayer";
 
@@ -15,11 +16,13 @@ const formatDuration = (seconds?: number) => {
 };
 
 const getPlaylistFromResponse = (responseData: unknown): Playlist => {
-  const data = responseData as {
-    data?: Playlist;
+  const wrapper = responseData as {
+    data?: PlaylistDetailDto;
   };
 
-  return data.data ?? (responseData as Playlist);
+  const raw = wrapper.data ?? (responseData as PlaylistDetailDto);
+
+  return mapPlaylistDetailDtoToPlaylist(raw);
 };
 
 const PlaylistDetailPage = () => {
@@ -65,11 +68,7 @@ const PlaylistDetailPage = () => {
         const res = await playlistApi.getById(Number(id));
         const data = getPlaylistFromResponse(res.data);
 
-        setPlaylist({
-          ...data,
-          tracks: data.tracks ?? [],
-          trackCount: data.trackCount ?? data.tracks?.length ?? 0,
-        });
+        setPlaylist(data);
       } catch (err) {
         console.error("LOAD PLAYLIST ERROR:", err);
         setError("Không tải được playlist");
@@ -195,7 +194,7 @@ const PlaylistDetailPage = () => {
           {playlist.coverUrl ?
             <img
               src={playlist.coverUrl}
-              alt={playlist.name}
+              alt={playlist.name || playlist.playlistName}
               style={{
                 width: "100%",
                 height: "100%",
@@ -227,7 +226,7 @@ const PlaylistDetailPage = () => {
               wordBreak: "break-word",
             }}
           >
-            {playlist.name}
+            {playlist.name || playlist.playlistName}
           </h1>
 
           {playlist.description && (

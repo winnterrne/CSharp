@@ -11,7 +11,7 @@ using TuneVault.Application.DTOs;
 using TuneVault.Application.UseCases.MediaItem;
 using TuneVault.Application.UseCases.MediaItem.MediaUploading;
 using TuneVault.Application.UseCases.MediaItem.MediaStreaming;
-using TuneVault.Application.UseCases.Playhistory;
+using TuneVault.Application.UseCases.Interaction;
 using System.IO;
 
 namespace TuneVault.API.Controllers
@@ -75,7 +75,19 @@ namespace TuneVault.API.Controllers
             return Ok(new { success = true, data = result});
         }
 
-        [Authorize]
+        //ham getall Vinh them
+[HttpGet]
+public async Task<IActionResult> GetAll()
+{
+    var result = await _mediator.Send(new GetAllMediaQuery());
+
+    return Ok(new
+    {
+        success = true,
+        data = result
+    });
+}
+        // [Authorize]
         [HttpGet("{id}/stream")]
         public async Task<IActionResult> Streaming(int id)
         {

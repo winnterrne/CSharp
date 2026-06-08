@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using TuneVault.Domain.Interfaces;
 using TuneVault.Domain.Entities;
 using TuneVault.Infrastructure.Dapper;
+using Dapper;
 namespace TuneVault.Infrastructure.Repositories
 {
     public class InteractionRepository : IInteractionRepository
@@ -18,9 +19,9 @@ namespace TuneVault.Infrastructure.Repositories
         // Thêm yêu thích
         public async Task<int> AddFavoriteAsync(Favorite favorite)
         {
-            string sql = @"IF NOT EXISTS (SELECT 1 FROM TuneVault.Favorite WHERE UserID = @UserID AND MediaItemID = @MediaItemID)
+            string sql = @"IF NOT EXISTS (SELECT 1 FROM Favorite WHERE UserID = @UserID AND MediaItemID = @MediaItemID)
                             BEGIN
-                                    INSERT INTO TuneVault.Favorite (UserID, MediaItemID) VALUES (@UserID, @MediaItemID)
+                                    INSERT INTO Favorite (UserID, MediaItemID) VALUES (@UserID, @MediaItemID)
                             END";
             return await _db.ExecuteDataAsync(sql, favorite);
         }
@@ -35,7 +36,7 @@ namespace TuneVault.Infrastructure.Repositories
         public async Task<IEnumerable<MediaItem>> GetUserFavoritesAsync(string userId)
         {
             string sql = @"SELECT m.* FROM MediaItem m
-                            INNER JOIN TuneVault.Favorite f ON m.MediaItemID = f.MediaItemID
+                            INNER JOIN Favorite f ON m.MediaItemID = f.MediaItemID
                             WHERE f.UserID = @UserID";
             return await _db.LoadAllDataSingleAsync<MediaItem>(sql, new {UserID = userId});
         }
@@ -58,10 +59,18 @@ namespace TuneVault.Infrastructure.Repositories
         //Lấy 10 bài mới nhất trong lịch sử nghe nhạc của người dùng
         public async Task<IEnumerable<PlayHistory>> GetRecentPlayHistoryAsync(string userId, int limit = 10)
         {
-            string sql = @"SELECT TOP (@Limit) * FROM PlayHistory
-                            WHERE UserID = @UserID
-                            ORDER BY PlayedAt DESC";
-            return await _db.LoadAllDataSingleAsync<PlayHistory>(sql, new {UserID = userId, Limit = limit});
+            string sql = @"SELECT TOP (@Limit) p.historyID, p.UserID, p.MediaItemID, p.PlayedAt, m.TitleName, m.MediaItemID, m.MediaItemImage 
+                        FROM PlayHistory as p
+                        INNER JOIN MediaItem m on p.MediaItemID = m.MediaItemID
+                        WHERE p.UserID = @UserID
+                        ORDER BY p.PlayedAt DESC";
+            using var con = _db.CreateConnection();
+            var result = await con.QueryAsync<PlayHistory, MediaItem, PlayHistory>(sql, (history, media) => 
+            {
+                history.MediaItem = media;
+                return history;
+            }, new { UserID = userId, Limit = limit }, splitOn: "MediaItemID");
+            return result;
         }
 
     // Chức năng: Theo dõi (Follow)
