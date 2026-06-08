@@ -59,7 +59,8 @@ namespace TuneVault.Infrastructure.Repositories
         //Lấy 10 bài mới nhất trong lịch sử nghe nhạc của người dùng
         public async Task<IEnumerable<PlayHistory>> GetRecentPlayHistoryAsync(string userId, int limit = 10)
         {
-            string sql = @"SELECT TOP (@Limit) p.historyID, p.UserID, p.MediaItemID, p.PlayedAt, m.TitleName, m.MediaItemID, m.MediaItemImage 
+            string sql = @"SELECT TOP (@Limit) p.historyID, p.UserID, p.MediaItemID, p.PlayedAt,
+                        m.MediaItemID, m.TitleName, m.MediaItemImage 
                         FROM PlayHistory as p
                         INNER JOIN MediaItem m on p.MediaItemID = m.MediaItemID
                         WHERE p.UserID = @UserID
