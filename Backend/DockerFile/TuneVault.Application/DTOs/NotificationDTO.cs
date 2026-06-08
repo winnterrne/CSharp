@@ -6,5 +6,6 @@ public record NotificationDTO(
     string? Type,
     string? Payload,
     bool IsRead,
-    string? UserID  
+    string? UserID,
+    DateTime NoticedAT
 );

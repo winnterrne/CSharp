@@ -3,6 +3,7 @@ using MediatR;
 using TuneVault.Application.DTOs;
 using TuneVault.Domain.Entities;
 using TuneVault.Domain.Interfaces;
+using TuneVault.Application.Interfaces;
 
 namespace TuneVault.Application.UseCases.Share;
 
@@ -11,15 +12,18 @@ public class ShareMediaHandler : IRequestHandler<ShareMediaCommand, ShareMediaRe
     private readonly IShareRepository _shareRepo;
     private readonly INotificationRepository _notifRepo;
     private readonly IUserRepository _userRepo;
+    private readonly INotificationPushService _pushService;
 
     public ShareMediaHandler(
         IShareRepository shareRepo,
         INotificationRepository notifRepo,
-        IUserRepository userRepo)
+        IUserRepository userRepo,
+        INotificationPushService pushService)
     {
         _shareRepo = shareRepo;
         _notifRepo = notifRepo;
         _userRepo = userRepo;
+        _pushService = pushService;
     }
 
     public async Task<ShareMediaResponseDto> Handle (
@@ -65,6 +69,7 @@ public class ShareMediaHandler : IRequestHandler<ShareMediaCommand, ShareMediaRe
             UserID = request.ReceiverID
         };
         await _notifRepo.CreateNotificationAsync(notification);
+        await _pushService.SendNotificationAsync(request.ReceiverID, notification.Title);
 
         return new ShareMediaResponseDto(
             share.ShareID,

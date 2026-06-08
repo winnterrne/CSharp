@@ -16,12 +16,3 @@ public record ShareMediaResponseDto(
     DateTime SharedAt
 );
 
-// Trả về thông báo
-public record NotificationDto(
-    int NotificationID,
-    string? Title,
-    string? Type,
-    string? Payload,
-    bool IsRead,
-    string? UserID
-);

@@ -1,5 +1,12 @@
 C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.csproj.AssemblyReference.cache
 C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\rpswa.dswa.cache.json
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.GeneratedMSBuildEditorConfig.editorconfig
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.AssemblyInfoInputs.cache
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.AssemblyInfo.cs
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.csproj.CoreCompileInputs.cache
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.MvcApplicationPartsAssemblyInfo.cs
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.MvcApplicationPartsAssemblyInfo.cache
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.sourcelink.json
 C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\appsettings.Development.json
 C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\appsettings.json
 C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\TuneVault.API.staticwebassets.runtime.json
@@ -63,13 +70,6 @@ C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net
 C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\TuneVault.Application.pdb
 C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\TuneVault.Domain.pdb
 C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\TuneVault.Infrastructure.pdb
-C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.GeneratedMSBuildEditorConfig.editorconfig
-C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.AssemblyInfoInputs.cache
-C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.AssemblyInfo.cs
-C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.csproj.CoreCompileInputs.cache
-C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.MvcApplicationPartsAssemblyInfo.cs
-C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.MvcApplicationPartsAssemblyInfo.cache
-C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.sourcelink.json
 C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\rjimswa.dswa.cache.json
 C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\rjsmrazor.dswa.cache.json
 C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\rjsmcshtml.dswa.cache.json
@@ -85,9 +85,6 @@ C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net
 C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.pdb
 C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.genruntimeconfig.cache
 C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\ref\TuneVault.API.dll
-C:\DoAnMonHoc\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.dll
-C:\DoAnMonHoc\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\refint\TuneVault.API.dll
-C:\DoAnMonHoc\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.pdb
 C:\DoAnMonHoc\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\appsettings.Development.json
 C:\DoAnMonHoc\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\appsettings.json
 C:\DoAnMonHoc\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\TuneVault.API.staticwebassets.runtime.json
@@ -170,5 +167,8 @@ C:\DoAnMonHoc\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\staticwe
 C:\DoAnMonHoc\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\staticwebassets.build.endpoints.json
 C:\DoAnMonHoc\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\swae.build.ex.cache
 C:\DoAnMonHoc\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVaul.BE12D78A.Up2Date
+C:\DoAnMonHoc\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.dll
+C:\DoAnMonHoc\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\refint\TuneVault.API.dll
+C:\DoAnMonHoc\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.pdb
 C:\DoAnMonHoc\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.genruntimeconfig.cache
 C:\DoAnMonHoc\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\ref\TuneVault.API.dll

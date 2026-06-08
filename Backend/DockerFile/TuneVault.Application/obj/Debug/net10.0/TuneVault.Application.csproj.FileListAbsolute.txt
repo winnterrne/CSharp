@@ -14,6 +14,8 @@ C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.Application\obj\D
 C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.Application\obj\Debug\net10.0\refint\TuneVault.Application.dll
 C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.Application\obj\Debug\net10.0\TuneVault.Application.pdb
 C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.Application\obj\Debug\net10.0\ref\TuneVault.Application.dll
+<<<<<<< HEAD
+=======
 C:\DoAnMonHoc\CSharp\Backend\DockerFile\TuneVault.Application\obj\Debug\net10.0\TuneVault.Application.csproj.AssemblyReference.cache
 C:\DoAnMonHoc\CSharp\Backend\DockerFile\TuneVault.Application\obj\Debug\net10.0\TuneVault.Application.GeneratedMSBuildEditorConfig.editorconfig
 C:\DoAnMonHoc\CSharp\Backend\DockerFile\TuneVault.Application\obj\Debug\net10.0\TuneVault.Application.AssemblyInfoInputs.cache
@@ -30,3 +32,4 @@ C:\DoAnMonHoc\CSharp\Backend\DockerFile\TuneVault.Application\bin\Debug\net10.0\
 C:\DoAnMonHoc\CSharp\Backend\DockerFile\TuneVault.Application\bin\Debug\net10.0\TuneVault.Domain.pdb
 C:\DoAnMonHoc\CSharp\Backend\DockerFile\TuneVault.Application\obj\Debug\net10.0\TuneVaul.CD6889CD.Up2Date
 C:\DoAnMonHoc\CSharp\Backend\DockerFile\TuneVault.Application\obj\Debug\net10.0\ref\TuneVault.Application.dll
+>>>>>>> origin/DangKhanh

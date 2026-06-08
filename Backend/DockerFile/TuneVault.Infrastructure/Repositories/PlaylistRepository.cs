@@ -27,10 +27,10 @@ public class PlaylistRepository : IPlaylistRepository
 
     public async Task<int> CreatePlaylistAsync(Playlist playlist) {
         string sql = @"INSERT INTO Playlist 
-                            (PlaylistID, PlaylistName, IsPublic, Description, UserID, IsDeleted)
+                            (PlaylistName, IsPublic, Description, UserID, IsDeleted)
                         OUTPUT INSERTED.PlaylistID
                         VALUES 
-                            (@PlaylistID, @PlaylistName, @IsPublic, @Description, @UserID, 0)";
+                            (@PlaylistName, @IsPublic, @Description, @UserID, 0)";
         return await _db.ExecuteScalarAsync<int>(sql, playlist);
     }
     public async Task<int> UpdatePlaylistAsync(Playlist playlist) {
