@@ -65,7 +65,7 @@ namespace TuneVault.Infrastructure.Repositories
                 OFFSET @skip ROWS FETCH NEXT @take ROWS ONLY";
 
             string countSql = @"
-            SELECT COUNT(*) FROM Playlist 
+            SELECT COUNT(*) FROM Artist 
             WHERE ArtistName LIKE @keyword AND IsDeleted = 0";
 
             var parameters = new { Keyword = $"%{keyword}%", skip, take };

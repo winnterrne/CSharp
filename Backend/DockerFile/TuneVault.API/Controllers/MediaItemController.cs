@@ -13,6 +13,7 @@ using TuneVault.Application.UseCases.MediaItem.MediaUploading;
 using TuneVault.Application.UseCases.MediaItem.MediaStreaming;
 using TuneVault.Application.UseCases.Interaction;
 using System.IO;
+using TuneVault.Application.UseCases;
 
 namespace TuneVault.API.Controllers
 {
@@ -143,6 +144,13 @@ namespace TuneVault.API.Controllers
 
             return PhysicalFile(physicalPath, contentType, enableRangeProcessing: true);
             
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Search([FromQuery] SearchMediaQuery query)
+        {
+            var result = await _mediator.Send(query);
+            return Ok(new { success = true, data = result });
         }
     }
 }
