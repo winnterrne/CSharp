@@ -108,5 +108,25 @@ public class MediaItemRepository : IMediaItemRepository
         return await _db.LoadDataSingleAsync<MediaItem>(sql, new { MediaItemID = mediaId});
     }
 
+    public async Task<(IEnumerable<MediaItem> Items, int TotalCount)> SearchAsync(string keyword, int skip, int take)
+    {
+        string dataSql = @"
+            SELECT * FROM MediaItem 
+            WHERE TitleName LIKE @keyword AND IsDeleted = 0
+            ORDER BY TitleName ASC
+            OFFSET @skip ROWS FETCH NEXT @take ROWS ONLY";
+
+        string countSql = @"
+            SELECT COUNT(*) FROM MediaItem 
+            WHERE TitleName LIKE @keyword AND IsDeleted = 0";
+
+        var parameters = new { Keyword = $"%{keyword}%", skip, take };
+
+        var items = await _db.LoadAllDataSingleAsync<MediaItem>(dataSql, parameters);
+        var totalCount = await _db.ExecuteScalarAsync<int>(countSql, parameters);
+
+        return (items, totalCount);
+    }
+
 
 }

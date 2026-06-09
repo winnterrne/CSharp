@@ -5,12 +5,12 @@ namespace TuneVault.Application.DTOs;
 
 public record PlaylistDto (
     int PlaylistID,
-    string PlaylistName,
+    string? PlaylistName,
     string UserID
 );
 
 public record PlaylistSongDto (
-    int mediaItemID,
+    int MediaItemID,
     string TitleName,
     string ArtistID,
     string? AlbumID,

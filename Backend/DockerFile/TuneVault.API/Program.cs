@@ -99,6 +99,10 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSignalR();
 builder.Services.AddScoped<INotificationPushService, SignalRNotificationService>();
 
+// ── AI Service (Gemini)───────────────────────────────
+builder.Services.AddScoped<IAIService,GeminiService>();  
+builder.Services.AddHttpClient<IAIService,GeminiService>();  
+
 var app = builder.Build();
 // ── Middleware Pipeline ───────────────────────────────
 app.UseSwagger();

@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TuneVault.Application.DTOs;
+using TuneVault.Application.UseCases;
 using TuneVault.Application.UseCases.User;
 
 namespace TuneVault.API.Controllers;
@@ -41,5 +42,12 @@ public class UserController : ControllerBase
 
         var result = await _mediator.Send(command);
         return Ok(new { success = true, data = result});
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Search([FromQuery] SearchUserQuery query)
+    {
+            var result = await _mediator.Send(query);
+            return Ok(new { success = true, data = result });
     }
 }
