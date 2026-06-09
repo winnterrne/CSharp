@@ -10,7 +10,7 @@ type HomeViewProps = {
   forYou: Media[];
   upcoming: Media[];
   onOpenTrack: (track: Media) => void;
-  onOpenAlbum: (track: Media, tracks: Media[]) => void;
+  onOpenAlbum: (track: Media, tracks: Media[], title?: string) => void;
   onShowAll: (mode: "recommended" | "upcoming" | "forYou") => void;
 };
 
@@ -23,67 +23,195 @@ const HomeView = ({
   onOpenAlbum,
   onShowAll,
 }: HomeViewProps) => {
-  // NEW: lấy lịch sử bài hát đã nghe từ localStorage
   const recentTracks = useHistoryStore((state) => state.recentTracks);
-  // NEW: xóa lịch sử nghe gần đây
   const clearHistory = useHistoryStore((state) => state.clearHistory);
-  // NEW: kiểm tra có dữ liệu hay không
+
   const isEmpty =
     !loading &&
     recommended.length === 0 &&
     forYou.length === 0 &&
     upcoming.length === 0;
 
+  const firstTrack = recommended[0] ?? forYou[0] ?? upcoming[0];
+
+  if (loading) {
+    return (
+      <div style={{ color: "#fff", fontSize: "20px", fontWeight: 700 }}>
+        Đang tải dữ liệu...
+      </div>
+    );
+  }
+
+  if (isEmpty) {
+    return (
+      <div
+        style={{
+          minHeight: "60vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center",
+          flexDirection: "column",
+        }}
+      >
+        <div style={{ fontSize: "72px", marginBottom: "18px" }}>🎵</div>
+
+        <h2 style={{ color: "#fff", marginBottom: "10px" }}>
+          Chưa có dữ liệu
+        </h2>
+
+        <p style={{ color: "#b3b3b3", maxWidth: "420px", lineHeight: 1.6 }}>
+          Backend chưa trả bài hát nào. Hãy thêm dữ liệu vào bảng MediaItem rồi
+          load lại trang.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <>
-      {isEmpty && (
+      <section style={{ marginBottom: "42px" }}>
         <div
           style={{
             display: "flex",
-            flexDirection: "column",
+            justifyContent: "space-between",
             alignItems: "center",
-            justifyContent: "center",
-            minHeight: "60vh",
-            textAlign: "center",
+            marginBottom: "22px",
           }}
         >
+          <h1 style={{ color: "#fff", fontSize: "34px", margin: 0 }}>
+            Gần đây
+          </h1>
+
+          {recentTracks.length > 0 && (
+            <button
+              onClick={clearHistory}
+              style={{
+                border: "none",
+                background: "transparent",
+                color: "#b3b3b3",
+                cursor: "pointer",
+                fontWeight: 700,
+              }}
+            >
+              Xóa lịch sử
+            </button>
+          )}
+        </div>
+
+        {recentTracks.length > 0 ? (
           <div
             style={{
-              fontSize: "72px",
-              marginBottom: "20px",
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+              gap: "10px",
             }}
           >
-            🎵
+            {recentTracks.slice(0, 8).map((track) => (
+              <QuickPlayCard
+                key={track.id}
+                track={track}
+                tracks={recentTracks}
+                onOpenTrack={onOpenTrack}
+              />
+            ))}
+          </div>
+        ) : (
+          <div
+            style={{
+              background: "rgba(255,255,255,.08)",
+              borderRadius: "12px",
+              padding: "18px",
+              color: "#b3b3b3",
+            }}
+          >
+            Bạn chưa nghe bài nào gần đây.
+          </div>
+        )}
+      </section>
+
+      <section style={{ marginBottom: "38px" }}>
+        <SectionHeader
+          title="Đề xuất cho bạn"
+          onShowAll={() => onShowAll("recommended")}
+        />
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+            gap: "10px",
+          }}
+        >
+          {recommended.slice(0, 8).map((track) => (
+            <QuickPlayCard
+              key={track.id}
+              track={track}
+              tracks={recommended}
+              onOpenTrack={onOpenTrack}
+            />
+          ))}
+        </div>
+      </section>
+
+      {firstTrack && (
+        <section
+          style={{
+            display: "grid",
+            gridTemplateColumns: "minmax(260px, 420px) 1fr",
+            gap: "32px",
+            marginBottom: "42px",
+            alignItems: "center",
+          }}
+        >
+          <div>
+            <p
+              style={{
+                color: "#b3b3b3",
+                fontWeight: 700,
+                marginBottom: "8px",
+              }}
+            >
+              Bộ sưu tập nổi bật
+            </p>
+
+            <h2
+              style={{
+                color: "#fff",
+                fontSize: "34px",
+                margin: "0 0 12px",
+              }}
+            >
+              {firstTrack.title}
+            </h2>
+
+            <p
+              style={{
+                color: "#b3b3b3",
+                lineHeight: 1.6,
+                marginBottom: "18px",
+              }}
+            >
+              Nghe các bài hát đang có trong TuneVault, lấy trực tiếp từ
+              database backend.
+            </p>
+
+            <button
+              onClick={() => onOpenAlbum(firstTrack, forYou, "Dành cho bạn")}
+              style={{
+                border: "none",
+                borderRadius: "999px",
+                background: "#1DB954",
+                color: "#000",
+                padding: "13px 24px",
+                fontWeight: 800,
+                cursor: "pointer",
+              }}
+            >
+              Mở danh sách
+            </button>
           </div>
 
-          <h2
-            style={{
-              color: "#fff",
-              marginBottom: "10px",
-            }}
-          >
-            Chưa có dữ liệu
-          </h2>
-
-          <p
-            style={{
-              color: "#b3b3b3",
-              maxWidth: "400px",
-            }}
-          >
-            Chưa có bài hát nào từ hệ thống. Hãy thêm dữ liệu từ backend để hiển
-            thị nội dung.
-          </p>
-        </div>
-      )}
-      {/* NEW: Recently Played */}
-      {recentTracks.length > 0 && (
-        <section style={{ marginBottom: "32px" }}>
-          <SectionHeader
-            title="Nghe gần đây"
-            actionText="Xóa lịch sử"
-            onShowAll={clearHistory}
-          />
           <div
             style={{
               display: "grid",
@@ -91,48 +219,23 @@ const HomeView = ({
               gap: "18px",
             }}
           >
-            {recentTracks.slice(0, 6).map((track) => (
+            {forYou.slice(0, 4).map((track) => (
               <AlbumCardLarge
                 key={track.id}
                 track={track}
-                tracks={recentTracks}
-                onOpenAlbum={onOpenAlbum}
+                tracks={forYou}
+                onOpenAlbum={(cover, tracks) =>
+                  onOpenAlbum(cover, tracks, "Dành cho bạn")
+                }
               />
             ))}
           </div>
         </section>
       )}
-      {/* NEW: Quick play */}
-      <SectionHeader
-        title="Đề xuất cho bạn"
-        onShowAll={() => onShowAll("recommended")}
-      />
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-          gap: "8px",
-          marginBottom: "32px",
-        }}
-      >
-        {!loading &&
-          recommended
-            .slice(0, 8)
-            .map((track) => (
-              <QuickPlayCard
-                key={track.id}
-                track={track}
-                tracks={recommended}
-                onOpenTrack={onOpenTrack}
-              />
-            ))}
-      </div>
-
-      {/* NEW: Album / playlist cards */}
-      <section style={{ marginBottom: "32px" }}>
+      <section style={{ marginBottom: "36px" }}>
         <SectionHeader
-          label="Dành Cho"
+          label="Dành cho"
           title="Phan Ngọc Vinh"
           onShowAll={() => onShowAll("forYou")}
         />
@@ -140,21 +243,20 @@ const HomeView = ({
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
+            gridTemplateColumns: "repeat(auto-fill, minmax(170px, 1fr))",
             gap: "18px",
           }}
         >
-          {!loading &&
-            forYou
-              .slice(0, 6)
-              .map((track) => (
-                <AlbumCardLarge
-                  key={track.id}
-                  track={track}
-                  tracks={forYou}
-                  onOpenAlbum={onOpenAlbum}
-                />
-              ))}
+          {forYou.slice(0, 6).map((track) => (
+            <AlbumCardLarge
+              key={track.id}
+              track={track}
+              tracks={forYou}
+              onOpenAlbum={(cover, tracks) =>
+                onOpenAlbum(cover, tracks, "Dành cho bạn")
+              }
+            />
+          ))}
         </div>
       </section>
 
@@ -167,21 +269,20 @@ const HomeView = ({
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
+            gridTemplateColumns: "repeat(auto-fill, minmax(170px, 1fr))",
             gap: "18px",
           }}
         >
-          {!loading &&
-            upcoming
-              .slice(0, 6)
-              .map((track) => (
-                <AlbumCardLarge
-                  key={track.id}
-                  track={track}
-                  tracks={upcoming}
-                  onOpenAlbum={onOpenAlbum}
-                />
-              ))}
+          {upcoming.slice(0, 6).map((track) => (
+            <AlbumCardLarge
+              key={track.id}
+              track={track}
+              tracks={upcoming}
+              onOpenAlbum={(cover, tracks) =>
+                onOpenAlbum(cover, tracks, "Được đề xuất cho hôm nay")
+              }
+            />
+          ))}
         </div>
       </section>
     </>

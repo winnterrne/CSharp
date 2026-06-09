@@ -1,55 +1,78 @@
-import { useCallback } from "react";
-import { notificationStore } from "../store/notificationStore";
+import { useCallback, useEffect, useState } from "react";
+import { notificationApi } from "../api/notificationApi";
 import type { Notification } from "../types/notification";
 
 export const useNotification = () => {
-  const notifications = notificationStore((state) => state.notifications);
-  const unreadCount = notificationStore((state) => state.unreadCount);
-  const isLoading = notificationStore((state) => state.isLoading);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const setNotifications = useCallback((notifs: Notification[]) => {
-    notificationStore.getState().setNotifications(notifs);
+  const fetchNotifications = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError("");
+
+      const data = await notificationApi.getAll();
+
+      setNotifications(data);
+      setUnreadCount(data.filter((item) => !item.isRead).length);
+    } catch (err) {
+      console.error("LOAD NOTIFICATIONS ERROR:", err);
+      setNotifications([]);
+      setUnreadCount(0);
+      setError("Không tải được thông báo.");
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  const addNotification = useCallback((notif: Notification) => {
-    notificationStore.getState().addNotification(notif);
-  }, []);
+  const markAsRead = async (id: number) => {
+    try {
+      await notificationApi.markAsRead(id);
 
-  const removeNotification = useCallback((id: number) => {
-    notificationStore.getState().removeNotification(id);
-  }, []);
+      setNotifications((prev) =>
+        prev.map((item) =>
+          item.id === id ? { ...item, isRead: true } : item
+        )
+      );
 
-  const updateNotification = useCallback((id: number, updates: Partial<Notification>) => {
-    notificationStore.getState().updateNotification(id, updates);
-  }, []);
+      setUnreadCount((prev) => Math.max(0, prev - 1));
+    } catch (err) {
+      console.error("MARK READ ERROR:", err);
+    }
+  };
 
-  const markAsRead = useCallback((id: number) => {
-    notificationStore.getState().markAsRead(id);
-  }, []);
+  const markAllAsRead = async () => {
+    try {
+      await notificationApi.markAllAsRead();
 
-  const markAllAsRead = useCallback(() => {
-    notificationStore.getState().markAllAsRead();
-  }, []);
+      setNotifications((prev) =>
+        prev.map((item) => ({
+          ...item,
+          isRead: true,
+        }))
+      );
 
-  const setLoading = useCallback((loading: boolean) => {
-    notificationStore.getState().setLoading(loading);
-  }, []);
+      setUnreadCount(0);
+    } catch (err) {
+      console.error("MARK ALL READ ERROR:", err);
+    }
+  };
 
-  const clearAll = useCallback(() => {
-    notificationStore.getState().clearAll();
-  }, []);
+
+
+  useEffect(() => {
+    fetchNotifications();
+  }, [fetchNotifications]);
 
   return {
     notifications,
     unreadCount,
-    isLoading,
-    setNotifications,
-    addNotification,
-    removeNotification,
-    updateNotification,
+    loading,
+    error,
+    fetchNotifications,
     markAsRead,
     markAllAsRead,
-    setLoading,
-    clearAll,
   };
 };

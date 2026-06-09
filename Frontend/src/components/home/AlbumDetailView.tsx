@@ -11,10 +11,8 @@ type AlbumDetailViewProps = {
 
 const formatDuration = (seconds?: number) => {
   if (!seconds) return "0:00";
-
   const min = Math.floor(seconds / 60);
   const sec = Math.floor(seconds % 60);
-
   return `${min}:${String(sec).padStart(2, "0")}`;
 };
 
@@ -25,171 +23,236 @@ const AlbumDetailView = ({
   onOpenArtist,
 }: AlbumDetailViewProps) => {
   const { playTrack, setQueue } = usePlayer();
-  // NEW: trạng thái yêu thích playlist
   const [liked, setLiked] = useState(false);
-
+  const [shuffle, setShuffle] = useState(false);
+  const [compactView, setCompactView] = useState(false);
+  const totalDuration = tracks.reduce(
+    (sum, item) => sum + (item.duration ?? 0),
+    0,
+  );
   const handlePlayAlbum = () => {
     if (tracks.length === 0) return;
 
-    setQueue(tracks);
-    playTrack(tracks[0]);
+    const list = shuffle ? [...tracks].sort(() => Math.random() - 0.5) : tracks;
+
+    setQueue(list);
+    playTrack(list[0]);
   };
 
   return (
     <div>
-      {/* NEW: HEADER ALBUM */}
       <section
         style={{
           display: "flex",
-          gap: "24px",
+          gap: "26px",
           alignItems: "flex-end",
-          marginBottom: "28px",
+          padding: "22px 0 34px",
         }}
       >
-        <img
-          src={cover.thumbnailUrl}
-          alt={cover.title}
+        <div
           style={{
-            width: "220px",
-            height: "220px",
-            borderRadius: "10px",
-            objectFit: "cover",
+            width: "230px",
+            height: "230px",
+            borderRadius: "8px",
+            background: "#282828",
+            overflow: "hidden",
             boxShadow: "0 18px 50px rgba(0,0,0,.55)",
+            flexShrink: 0,
           }}
-        />
+        >
+          {cover.thumbnailUrl ?
+            <img
+              src={cover.thumbnailUrl}
+              alt={cover.title}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+              }}
+            />
+          : <div
+              style={{
+                height: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "64px",
+              }}
+            >
+              🎵
+            </div>
+          }
+        </div>
 
-        <div>
-          <p style={{ color: "#fff", fontWeight: 700 }}>Playlist</p>
+        <div style={{ minWidth: 0 }}>
+          <p style={{ color: "#fff", fontWeight: 700 }}>
+            {tracks.length > 1 ? "Danh sách phát" : "Đĩa đơn"}
+          </p>
 
           <h1
             style={{
               color: "#fff",
-              fontSize: "56px",
+              fontSize: "clamp(46px, 6vw, 82px)",
               margin: "8px 0",
               lineHeight: 1,
+              wordBreak: "break-word",
             }}
           >
             {cover.title}
           </h1>
 
-          <p style={{ color: "#b3b3b3" }}>
+          <p style={{ color: "#d6d6d6", fontWeight: 600 }}>
             <span
-              onClick={() => onOpenArtist(cover.artist.name)}
-              style={{
-                color: "#1DB954",
-                cursor: "pointer",
-              }}
+              onClick={() =>
+                onOpenArtist(cover.artist?.name ?? "Unknown Artist")
+              }
+              style={{ cursor: "pointer", color: "#fff" }}
             >
-              {cover.artist.name}
+              {cover.artist?.name ?? "Unknown Artist"}
             </span>{" "}
-            • {tracks.length} bài hát
-          </p>
-          <p
-            style={{
-              color: "#8a8a8a",
-              marginTop: "10px",
-              maxWidth: "700px",
-              lineHeight: 1.6,
-            }}
-          >
-            Playlist tuyển chọn từ {cover.artist.name}. Những bài hát được nghe
-            nhiều nhất và phù hợp với sở thích của bạn.
+            • {new Date().getFullYear()} • {tracks.length} bài hát •{" "}
+            {formatDuration(totalDuration)}
           </p>
         </div>
       </section>
 
-      {/* NEW: ACTION */}
-      <div
+      <section
         style={{
           display: "flex",
           alignItems: "center",
-          gap: "18px",
-          marginBottom: "28px",
+          gap: "20px",
+          marginBottom: "30px",
         }}
       >
-        {/* NEW: Like */}
-        <button
-          onClick={() => setLiked(!liked)}
-          style={{
-            background: "none",
-            border: "none",
-            fontSize: "28px",
-            cursor: "pointer",
-            color: liked ? "#1DB954" : "#b3b3b3",
-          }}
-        >
-          ♥
-        </button>
-
-        {/* NEW: Play */}
         <button
           onClick={handlePlayAlbum}
+          title="Phát"
           style={{
-            width: "58px",
-            height: "58px",
+            width: "60px",
+            height: "60px",
             borderRadius: "50%",
             border: "none",
             background: "#1DB954",
+            color: "#000",
             cursor: "pointer",
-            fontSize: "22px",
-            fontWeight: 800,
-            boxShadow: "0 8px 20px rgba(0,0,0,.3)",
+            fontSize: "24px",
+            fontWeight: 900,
           }}
         >
           ▶
         </button>
 
-        {/* NEW: More */}
         <button
+          onClick={() => setShuffle(!shuffle)}
+          title="Phát ngẫu nhiên"
+          style={{
+            background: "none",
+            border: "none",
+            color: shuffle ? "#1DB954" : "#b3b3b3",
+            fontSize: "30px",
+            cursor: "pointer",
+          }}
+        >
+          🔀
+        </button>
+
+        <button
+          onClick={() => setLiked(!liked)}
+          title="Yêu thích"
+          style={{
+            background: "none",
+            border: "none",
+            color: liked ? "#1DB954" : "#b3b3b3",
+            fontSize: "30px",
+            cursor: "pointer",
+          }}
+        >
+          {liked ? "♥" : "♡"}
+        </button>
+
+        <button
+          title="Tải xuống"
           style={{
             background: "none",
             border: "none",
             color: "#b3b3b3",
-            fontSize: "26px",
+            fontSize: "28px",
+            cursor: "pointer",
+          }}
+        >
+          ⬇
+        </button>
+
+        <button
+          title="Tùy chọn khác"
+          style={{
+            background: "none",
+            border: "none",
+            color: "#b3b3b3",
+            fontSize: "30px",
             cursor: "pointer",
           }}
         >
           ⋯
         </button>
-      </div>
-      {/* NEW: TRACK LIST */}
-      <div>
+
+        <button
+          onClick={() => setCompactView(!compactView)}
+          title="Đổi kiểu danh sách"
+          style={{
+            marginLeft: "auto",
+            background: "none",
+            border: "none",
+            color: "#b3b3b3",
+            fontSize: "18px",
+            cursor: "pointer",
+            fontWeight: 700,
+          }}
+        >
+          Danh sách ☰
+        </button>
+      </section>
+
+      <section>
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "40px minmax(0, 1fr) 180px 120px",
+            gridTemplateColumns:
+              compactView ?
+                "40px minmax(0, 1fr) 90px"
+              : "40px minmax(0, 1.4fr) minmax(140px, .8fr) 90px",
             color: "#b3b3b3",
             fontSize: "13px",
             borderBottom: "1px solid #333",
             padding: "0 8px 10px",
+            alignItems: "center",
           }}
         >
           <div>#</div>
           <div>Tiêu đề</div>
-
-          <div>Nghệ sĩ</div>
-
-          <div style={{ textAlign: "right" }}>Thời lượng</div>
+          {!compactView && <div>Nghệ sĩ</div>}
+          <div style={{ textAlign: "right" }}>⏱</div>
         </div>
 
         {tracks.map((track, index) => (
           <div
             key={track.id}
-            // NEW: click mở TrackDetail
             onClick={() => onOpenTrack(track)}
-            // NEW: double click phát nhạc
             onDoubleClick={() => {
               setQueue(tracks);
               playTrack(track);
             }}
             style={{
               display: "grid",
-              gridTemplateColumns: "40px minmax(0, 1fr) 180px 120px",
+              gridTemplateColumns:
+                compactView ?
+                  "40px minmax(0, 1fr) 90px"
+                : "40px minmax(0, 1.4fr) minmax(140px, .8fr) 90px",
               alignItems: "center",
-              height: "64px",
+              minHeight: "64px",
               padding: "0 8px",
               borderRadius: "8px",
-              cursor: "pointer",
+              cursor: "default",
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.background = "#1a1a1a";
@@ -200,48 +263,114 @@ const AlbumDetailView = ({
           >
             <div style={{ color: "#b3b3b3" }}>{index + 1}</div>
 
-            <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-              <img
-                src={track.thumbnailUrl}
-                alt={track.title}
-                style={{
-                  width: "44px",
-                  height: "44px",
-                  borderRadius: "6px",
-                  objectFit: "cover",
-                }}
-              />
-
-              <div>
-                <div style={{ color: "#fff", fontWeight: 700 }}>
-                  {track.title}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "12px",
+                minWidth: 0,
+              }}
+            >
+              {!compactView && (
+                <div
+                  style={{
+                    width: "44px",
+                    height: "44px",
+                    borderRadius: "6px",
+                    background: "#282828",
+                    overflow: "hidden",
+                    flexShrink: 0,
+                  }}
+                >
+                  {track.thumbnailUrl ?
+                    <img
+                      src={track.thumbnailUrl}
+                      alt={track.title}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                      }}
+                    />
+                  : <div
+                      style={{
+                        height: "100%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      🎵
+                    </div>
+                  }
                 </div>
+              )}
 
-                <div style={{ color: "#b3b3b3", fontSize: "12px" }}>
-                  {track.artist.name}
+              <div style={{ minWidth: 0 }}>
+                <button
+                  onClick={() => onOpenTrack(track)}
+                  style={{
+                    color: "#fff",
+                    fontWeight: 700,
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    border: "none",
+                    background: "transparent",
+                    padding: 0,
+                    cursor: "pointer",
+                    fontSize: "15px",
+                    maxWidth: "100%",
+                    textAlign: "left",
+                  }}
+                >
+                  {track.title}
+                </button>
+
+                <div
+                  onClick={() =>
+                    onOpenArtist(track.artist?.name ?? "Unknown Artist")
+                  }
+                  style={{
+                    color: "#b3b3b3",
+                    fontSize: "13px",
+                    marginTop: "4px",
+                    cursor: "pointer",
+                  }}
+                >
+                  {track.artist?.name ?? "Unknown Artist"}
                 </div>
               </div>
             </div>
-            {/* FIX: cột nghệ sĩ */}
+
+            {!compactView && (
+              <div
+                onClick={() => onOpenArtist(track.artist.name)}
+                style={{
+                  color: "#b3b3b3",
+                  fontSize: "14px",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  cursor: "pointer",
+                }}
+              >
+                {track.artist.name}
+              </div>
+            )}
+
             <div
-              onClick={() => onOpenArtist(track.artist.name)}
               style={{
                 color: "#b3b3b3",
-                cursor: "pointer",
                 fontSize: "14px",
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
+                textAlign: "right",
               }}
             >
-              {track.artist.name}
-            </div>
-            <div style={{ color: "#b3b3b3", textAlign: "right" }}>
               {formatDuration(track.duration)}
             </div>
           </div>
         ))}
-      </div>
+      </section>
     </div>
   );
 };

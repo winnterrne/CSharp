@@ -1,15 +1,27 @@
 import api from "./axios";
+import {
+  mapNotificationDtoToNotification,
+  type NotificationDto,
+} from "../types/notification";
 
 export const notificationApi = {
-  getAll: () =>
-    api.get("/notifications"),
+  getAll: async () => {
+    const res = await api.get("/Notification");
 
-  getUnread: () =>
-    api.get("/notifications/unread"),
+    const rawData = Array.isArray(res.data?.data)
+      ? res.data.data
+      : [];
 
-  markAsRead: (id: number) =>
-    api.put(`/notifications/${id}/read`),
+    return rawData.map((item: NotificationDto) =>
+      mapNotificationDtoToNotification(item)
+    );
+  },
 
-  markAllAsRead: () =>
-    api.put("/notifications/read-all"),
+  markAsRead: async (id: number) => {
+    return api.put(`/Notification/${id}/read`);
+  },
+
+  markAllAsRead: async () => {
+    return api.put("/Notification/read-all");
+  },
 };

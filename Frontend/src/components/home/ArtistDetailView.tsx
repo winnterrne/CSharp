@@ -174,16 +174,33 @@ const ArtistDetailView = ({
                 minWidth: 0,
               }}
             >
-              <img
-                src={track.thumbnailUrl}
-                alt={track.title}
-                style={{
-                  width: "42px",
-                  height: "42px",
-                  borderRadius: "6px",
-                  objectFit: "cover",
-                }}
-              />
+              {track.thumbnailUrl ?
+                <img
+                  src={track.thumbnailUrl}
+                  alt={track.title}
+                  style={{
+                    width: "42px",
+                    height: "42px",
+                    borderRadius: "6px",
+                    objectFit: "cover",
+                  }}
+                />
+              : <div
+                  style={{
+                    width: "42px",
+                    height: "42px",
+                    borderRadius: "6px",
+                    background: "#282828",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "#b3b3b3",
+                    fontSize: "12px",
+                  }}
+                >
+                  ♪
+                </div>
+              }
 
               <div
                 style={{

@@ -65,33 +65,70 @@ export const playerStore = create<PlayerStore>()(
       play: () => set({ isPlaying: true }),
       pause: () => set({ isPlaying: false }),
       togglePlay: () => set((state) => ({ isPlaying: !state.isPlaying })),
-
       next: () => {
         const { currentTrack, queue, isShuffle, repeatMode } = get();
+
         if (!currentTrack || queue.length === 0) return;
 
         const currentIdx = queue.findIndex((m) => m.id === currentTrack.id);
 
         if (isShuffle) {
-          const randomIdx = Math.floor(Math.random() * queue.length);
-          set({ currentTrack: queue[randomIdx], position: 0 });
-        } else if (currentIdx < queue.length - 1) {
-          set({ currentTrack: queue[currentIdx + 1], position: 0 });
-        } else if (repeatMode === "all") {
-          set({ currentTrack: queue[0], position: 0 });
+          if (queue.length === 1) return;
+
+          let randomIdx = currentIdx;
+
+          while (randomIdx === currentIdx) {
+            randomIdx = Math.floor(Math.random() * queue.length);
+          }
+
+          set({
+            currentTrack: queue[randomIdx],
+            position: 0,
+          });
+
+          return;
+        }
+
+        if (currentIdx < queue.length - 1) {
+          set({
+            currentTrack: queue[currentIdx + 1],
+            position: 0,
+          });
+
+          return;
+        }
+
+        if (repeatMode === "all") {
+          set({
+            currentTrack: queue[0],
+            position: 0,
+          });
         }
       },
 
       previous: () => {
-        const { currentTrack, queue } = get();
+        const { currentTrack, queue, repeatMode } = get();
+
         if (!currentTrack || queue.length === 0) return;
 
         const currentIdx = queue.findIndex((m) => m.id === currentTrack.id);
+
         if (currentIdx > 0) {
-          set({ currentTrack: queue[currentIdx - 1], position: 0 });
+          set({
+            currentTrack: queue[currentIdx - 1],
+            position: 0,
+          });
+
+          return;
+        }
+
+        if (repeatMode === "all") {
+          set({
+            currentTrack: queue[queue.length - 1],
+            position: 0,
+          });
         }
       },
-
       seek: (position) => set({ position: Math.max(0, position) }),
 
       toggleShuffle: () => set((state) => ({ isShuffle: !state.isShuffle })),
@@ -105,7 +142,17 @@ export const playerStore = create<PlayerStore>()(
       },
 
       addToQueue: (media) =>
-        set((state) => ({ queue: [...state.queue, media] })),
+        set((state) => {
+          const existed = state.queue.some((item) => item.id === media.id);
+
+          if (existed) {
+            return state;
+          }
+
+          return {
+            queue: [...state.queue, media],
+          };
+        }),
 
       removeFromQueue: (mediaId) =>
         set((state) => ({

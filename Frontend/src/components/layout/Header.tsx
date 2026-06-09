@@ -59,7 +59,8 @@ const Header = ({
         top: 0,
         zIndex: 100,
         minHeight: "64px",
-        fontFamily: "'Circular', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+        fontFamily:
+          "'Circular', 'Helvetica Neue', Helvetica, Arial, sans-serif",
       }}
     >
       {/* Logo */}
@@ -84,7 +85,7 @@ const Header = ({
           onClick={onHomeClick}
           title="Trang chủ"
           style={{
-            background: "#aa1389",
+            background: "#2a2a2a",
             border: "none",
             borderRadius: "50%",
             width: "48px",
@@ -118,7 +119,7 @@ const Header = ({
               display: "flex",
               alignItems: "center",
               gap: "8px",
-              background: "#2a2a2a",
+              background: "#3a3a3a",
               borderRadius: "500px",
               padding: "10px 16px",
               border: `1px solid ${searchFocused ? "#fff" : "transparent"}`,
@@ -136,7 +137,13 @@ const Header = ({
                 padding: 0,
               }}
             >
-              <svg role="img" height="24" width="24" viewBox="0 0 24 24" fill="#b3b3b3">
+              <svg
+                role="img"
+                height="24"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="#b3b3b3"
+              >
                 <path d="M10.5 3a7.5 7.5 0 1 0 4.74 13.32l4.22 4.22a1 1 0 0 0 1.42-1.42l-4.22-4.22A7.5 7.5 0 0 0 10.5 3Zm0 2a5.5 5.5 0 1 1 0 11a5.5 5.5 0 0 1 0-11Z" />
               </svg>
             </button>
@@ -148,7 +155,9 @@ const Header = ({
               onChange={(e) => onSearchChange(e.target.value)}
               onFocus={() => setSearchFocused(true)}
               onBlur={() => setTimeout(() => setSearchFocused(false), 150)}
-              onKeyDown={(e) => { if (e.key === "Enter") onSearch(); }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") onSearch();
+              }}
               style={{
                 background: "transparent",
                 border: "none",
@@ -233,13 +242,17 @@ const Header = ({
                         fontSize: "20px",
                       }}
                     >
-                      {item.thumbnailUrl ? (
+                      {item.thumbnailUrl ?
                         <img
                           src={item.thumbnailUrl}
                           alt={item.title}
-                          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                          }}
                         />
-                      ) : "🎵"}
+                      : "🎵"}
                     </div>
 
                     {/* Info */}
@@ -300,7 +313,14 @@ const Header = ({
       </div>
 
       {/* Right */}
-      <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
+          flexShrink: 0,
+        }}
+      >
         <IconActionBtn title="Thông báo" onClick={onNotificationClick}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6V11c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
@@ -335,16 +355,18 @@ const Header = ({
               padding: 0,
               overflow: "hidden",
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.08)")}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.transform = "scale(1.08)")
+            }
             onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
           >
-            {user?.avatarUrl ? (
+            {user?.avatarUrl ?
               <img
                 src={user.avatarUrl}
                 alt={user.displayName}
                 style={{ width: "100%", height: "100%", objectFit: "cover" }}
               />
-            ) : avatarInitial}
+            : avatarInitial}
           </button>
 
           {showAccountMenu && (
@@ -361,12 +383,33 @@ const Header = ({
                 zIndex: 9999,
               }}
             >
-              <MenuItem label="Tài khoản" onClick={() => { setShowAccountMenu(false); onAvatarClick?.(); }} />
-              <MenuItem label="Hồ sơ" onClick={() => { setShowAccountMenu(false); onAvatarClick?.(); }} />
+              <MenuItem
+                label="Tài khoản"
+                onClick={() => {
+                  setShowAccountMenu(false);
+                  onAvatarClick?.();
+                }}
+              />
+              <MenuItem
+                label="Hồ sơ"
+                onClick={() => {
+                  setShowAccountMenu(false);
+                  onAvatarClick?.();
+                }}
+              />
               <MenuItem label="Gần đây" />
               <MenuItem label="Cài đặt" />
-              <div style={{ height: "1px", background: "#3e3e3e", margin: "4px 0" }} />
-              <MenuItem label="Đăng xuất" onClick={() => setShowAccountMenu(false)} />
+              <div
+                style={{
+                  height: "1px",
+                  background: "#3e3e3e",
+                  margin: "4px 0",
+                }}
+              />
+              <MenuItem
+                label="Đăng xuất"
+                onClick={() => setShowAccountMenu(false)}
+              />
             </div>
           )}
         </div>
@@ -408,7 +451,13 @@ const IconActionBtn = ({
   </button>
 );
 
-const MenuItem = ({ label, onClick }: { label: string; onClick?: () => void }) => (
+const MenuItem = ({
+  label,
+  onClick,
+}: {
+  label: string;
+  onClick?: () => void;
+}) => (
   <button
     onClick={onClick}
     style={{

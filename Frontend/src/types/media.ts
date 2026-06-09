@@ -22,6 +22,11 @@ export interface Media {
   releaseDate?: string;
   playCount?: number;
   createdAt: string;
+  playedAt?: string;
+  playlistId?: number;
+  playlistName?: string;
+  albumId?: number;
+  albumName?: string;
 }
 
 export interface MediaSearchResult {
@@ -62,7 +67,7 @@ export const mapMediaItemDtoToMedia = (item: MediaItemDto): Media => {
     duration: item.duration ?? 0,
     artist: {
       id: item.artistID ?? 0,
-      name: "Unknown Artist",
+      name: item.artistID ? `Artist ${item.artistID}` : "Unknown Artist",
     },
     genre: item.mediaItemTag ?? undefined,
     createdAt: item.uploadAT ?? new Date().toISOString(),

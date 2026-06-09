@@ -22,7 +22,7 @@ export const useHistoryStore = create<HistoryState>()(
           );
 
           return {
-            recentTracks: [track, ...filtered].slice(0, 20),
+            recentTracks: [track, ...filtered].slice(0, 50),
           };
         }),
 

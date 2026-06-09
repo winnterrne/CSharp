@@ -203,7 +203,7 @@ const NowPlaying = ({
             marginBottom: "12px",
           }}
         >
-          {currentTrack.artist.name}
+          {currentTrack.artist?.name ?? "Unknown Artist"}
         </p>
 
         <div
@@ -311,7 +311,7 @@ const NowPlaying = ({
                       fontSize: "12px",
                     }}
                   >
-                    {track.artist.name}
+                    {track.artist?.name ?? "Unknown Artist"}
                   </div>
                 </div>
               </div>

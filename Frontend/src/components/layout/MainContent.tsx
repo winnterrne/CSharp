@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Media } from "../../types/media";
 import AlbumDetailView from "../home/AlbumDetailView";
 import TrackDetailView from "../home/TrackDetailView";
-
 import HomeView from "../home/HomeView";
 import ArtistDetailView from "../home/ArtistDetailView";
 import AlbumCardLarge from "../home/AlbumCardLarge";
@@ -21,40 +20,39 @@ type ViewMode =
 const MainContent = () => {
   const [viewMode, setViewMode] = useState<ViewMode>("home");
 
-  // NEW: lưu bài hát đang chọn
   const [selectedTrack, setSelectedTrack] = useState<Media | null>(null);
 
-  // NEW: lưu album/playlist giả lập đang chọn
   const [selectedAlbum, setSelectedAlbum] = useState<{
     cover: Media;
+    tracks: Media[];
+    title?: string;
+  } | null>(null);
+
+  const [selectedArtist, setSelectedArtist] = useState<{
+    name: string;
     tracks: Media[];
   } | null>(null);
 
   const [recommended, setRecommended] = useState<Media[]>([]);
   const [forYou, setForYou] = useState<Media[]>([]);
   const [upcoming, setUpcoming] = useState<Media[]>([]);
+
   const [loading, setLoading] = useState(true);
-  // NEW: lưu nghệ sĩ đang chọn
-  const [selectedArtist, setSelectedArtist] = useState<{
-    name: string;
-    tracks: Media[];
-  } | null>(null);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchHomeData = async () => {
       try {
         setLoading(true);
+        setError("");
 
         const res = await mediaApi.getAll();
 
-        console.log("API RESPONSE:", res.data);
-
-        const mediaDtos: MediaItemDto[] =
-          Array.isArray(res.data?.data) ? res.data.data : [];
+        const mediaDtos: MediaItemDto[] = Array.isArray(res.data?.data)
+          ? res.data.data
+          : [];
 
         const mediaList: Media[] = mediaDtos.map(mapMediaItemDtoToMedia);
-
-        console.log("MEDIA LIST:", mediaList);
 
         setRecommended(mediaList);
         setForYou(mediaList);
@@ -65,6 +63,7 @@ const MainContent = () => {
         setRecommended([]);
         setForYou([]);
         setUpcoming([]);
+        setError("Không tải được dữ liệu bài hát từ server.");
       } finally {
         setLoading(false);
       }
@@ -72,93 +71,88 @@ const MainContent = () => {
 
     fetchHomeData();
   }, []);
-  // const fetchHomeData = async () => {
-  //   try {
-  //     setLoading(true);
 
-  // NEW: gọi dữ liệu thật từ backend
-  // const [recommendedRes, forYouRes, upcomingRes] = await Promise.all([
-  //   mediaApi.getRecommended(),
-  //   mediaApi.getForYou(),
-  //   mediaApi.getUpcoming(),
-  // ]);
+  const allTracks = useMemo(() => {
+    const map = new Map<string | number, Media>();
 
-  // FIX: backend có thể trả res.data hoặc res.data.data
-  //     setRecommended(recommendedRes.data?.data ?? recommendedRes.data ?? []);
-  //     setForYou(forYouRes.data?.data ?? forYouRes.data ?? []);
-  //     setUpcoming(upcomingRes.data?.data ?? upcomingRes.data ?? []);
-  //   } catch (err) {
-  //     console.error("FETCH HOME DATA ERROR:", err);
+    [...recommended, ...forYou, ...upcoming].forEach((track) => {
+      map.set(track.id, track);
+    });
 
-  //     // NEW: nếu backend lỗi thì để mảng rỗng, không crash UI
-  //     setRecommended([]);
-  //     setForYou([]);
-  //     setUpcoming([]);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-  //   fetchHomeData();
-  // }, []);
+    return Array.from(map.values());
+  }, [recommended, forYou, upcoming]);
 
   const handleOpenTrack = (track: Media) => {
-    // NEW: mở màn hình chi tiết bài hát
     setSelectedTrack(track);
     setSelectedAlbum(null);
+    setSelectedArtist(null);
     setViewMode("track");
   };
 
-  const handleOpenAlbum = (track: Media, tracks: Media[]) => {
-    // NEW: mở màn hình album/playlist
+  const handleOpenAlbum = (cover: Media, tracks: Media[], title?: string) => {
     setSelectedAlbum({
-      cover: track,
+      cover,
       tracks,
+      title,
     });
+
     setSelectedTrack(null);
+    setSelectedArtist(null);
     setViewMode("album");
   };
 
-  // NEW: mở trang nghệ sĩ
-  const handleOpenArtist = (artistName: string, tracks: Media[]) => {
+  const handleOpenArtist = (artistName: string, tracks: Media[] = allTracks) => {
+    const artistTracks = tracks.filter(
+      (track) => track.artist?.name === artistName
+    );
+
     setSelectedArtist({
       name: artistName,
-      tracks: tracks.filter((track) => track.artist.name === artistName),
-    }); // NEW: lấy dữ liệu cho màn hình "Hiện tất cả"
+      tracks: artistTracks,
+    });
 
     setSelectedTrack(null);
     setSelectedAlbum(null);
     setViewMode("artist");
   };
 
-  const getShowAllData = () => {
-    if (viewMode === "recommended") {
-      return {
-        title: "Đề xuất cho bạn",
-        tracks: recommended,
-      };
-    }
-
-    if (viewMode === "upcoming") {
-      return {
-        title: "Được đề xuất cho hôm nay",
-        tracks: upcoming,
-      };
-    }
-
-    if (viewMode === "forYou") {
-      return {
-        title: "Dành cho bạn",
-        tracks: forYou,
-      };
-    }
-
-    return {
-      title: "",
-      tracks: [],
-    };
+  const handleBackHome = () => {
+    setViewMode("home");
+    setSelectedTrack(null);
+    setSelectedAlbum(null);
+    setSelectedArtist(null);
   };
+
+  const getShowAllData = () => {
+    switch (viewMode) {
+      case "recommended":
+        return {
+          title: "Đề xuất cho bạn",
+          tracks: recommended,
+        };
+
+      case "upcoming":
+        return {
+          title: "Được đề xuất cho hôm nay",
+          tracks: upcoming,
+        };
+
+      case "forYou":
+        return {
+          title: "Dành cho bạn",
+          tracks: forYou,
+        };
+
+      default:
+        return {
+          title: "",
+          tracks: [],
+        };
+    }
+  };
+
   const showAllData = getShowAllData();
+
   return (
     <main
       style={{
@@ -171,34 +165,47 @@ const MainContent = () => {
         padding: "30px",
         paddingBottom: "120px",
         boxSizing: "border-box",
-        background: "linear-gradient(180deg, #0b3b4a 0%, #121212 300px)",
+        background:
+          viewMode === "home"
+            ? "linear-gradient(180deg, #0b3b4a 0%, #121212 320px)"
+            : "linear-gradient(180deg, #16485a 0%, #121212 360px)",
       }}
     >
-      {/* NEW: quay lại home */}
       {viewMode !== "home" && (
         <button
-          onClick={() => {
-            setViewMode("home");
-            setSelectedTrack(null);
-            setSelectedAlbum(null);
-            setSelectedArtist(null);
-          }}
+          onClick={handleBackHome}
           style={{
             marginBottom: "20px",
-            background: "#2a2a2a",
+            background: "rgba(0,0,0,.45)",
             color: "#fff",
             border: "none",
             borderRadius: "999px",
-            padding: "8px 14px",
+            width: "38px",
+            height: "38px",
             cursor: "pointer",
-            fontWeight: 700,
+            fontWeight: 800,
+            fontSize: "18px",
           }}
         >
-          ← Quay lại
+          ‹
         </button>
       )}
 
-      {/* NEW: Home view */}
+      {error && (
+        <div
+          style={{
+            marginBottom: "18px",
+            padding: "12px 16px",
+            borderRadius: "12px",
+            background: "rgba(255, 80, 80, 0.15)",
+            color: "#ffb4b4",
+            fontSize: "14px",
+          }}
+        >
+          {error}
+        </div>
+      )}
+
       {viewMode === "home" && (
         <HomeView
           loading={loading}
@@ -210,7 +217,7 @@ const MainContent = () => {
           onShowAll={(mode) => setViewMode(mode)}
         />
       )}
-      {/* NEW: Show All View */}
+
       {(viewMode === "recommended" ||
         viewMode === "upcoming" ||
         viewMode === "forYou") && (
@@ -218,69 +225,61 @@ const MainContent = () => {
           <h1
             style={{
               color: "#fff",
-              fontSize: "36px",
+              fontSize: "38px",
               marginBottom: "24px",
             }}
           >
             {showAllData.title}
           </h1>
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
-              gap: "18px",
-            }}
-          >
-            {showAllData.tracks.map((track) => (
-              <AlbumCardLarge
-                key={track.id}
-                track={track}
-                tracks={showAllData.tracks}
-                onOpenAlbum={handleOpenAlbum}
-              />
-            ))}
-          </div>
+          {showAllData.tracks.length === 0 && !loading ? (
+            <p style={{ color: "#b3b3b3" }}>Chưa có bài hát nào.</p>
+          ) : (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(170px, 1fr))",
+                gap: "20px",
+              }}
+            >
+              {showAllData.tracks.map((track) => (
+                <AlbumCardLarge
+                  key={track.id}
+                  track={track}
+                  tracks={showAllData.tracks}
+                  onOpenAlbum={handleOpenAlbum}
+                />
+              ))}
+            </div>
+          )}
         </section>
       )}
 
-      {/* NEW: tạm thời album view placeholder */}
       {viewMode === "album" && selectedAlbum && (
         <AlbumDetailView
-          cover={selectedAlbum.cover}
+          cover={{
+            ...selectedAlbum.cover,
+            title: selectedAlbum.title ?? selectedAlbum.cover.title,
+          }}
           tracks={selectedAlbum.tracks}
           onOpenTrack={handleOpenTrack}
-          onOpenArtist={(artistName) =>
-            handleOpenArtist(artistName, [
-              ...recommended,
-              ...forYou,
-              ...upcoming,
-            ])
-          }
+          onOpenArtist={handleOpenArtist}
         />
       )}
 
-      {/* NEW: tạm thời track view placeholder */}
       {viewMode === "track" && selectedTrack && (
         <TrackDetailView
           track={selectedTrack}
-          onOpenArtist={(artistName) =>
-            handleOpenArtist(artistName, [
-              ...recommended,
-              ...forYou,
-              ...upcoming,
-            ])
-          }
+          onOpenArtist={handleOpenArtist}
         />
       )}
 
-      {/*New:tạm thơi artist */}
       {viewMode === "artist" && selectedArtist && (
         <ArtistDetailView
           artistName={selectedArtist.name}
           tracks={selectedArtist.tracks}
           onOpenAlbum={handleOpenAlbum}
-          onOpenTrack={handleOpenTrack} // NEW
+          onOpenTrack={handleOpenTrack}
         />
       )}
     </main>

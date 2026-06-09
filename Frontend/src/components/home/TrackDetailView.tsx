@@ -1,12 +1,9 @@
+import { useState } from "react";
 import type { Media } from "../../types/media";
 import { usePlayer } from "../../hooks/usePlayer";
-import AddToPlaylistModal from "../playlist/AddToPlaylistModal";
-import { useState } from "react";
 
 type TrackDetailViewProps = {
   track: Media;
-
-  // NEW
   onOpenArtist: (artistName: string) => void;
 };
 
@@ -19,178 +16,306 @@ const formatDuration = (seconds?: number) => {
   return `${min}:${String(sec).padStart(2, "0")}`;
 };
 
-const TrackDetailView = ({ track, onOpenArtist }: TrackDetailViewProps) => {
+const TrackDetailView = ({
+  track,
+  onOpenArtist,
+}: TrackDetailViewProps) => {
   const { playTrack, setQueue } = usePlayer();
-  const [showAddModal, setShowAddModal] = useState(false);
+
+  const [liked, setLiked] = useState(false);
+
+  const artistName =
+    track.artist?.name ?? "Unknown Artist";
 
   return (
     <>
+      {/* HEADER */}
       <section
         style={{
           display: "flex",
-          gap: "24px",
+          gap: "28px",
           alignItems: "flex-end",
-          marginBottom: "32px",
+          padding: "24px 0 40px",
         }}
       >
-        <img
-          src={track.thumbnailUrl}
-          alt={track.title}
-          style={{
-            width: "240px",
-            height: "240px",
-            borderRadius: "12px",
-            objectFit: "cover",
-            boxShadow: "0 18px 50px rgba(0,0,0,.55)",
-          }}
-        />
-
         <div
           style={{
-            display: "flex",
-            gap: "12px",
-            alignItems: "center",
-            marginTop: "8px",
+            width: "260px",
+            height: "260px",
+            borderRadius: "12px",
+            overflow: "hidden",
+            background: "#282828",
+            boxShadow: "0 20px 50px rgba(0,0,0,.5)",
+            flexShrink: 0,
           }}
         >
+          {track.thumbnailUrl ? (
+            <img
+              src={track.thumbnailUrl}
+              alt={track.title}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+              }}
+            />
+          ) : (
+            <div
+              style={{
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "70px",
+              }}
+            >
+              🎵
+            </div>
+          )}
+        </div>
+
+        <div>
           <p
-            onClick={() => onOpenArtist(track.artist.name)}
             style={{
-              color: "#1DB954",
-              cursor: "pointer",
-              fontWeight: 600,
-              margin: 0,
+              color: "#fff",
+              fontWeight: 700,
+              marginBottom: "8px",
             }}
           >
-            {track.artist.name}
+            Bài hát
           </p>
 
-          <span style={{ color: "#b3b3b3" }}>
-            • {formatDuration(track.duration)}
-          </span>
+          <h1
+            style={{
+              color: "#fff",
+              fontSize: "clamp(48px,6vw,82px)",
+              margin: 0,
+              lineHeight: 1,
+            }}
+          >
+            {track.title}
+          </h1>
 
-          <span style={{ color: "#b3b3b3" }}>• {track.type}</span>
+          <div
+            style={{
+              marginTop: "14px",
+              color: "#b3b3b3",
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "8px",
+              alignItems: "center",
+            }}
+          >
+            <span
+              onClick={() => onOpenArtist(artistName)}
+              style={{
+                color: "#fff",
+                cursor: "pointer",
+                fontWeight: 700,
+              }}
+            >
+              {artistName}
+            </span>
+
+            <span>•</span>
+
+            <span>
+              {formatDuration(track.duration)}
+            </span>
+
+            <span>•</span>
+
+            <span>{track.type}</span>
+          </div>
         </div>
       </section>
 
-      {/* NEW: ACTION */}
-      <div style={{ display: "flex", gap: "14px", marginBottom: "28px" }}>
+      {/* ACTIONS */}
+      <section
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "20px",
+          marginBottom: "36px",
+        }}
+      >
         <button
           onClick={() => {
             setQueue([track]);
             playTrack(track);
           }}
           style={{
-            width: "56px",
-            height: "56px",
+            width: "64px",
+            height: "64px",
             borderRadius: "50%",
             border: "none",
             background: "#1DB954",
+            color: "#000",
+            fontSize: "24px",
+            fontWeight: 900,
             cursor: "pointer",
-            fontSize: "22px",
-            fontWeight: 800,
           }}
         >
           ▶
         </button>
 
         <button
-          onClick={() => setShowAddModal(true)}
+          onClick={() => setLiked(!liked)}
           style={{
             border: "none",
-            borderRadius: "999px",
-            background: "#2a2a2a",
-            color: "#fff",
-            padding: "0 18px",
+            background: "transparent",
+            fontSize: "30px",
             cursor: "pointer",
-            fontWeight: 700,
+            color: liked ? "#1DB954" : "#b3b3b3",
           }}
         >
-          + Thêm vào playlist
+          {liked ? "♥" : "♡"}
         </button>
-      </div>
 
-      {/* NEW: INFO CARD */}
-      {/* NEW: ABOUT ARTIST */}
-      <div
-        style={{
-          background: "#181818",
-          borderRadius: "14px",
-          padding: "20px",
-          marginTop: "24px",
-          maxWidth: "520px",
-        }}
-      >
-        <h2
-          style={{
-            color: "#fff",
-            marginBottom: "14px",
+        <button
+          onClick={() => {
+            navigator.clipboard.writeText(
+              window.location.href
+            );
           }}
-        >
-          Về nghệ sĩ
-        </h2>
-
-        <p
           style={{
+            border: "none",
+            background: "transparent",
+            fontSize: "24px",
+            cursor: "pointer",
             color: "#b3b3b3",
-            lineHeight: 1.8,
           }}
         >
-          {track.artist.name} là một trong những nghệ sĩ nổi bật trên TuneVault.
-          Các ca khúc của nghệ sĩ thường xuất hiện trong những playlist được
-          nghe nhiều nhất.
-        </p>
-      </div>
-      {/* NEW: ALBUM INFO */}
-      <div
-        style={{
-          background: "#181818",
-          borderRadius: "14px",
-          padding: "20px",
-          marginTop: "24px",
-          maxWidth: "520px",
-        }}
-      >
-        <h2
+          📤
+        </button>
+
+        <button
           style={{
-            color: "#fff",
-            marginBottom: "14px",
+            border: "none",
+            background: "transparent",
+            fontSize: "28px",
+            cursor: "pointer",
+            color: "#b3b3b3",
           }}
         >
-          Album
-        </h2>
+          ⋯
+        </button>
+      </section>
 
-        <p style={{ color: "#b3b3b3" }}>
-          Bài hát này thuộc bộ sưu tập của {track.artist.name}.
-        </p>
-      </div>
-      <div
+      {/* CONTENT */}
+      <section
         style={{
-          background: "#181818",
-          borderRadius: "14px",
-          padding: "20px",
-          maxWidth: "520px",
+          display: "grid",
+          gridTemplateColumns:
+            "minmax(0,1fr) minmax(280px,400px)",
+          gap: "24px",
         }}
       >
-        <h2 style={{ color: "#fff", marginBottom: "14px" }}>
-          Thông tin bài hát
-        </h2>
+        <div
+          style={{
+            background: "#181818",
+            borderRadius: "14px",
+            padding: "22px",
+          }}
+        >
+          <h2
+            style={{
+              color: "#fff",
+              marginBottom: "18px",
+            }}
+          >
+            Thông tin bài hát
+          </h2>
 
-        <p style={{ color: "#b3b3b3" }}>Tên bài: {track.title}</p>
-        <p style={{ color: "#b3b3b3" }}>Nghệ sĩ: {track.artist.name}</p>
-        <p style={{ color: "#b3b3b3" }}>
-          Thời lượng: {formatDuration(track.duration)}
-        </p>
-        <p style={{ color: "#b3b3b3" }}>Thể loại: {track.genre ?? "Unknown"}</p>
-      </div>
+          <InfoRow
+            label="Tên bài"
+            value={track.title}
+          />
 
-      <AddToPlaylistModal
-        open={showAddModal}
-        media={track}
-        onClose={() => setShowAddModal(false)}
-      />
+          <InfoRow
+            label="Nghệ sĩ"
+            value={artistName}
+          />
+
+          <InfoRow
+            label="Thời lượng"
+            value={formatDuration(track.duration)}
+          />
+
+          <InfoRow
+            label="Thể loại"
+            value={track.genre ?? "Unknown"}
+          />
+
+          <InfoRow
+            label="Loại"
+            value={track.type}
+          />
+        </div>
+
+        <div
+          style={{
+            background: "#181818",
+            borderRadius: "14px",
+            padding: "22px",
+          }}
+        >
+          <h2
+            style={{
+              color: "#fff",
+              marginBottom: "16px",
+            }}
+          >
+            Về nghệ sĩ
+          </h2>
+
+          <p
+            style={{
+              color: "#b3b3b3",
+              lineHeight: 1.8,
+            }}
+          >
+            {artistName} hiện đang có mặt trên
+            TuneVault. Bạn có thể mở trang nghệ sĩ
+            để xem thêm các bài hát liên quan.
+          </p>
+        </div>
+      </section>
     </>
   );
 };
+
+const InfoRow = ({
+  label,
+  value,
+}: {
+  label: string;
+  value: string;
+}) => (
+  <div
+    style={{
+      display: "flex",
+      justifyContent: "space-between",
+      gap: "12px",
+      padding: "12px 0",
+      borderBottom: "1px solid #2a2a2a",
+    }}
+  >
+    <span style={{ color: "#b3b3b3" }}>
+      {label}
+    </span>
+
+    <span
+      style={{
+        color: "#fff",
+        fontWeight: 700,
+        textAlign: "right",
+      }}
+    >
+      {value}
+    </span>
+  </div>
+);
 
 export default TrackDetailView;
