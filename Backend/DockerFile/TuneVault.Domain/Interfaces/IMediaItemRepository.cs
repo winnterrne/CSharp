@@ -19,5 +19,6 @@ namespace TuneVault.Domain.Interfaces
         public Task<int> UpdateMediaAsync(MediaItem media);
         public Task<int> DeleteMediaAsync(int mediaId); // Dùng xóa mềm (IsDelete = 1)
         public Task<MediaItem> GetMediaInfoAsync(int mediaId);
+        Task<(IEnumerable<MediaItem> Items, int TotalCount)> SearchAsync(string keyword, int skip, int take);
     }
 }
