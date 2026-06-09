@@ -1,5 +1,5 @@
 namespace TuneVault.Application.DTOs;
-public class FavoriteDTO
+public record FavoriteDTO
 {
     public int MediaItemID { get; set; }
     public string? TitleName { get; set; }

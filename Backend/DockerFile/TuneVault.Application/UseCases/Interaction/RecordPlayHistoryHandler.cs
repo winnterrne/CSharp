@@ -1,23 +1,27 @@
 using MediatR;
+using TuneVault.Application.DTOs;
 using TuneVault.Domain.Interfaces;
 using TuneVault.Domain.Entities;
+
 namespace TuneVault.Application.UseCases.Interaction;
 
 public class RecordPlayHistoryHandler : IRequestHandler<RecordPlayHistoryCommand, int>
 {
-    private readonly IInteractionRepository _repo;
-    public RecordPlayHistoryHandler(IInteractionRepository repo)
+    private readonly IInteractionRepository _playHistory;
+    public RecordPlayHistoryHandler(IInteractionRepository playHistory)
     {
-        _repo = repo;
+        _playHistory = playHistory;
     }
+
     public async Task<int> Handle(RecordPlayHistoryCommand request, CancellationToken cancellationToken)
     {
-        var result = new PlayHistory(
+        var history = new PlayHistory
+        (
             request.UserID,
-            request.MediaItemID,
+            request.MediaItemID,   
             DateTime.UtcNow
         );
-    return await _repo.RecordPlayHistoryAsync(result);
-        
+        var historyID = await _playHistory.RecordPlayHistoryAsync(history);
+        return historyID;
     }
 }
