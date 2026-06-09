@@ -61,3 +61,10 @@ public record UpdateMediaRequestDto(
     int? ArtistID,
     int? AlbumID
 );
+
+public record SearchResultDto(
+    IEnumerable<MediaItemDto> Tracks,
+    IEnumerable<ArtistDto> Artists,
+    IEnumerable<PlaylistDto> Playlists,
+    int TotalPages
+);
