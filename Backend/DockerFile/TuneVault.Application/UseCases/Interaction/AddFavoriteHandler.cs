@@ -1,6 +1,4 @@
 using MediatR;
-using Microsoft.Extensions.Configuration.UserSecrets;
-using TuneVault.Domain.Entities;
 using TuneVault.Domain.Interfaces;
 
 namespace TuneVault.Application.UseCases.Interaction;

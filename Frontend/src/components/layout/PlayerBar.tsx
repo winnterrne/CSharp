@@ -1,193 +1,284 @@
-import { useState, useRef } from "react";
-import { usePlayer } from "../../hooks/usePlayer";
+import { useRef, useState } from "react";
+import type { Media } from "../../types/media";
+import type { RepeatMode } from "../../types/player";
 
+interface PlayerBarProps {
+  currentTrack: Media | null;
+  isPlaying: boolean;
+  position: number;
+  duration: number;
+  volume: number;
+  isShuffle: boolean;
+  repeatMode: RepeatMode;
+  isMuted: boolean;
 
-// ─── Icons ────────────────────────────────────────────────────────────────────
-const ShuffleIcon = ({ active }: { active: boolean }) => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill={active ? "#1DB954" : "currentColor"}>
-    <path d="M17.65 3L22 7.35l-4.35 4.35-1.41-1.41 2.44-2.44H14c-1.1 0-2.03.6-2.56 1.5l-.97 1.64c.83.29 1.58.79 2.18 1.44l.73-1.22c.2-.33.56-.54.95-.54h3.97l-2.44 2.44 1.41 1.41L22 9.94l.01-.01L17.65 3zM2 7h5.5l2.57 4.35L8.6 13.2C8.2 13.72 7.62 14 7 14H2v2h5c1.1 0 2.03-.6 2.56-1.5L12 11.5l2.44 4.12c.53.9 1.46 1.5 2.56 1.5h1.25l2.44 2.44L22 18.12 17.65 21 14 17.65l1.41-1.41 2.44 2.44H16.44c-.39 0-.75-.2-.95-.54L12 13.5l-3.49 5.64c-.53.9-1.46 1.5-2.56 1.5H2v-2h3.94c.39 0 .75-.2.95-.54L9.38 14H2V7z" />
+  onTogglePlay: () => void;
+  onPrev: () => void;
+  onNext: () => void;
+  onSeek: (position: number) => void;
+  onVolumeChange: (volume: number) => void;
+  onToggleShuffle: () => void;
+  onToggleRepeatMode: () => void;
+  onToggleMuted: () => void;
+}
+
+const formatSeconds = (sec: number) => {
+  if (!Number.isFinite(sec) || sec < 0) return "0:00";
+
+  const minutes = Math.floor(sec / 60);
+  const seconds = Math.floor(sec % 60);
+
+  return `${minutes}:${String(seconds).padStart(2, "0")}`;
+};
+
+const Icon = ({
+  children,
+  size = 20,
+}: {
+  children: React.ReactNode;
+  size?: number;
+}) => (
+  <span
+    style={{
+      width: size,
+      height: size,
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+    }}
+  >
+    {children}
+  </span>
+);
+
+const ShuffleIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M16 3h5v5" />
+    <path d="M4 7h3c2.5 0 4 5 6.5 5H21" />
+    <path d="M16 21h5v-5" />
+    <path d="M4 17h3c1.2 0 2.2-.8 3.1-1.9" />
   </svg>
 );
 
 const PrevIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M6 6h2v12H6zm3.5 6 8.5 6V6z" />
+  <svg viewBox="0 0 24 24" fill="currentColor">
+    <path d="M6 5h2v14H6z" />
+    <path d="M19 6v12L9 12z" />
   </svg>
 );
 
 const NextIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
+  <svg viewBox="0 0 24 24" fill="currentColor">
+    <path d="M16 5h2v14h-2z" />
+    <path d="M5 6v12l10-6z" />
   </svg>
 );
 
 const PlayIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="black">
+  <svg viewBox="0 0 24 24" fill="currentColor">
     <path d="M8 5v14l11-7z" />
   </svg>
 );
 
 const PauseIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="black">
-    <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+  <svg viewBox="0 0 24 24" fill="currentColor">
+    <path d="M7 5h4v14H7z" />
+    <path d="M13 5h4v14h-4z" />
   </svg>
 );
 
-const RepeatIcon = ({ active }: { active: boolean }) => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill={active ? "#1DB954" : "currentColor"}>
-    <path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z" />
+const RepeatIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M17 1l4 4-4 4" />
+    <path d="M3 11V9a4 4 0 014-4h14" />
+    <path d="M7 23l-4-4 4-4" />
+    <path d="M21 13v2a4 4 0 01-4 4H3" />
   </svg>
 );
 
-const NowPlayingViewIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M11 17H9V8l-4 4-1.42-1.41L10 4.17l6.41 6.41L15 12l-4-4v9zm6.41.59L16 19l1.59 1.59L19 19l-1.59-1.41zM20 3H4v2h16V3zM4 21h7v-2H4v2zm13-4h-3v2h3v-2zm-6 0H4v2h7v-2z" />
+const RepeatOneIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M17 1l4 4-4 4" />
+    <path d="M3 11V9a4 4 0 014-4h14" />
+    <path d="M7 23l-4-4 4-4" />
+    <path d="M21 13v2a4 4 0 01-4 4H3" />
+    <text x="11.2" y="15.5" fontSize="7" fill="currentColor" stroke="none">
+      1
+    </text>
+  </svg>
+);
+
+const HeartIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.6l-1-1a5.5 5.5 0 00-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 000-7.8z" />
   </svg>
 );
 
 const QueueIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9H9V9h10v2zm-4 4H9v-2h6v2zm4-8H9V5h10v2z" />
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M4 6h16" />
+    <path d="M4 12h10" />
+    <path d="M4 18h7" />
+    <path d="M17 15l4 3-4 3v-6z" />
   </svg>
 );
 
 const DeviceIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M22 9V3h-6v2H8V3H2v6h2v9c0 1.1.9 2 2 2h4v2h4v-2h4c1.1 0 2-.9 2-2V9h2zM4 5h2v2H4V5zm14 13H6V9h12v9zm2-11h-2V5h2v2z" />
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <rect x="3" y="5" width="18" height="12" rx="2" />
+    <path d="M8 21h8" />
+    <path d="M12 17v4" />
   </svg>
 );
 
-const VolumeIcon = ({ level }: { level: number }) => {
-  if (level === 0) return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z" />
-    </svg>
-  );
-  if (level < 50) return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M18.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM5 9v6h4l5 5V4L9 9H5z" />
-    </svg>
-  );
+const VolumeIcon = ({ muted, volume }: { muted: boolean; volume: number }) => {
+  if (muted || volume === 0) {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M11 5L6 9H3v6h3l5 4z" />
+        <path d="M18 9l4 4" />
+        <path d="M22 9l-4 4" />
+      </svg>
+    );
+  }
+
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M11 5L6 9H3v6h3l5 4z" />
+      {volume > 35 && <path d="M15 9a5 5 0 010 6" />}
+      {volume > 70 && <path d="M18 6a9 9 0 010 12" />}
     </svg>
   );
 };
 
 const FullscreenIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z" />
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M8 3H3v5" />
+    <path d="M16 3h5v5" />
+    <path d="M3 16v5h5" />
+    <path d="M21 16v5h-5" />
   </svg>
 );
 
-const HeartIcon = ({ liked }: { liked: boolean }) => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill={liked ? "#1DB954" : "none"} stroke={liked ? "#1DB954" : "currentColor"} strokeWidth="2">
-    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+const NowPlayingIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <rect x="4" y="5" width="16" height="14" rx="2" />
+    <path d="M8 15l2.5-3 2 2.5L15 11l3 4" />
   </svg>
 );
 
-// ─── Slider ───────────────────────────────────────────────────────────────────
 const Slider = ({
   value,
   onChange,
-  color = "#1DB954",
 }: {
   value: number;
-  onChange: (v: number) => void;
-  color?: string;
+  onChange: (value: number) => void;
 }) => {
   const [hovered, setHovered] = useState(false);
   const trackRef = useRef<HTMLDivElement>(null);
 
-  const handleClick = (e: React.MouseEvent) => {
+  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!trackRef.current) return;
+
     const rect = trackRef.current.getBoundingClientRect();
-    const pct = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1);
-    onChange(pct * 100);
+    const percent = Math.min(
+      Math.max((e.clientX - rect.left) / rect.width, 0),
+      1
+    );
+
+    onChange(percent * 100);
   };
 
   return (
     <div
       ref={trackRef}
+      onClick={handleClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      onClick={handleClick}
       style={{
-        height: "4px",
-        background: "#4d4d4d",
-        borderRadius: "2px",
-        cursor: "pointer",
-        position: "relative",
         width: "100%",
+        height: "12px",
+        display: "flex",
+        alignItems: "center",
+        cursor: "pointer",
       }}
     >
-      {/* Fill */}
       <div
         style={{
-          position: "absolute",
-          left: 0,
-          top: 0,
-          height: "100%",
-          width: `${value}%`,
-          background: hovered ? color : "#fff",
-          borderRadius: "2px",
-          transition: "background 0.15s",
+          width: "100%",
+          height: "4px",
+          background: "#4d4d4d",
+          borderRadius: "999px",
+          position: "relative",
         }}
-      />
-      {/* Thumb */}
-      <div
-        style={{
-          position: "absolute",
-          top: "50%",
-          left: `${value}%`,
-          transform: "translate(-50%, -50%)",
-          width: "12px",
-          height: "12px",
-          borderRadius: "50%",
-          background: "#fff",
-          opacity: hovered ? 1 : 0,
-          transition: "opacity 0.15s",
-          pointerEvents: "none",
-        }}
-      />
+      >
+        <div
+          style={{
+            width: `${Math.min(Math.max(value, 0), 100)}%`,
+            height: "100%",
+            background: hovered ? "#1ed760" : "#fff",
+            borderRadius: "999px",
+          }}
+        />
+
+        <div
+          style={{
+            width: "12px",
+            height: "12px",
+            borderRadius: "50%",
+            background: "#fff",
+            position: "absolute",
+            left: `${Math.min(Math.max(value, 0), 100)}%`,
+            top: "50%",
+            transform: "translate(-50%, -50%)",
+            opacity: hovered ? 1 : 0,
+            pointerEvents: "none",
+          }}
+        />
+      </div>
     </div>
   );
 };
 
-// ─── Icon Button ──────────────────────────────────────────────────────────────
 const IconBtn = ({
   children,
   title,
   active,
+  disabled,
   onClick,
 }: {
   children: React.ReactNode;
   title?: string;
   active?: boolean;
+  disabled?: boolean;
   onClick?: () => void;
 }) => (
   <button
     title={title}
-    onClick={onClick}
+    onClick={disabled ? undefined : onClick}
+    disabled={disabled}
     style={{
-      background: "none",
+      width: "32px",
+      height: "32px",
       border: "none",
-      color: active ? "#1DB954" : "#b3b3b3",
-      cursor: "pointer",
+      background: "transparent",
+      color: disabled ? "#535353" : active ? "#1ed760" : "#b3b3b3",
+      cursor: disabled ? "default" : "pointer",
+      padding: 0,
+      borderRadius: "50%",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      padding: "6px",
-      borderRadius: "4px",
-      transition: "color 0.15s, transform 0.1s",
+      transition: ".15s ease",
     }}
     onMouseEnter={(e) => {
-      if (!active) e.currentTarget.style.color = "#fff";
+      if (disabled) return;
+      e.currentTarget.style.color = active ? "#1ed760" : "#fff";
       e.currentTarget.style.transform = "scale(1.08)";
     }}
     onMouseLeave={(e) => {
-      e.currentTarget.style.color = active ? "#1DB954" : "#b3b3b3";
+      if (disabled) return;
+      e.currentTarget.style.color = active ? "#1ed760" : "#b3b3b3";
       e.currentTarget.style.transform = "scale(1)";
     }}
   >
@@ -195,33 +286,38 @@ const IconBtn = ({
   </button>
 );
 
-// ─── Main Component ───────────────────────────────────────────────────────────
-const PlayerBar = () => {
-  const {
-    currentTrack,
-    isPlaying,
-    progress,
-    volume,
-    shuffle,
-    repeat,
-    togglePlay,
-    setProgress,
-    setVolume,
-    toggleShuffle,
-    toggleRepeat,
-  } = usePlayer();
+const PlayerBar = ({
+  currentTrack,
+  isPlaying,
+  position,
+  duration,
+  volume,
+  isShuffle,
+  repeatMode,
+  isMuted,
+  onTogglePlay,
+  onPrev,
+  onNext,
+  onSeek,
+  onVolumeChange,
+  onToggleShuffle,
+  onToggleRepeatMode,
+  onToggleMuted,
+}: PlayerBarProps) => {
+  const [liked, setLiked] = useState(false);
 
-  const [liked, setLiked] = useState(false); // giữ local vì chưa có API
+  const safeDuration = duration || currentTrack?.duration || 0;
 
-  const formatTime = (pct: number) => {
-    const totalSec = currentTrack?.duration ?? 214;
-    const s = Math.round((pct / 100) * totalSec);
-    return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
-  };
+  const progressPercent =
+    safeDuration > 0 ? Math.min((position / safeDuration) * 100, 100) : 0;
 
-  const formatDuration = () => {
-    const s = currentTrack?.duration ?? 214;
-    return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+  const artistName = currentTrack?.artist?.name ?? "";
+
+  const handleSeekPercent = (percent: number) => {
+    if (!safeDuration) return;
+
+    const nextPosition = Math.round((percent / 100) * safeDuration);
+    onSeek(nextPosition);
   };
 
   return (
@@ -232,70 +328,108 @@ const PlayerBar = () => {
         background: "#181818",
         borderTop: "1px solid #282828",
         display: "grid",
-        gridTemplateColumns: "1fr 1fr 1fr",
+        gridTemplateColumns: "minmax(180px, 1fr) minmax(320px, 1.4fr) minmax(180px, 1fr)",
         alignItems: "center",
         padding: "0 16px",
+        boxSizing: "border-box",
         zIndex: 200,
-        fontFamily: "'Circular', 'Helvetica Neue', Helvetica, Arial, sans-serif",
         userSelect: "none",
       }}
     >
-      {/* ── Left: Now Playing Info ── */}
-      <div style={{ display: "flex", alignItems: "center", gap: "12px", minWidth: 0 }}>
-        {/* Album art */}
+      {/* LEFT */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "14px",
+          minWidth: 0,
+        }}
+      >
         <div
           style={{
             width: "56px",
             height: "56px",
             borderRadius: "4px",
-            background: `linear-gradient(135deg, ${currentTrack?.color ?? "#1a3050"}, #1DB954)`,
+            background: "#282828",
+            overflow: "hidden",
             flexShrink: 0,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: "22px",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
+            color: "#b3b3b3",
           }}
         >
-          {currentTrack?.emoji ?? "🎵"}
+          {currentTrack?.thumbnailUrl ? (
+            <img
+              src={currentTrack.thumbnailUrl}
+              alt={currentTrack.title}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+              }}
+            />
+          ) : (
+            <svg
+              viewBox="0 0 24 24"
+              width="24"
+              height="24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path d="M9 18V5l12-2v13" />
+              <circle cx="6" cy="18" r="3" />
+              <circle cx="18" cy="16" r="3" />
+            </svg>
+          )}
         </div>
 
-        {/* Song info */}
         <div style={{ minWidth: 0 }}>
           <div
             style={{
-              color: "#fff",
+              color: currentTrack ? "#fff" : "#6b6b6b",
               fontSize: "14px",
               fontWeight: 600,
               whiteSpace: "nowrap",
               overflow: "hidden",
               textOverflow: "ellipsis",
-              letterSpacing: "-0.01em",
+              maxWidth: "220px",
             }}
+            title={currentTrack?.title ?? "Chưa phát bài nào"}
           >
             {currentTrack?.title ?? "Chưa phát bài nào"}
           </div>
+
           <div
             style={{
               color: "#b3b3b3",
-              fontSize: "11px",
+              fontSize: "12px",
+              marginTop: "3px",
               whiteSpace: "nowrap",
               overflow: "hidden",
               textOverflow: "ellipsis",
-              marginTop: "2px",
+              maxWidth: "220px",
             }}
+            title={artistName}
           >
-            {currentTrack?.artist ?? ""}
+            {artistName}
           </div>
         </div>
 
-        {/* Heart */}
-        <IconBtn title="Thêm vào thư viện" active={liked} onClick={() => setLiked(!liked)}>
-          <HeartIcon liked={liked} />
+        <IconBtn
+          title="Thêm vào thư viện"
+          active={liked}
+          disabled={!currentTrack}
+          onClick={() => setLiked((prev) => !prev)}
+        >
+          <Icon size={18}>
+            <HeartIcon />
+          </Icon>
         </IconBtn>
       </div>
 
-      {/* ── Center: Controls + Progress ── */}
+      {/* CENTER */}
       <div
         style={{
           display: "flex",
@@ -305,105 +439,152 @@ const PlayerBar = () => {
           width: "100%",
         }}
       >
-        {/* Control buttons */}
-        <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-          <IconBtn title="Phát ngẫu nhiên" active={shuffle} onClick={toggleShuffle}>
-            <ShuffleIcon active={shuffle} />
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+          }}
+        >
+          <IconBtn
+            title="Phát ngẫu nhiên"
+            active={isShuffle}
+            disabled={!currentTrack}
+            onClick={onToggleShuffle}
+          >
+            <Icon size={18}>
+              <ShuffleIcon />
+            </Icon>
           </IconBtn>
 
-          <IconBtn title="Trước">
-            <PrevIcon />
+          <IconBtn title="Trước" disabled={!currentTrack} onClick={onPrev}>
+            <Icon size={20}>
+              <PrevIcon />
+            </Icon>
           </IconBtn>
 
-          {/* Play/Pause */}
           <button
-            onClick={togglePlay}
+            title={isPlaying ? "Tạm dừng" : "Phát"}
+            onClick={onTogglePlay}
+            disabled={!currentTrack}
             style={{
-              background: "#fff",
-              border: "none",
+              width: "34px",
+              height: "34px",
               borderRadius: "50%",
-              width: "36px",
-              height: "36px",
+              border: "none",
+              background: currentTrack ? "#fff" : "#535353",
+              color: "#000",
+              cursor: currentTrack ? "pointer" : "default",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              cursor: "pointer",
-              margin: "0 4px",
-              transition: "transform 0.1s ease, background 0.15s",
-              flexShrink: 0,
+              padding: 0,
+              transition: ".15s ease",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.transform = "scale(1.07)";
-              e.currentTarget.style.background = "#f0f0f0";
+              if (!currentTrack) return;
+              e.currentTarget.style.transform = "scale(1.08)";
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = "scale(1)";
-              e.currentTarget.style.background = "#fff";
             }}
           >
-            {isPlaying ? <PauseIcon /> : <PlayIcon />}
+            <Icon size={20}>{isPlaying ? <PauseIcon /> : <PlayIcon />}</Icon>
           </button>
 
-          <IconBtn title="Tiếp theo">
-            <NextIcon />
+          <IconBtn title="Tiếp theo" disabled={!currentTrack} onClick={onNext}>
+            <Icon size={20}>
+              <NextIcon />
+            </Icon>
           </IconBtn>
 
-          <IconBtn title="Lặp lại" active={repeat} onClick={toggleRepeat}>
-            <RepeatIcon active={repeat} />
+          <IconBtn
+            title="Lặp lại"
+            active={repeatMode !== "off"}
+            disabled={!currentTrack}
+            onClick={onToggleRepeatMode}
+          >
+            <Icon size={18}>
+              {repeatMode === "one" ? <RepeatOneIcon /> : <RepeatIcon />}
+            </Icon>
           </IconBtn>
         </div>
 
-        {/* Progress bar */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
             gap: "8px",
             width: "100%",
-            maxWidth: "480px",
+            maxWidth: "540px",
           }}
         >
-          <span style={{ color: "#b3b3b3", fontSize: "11px", minWidth: "32px", textAlign: "right" }}>
-            {formatTime(progress)}
+          <span
+            style={{
+              color: "#b3b3b3",
+              fontSize: "11px",
+              minWidth: "38px",
+              textAlign: "right",
+            }}
+          >
+            {formatSeconds(position)}
           </span>
-          <Slider value={progress} onChange={setProgress} color="#1DB954" />
-          <span style={{ color: "#b3b3b3", fontSize: "11px", minWidth: "32px" }}>
-            {formatDuration()}
+
+          <Slider value={progressPercent} onChange={handleSeekPercent} />
+
+          <span
+            style={{
+              color: "#b3b3b3",
+              fontSize: "11px",
+              minWidth: "38px",
+            }}
+          >
+            {formatSeconds(safeDuration)}
           </span>
         </div>
       </div>
 
-      {/* ── Right: Extra Controls ── */}
+      {/* RIGHT */}
       <div
         style={{
           display: "flex",
           alignItems: "center",
           justifyContent: "flex-end",
-          gap: "4px",
+          gap: "8px",
         }}
       >
-        <IconBtn title="Now Playing View">
-          <NowPlayingViewIcon />
+        <IconBtn title="Now Playing View" disabled={!currentTrack}>
+          <Icon size={18}>
+            <NowPlayingIcon />
+          </Icon>
         </IconBtn>
 
-        <IconBtn title="Hàng chờ">
-          <QueueIcon />
+        <IconBtn title="Hàng chờ" disabled={!currentTrack}>
+          <Icon size={18}>
+            <QueueIcon />
+          </Icon>
         </IconBtn>
 
         <IconBtn title="Thiết bị">
-          <DeviceIcon />
+          <Icon size={18}>
+            <DeviceIcon />
+          </Icon>
         </IconBtn>
 
-        <IconBtn title="Âm lượng">
-          <VolumeIcon level={volume} />
+        <IconBtn title="Âm lượng" onClick={onToggleMuted}>
+          <Icon size={20}>
+            <VolumeIcon muted={isMuted} volume={volume} />
+          </Icon>
         </IconBtn>
 
-        <div style={{ width: "80px" }}>
-          <Slider value={volume} onChange={setVolume} color="#1DB954" />
+        <div style={{ width: "92px" }}>
+          <Slider value={isMuted ? 0 : volume} onChange={onVolumeChange} />
         </div>
 
         <IconBtn title="Toàn màn hình">
-          <FullscreenIcon />
+          <Icon size={18}>
+            <FullscreenIcon />
+          </Icon>
         </IconBtn>
       </div>
     </footer>

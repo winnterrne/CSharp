@@ -1,8 +1,12 @@
+import AppRoutes from "./routes/AppRoutes";
+import AudioPlayer from "./components/player/AudioPlayer";
+
 function App() {
   return (
-    <div className="text-3xl font-bold">
-      TuneVault 
-    </div>
+    <>
+      <AudioPlayer />
+      <AppRoutes />
+    </>
   );
 }
 

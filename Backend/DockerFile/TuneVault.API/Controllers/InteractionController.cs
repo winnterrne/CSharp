@@ -19,7 +19,7 @@ public class InteractionController : Controller
         _mediator = mediator;
     }
     
-[Authorize]
+[Authorize] 
 [HttpPost("favorite/{mediaItemId}")]
 public async Task<IActionResult> AddLike(int mediaItemId)
     {
@@ -111,5 +111,31 @@ public async Task<IActionResult> FollowArtist(int artistId)
         var followID = await _mediator.Send(new FollowArtistCommand(userID, artistId));
         if(followID == 0) return Conflict("Đã theo dõi nghệ sĩ này");
         return Ok(new { success = true, message = "Đã theo dõi nghệ sĩ", followID });
+    }
+[Authorize]
+[HttpDelete("unfollow/user/{followingUserId}")]
+public async Task<IActionResult> UnfollowUser(string followingUserId)
+    {
+        var userID = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if(userID == null) return Unauthorized();
+        var result = await _mediator.Send(new UnfollowUserCommand(userID, followingUserId));
+        if(result > 0) {
+            return Ok(new { success = true, message = "Đã hủy theo dõi người dùng"});
+        } else {
+            return BadRequest(new { success = false, message = "Failed to unfollow user"});
+        }
+    }
+[Authorize]
+[HttpDelete("unfollow/artist/{artistId}")]
+public async Task<IActionResult> UnfollowArtist(int artistId)
+    {
+        var userID = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if(userID == null) return Unauthorized();
+        var result = await _mediator.Send(new UnfollowArtistCommand(userID, artistId));
+        if(result > 0) {
+            return Ok(new { success = true, message = "Đã hủy theo dõi nghệ sĩ"});
+        } else {
+            return BadRequest(new { success = false, message = "Failed to unfollow artist"});
+        }
     }
 }
