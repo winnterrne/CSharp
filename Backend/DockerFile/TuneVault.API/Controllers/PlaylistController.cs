@@ -61,6 +61,15 @@ public async Task<IActionResult> DeletePlaylist(int id)
         if(result <= 0) return NotFound(new {success = false, message = "Playlist not found"});
         return Ok(new {success = true, message = "Playlist deleted successfully"});
     }
+// cap nhat playlist
+[HttpPut("{id}")]
+public async Task<IActionResult> UpdatePlaylist(int id, [FromBody] UpdatePlaylistCommand request)
+    {
+        if(id != request.PlaylistID) return BadRequest(new {success = false, message = "Playlist ID mismatch"});
+        var result = await _mediator.Send(request);
+        if(result <= 0) return NotFound(new {success = false, message = "Playlist not found"});
+        return Ok(new {success = true, message = "Playlist updated successfully"});
+    }
 
 // Add Track To List
 [HttpPost("{playlistId}/tracks/{mediaItemId}")]

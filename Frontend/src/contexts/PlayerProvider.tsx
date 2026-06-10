@@ -1,10 +1,12 @@
-import type { ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import type { Media } from "../types/media";
 import { PlayerContext } from "./PlayerContext";
 import { playerStore } from "../store/playerStore";
 
 export const PlayerProvider = ({ children }: { children: ReactNode }) => {
-  // Subscribe to playerStore
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // State từ playerStore
   const currentTrack = playerStore((state) => state.currentTrack);
   const queue = playerStore((state) => state.queue);
   const isPlaying = playerStore((state) => state.isPlaying);
@@ -15,11 +17,10 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   const isShuffle = playerStore((state) => state.isShuffle);
   const repeatMode = playerStore((state) => state.repeatMode);
   const isLoading = playerStore((state) => state.isLoading);
-  const setDuration = playerStore((state) => state.setDuration);
 
-  // Actions from store
-  const playTrack = playerStore((state) => state.setCurrentTrack);
+  // Actions từ playerStore
   const setQueue = playerStore((state) => state.setQueue);
+  const setDuration = playerStore((state) => state.setDuration);
   const togglePlay = playerStore((state) => state.togglePlay);
   const play = playerStore((state) => state.play);
   const pause = playerStore((state) => state.pause);
@@ -36,9 +37,138 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
 
   const handlePlayTrack = (track: Media) => {
     playerStore.getState().setCurrentTrack(track);
-    playerStore.getState().play();
     playerStore.getState().seek(0);
+    playerStore.getState().play();
   };
+
+  const handleTogglePlay = () => {
+    if (!currentTrack) return;
+    togglePlay();
+  };
+
+  const handleSeek = (nextPosition: number) => {
+    const safePosition = Math.max(0, nextPosition);
+
+    playerStore.getState().seek(safePosition);
+
+    if (audioRef.current) {
+      audioRef.current.currentTime = safePosition;
+    }
+  };
+
+  const handleNext = () => {
+    next();
+    playerStore.getState().play();
+  };
+
+  const handlePrevious = () => {
+    previous();
+    playerStore.getState().play();
+  };
+
+  // Khi đổi bài hát thì gắn src mới cho audio
+  useEffect(() => {
+    const audio = audioRef.current;
+
+    if (!audio || !currentTrack) return;
+
+    audio.src = currentTrack.url;
+    audio.currentTime = 0;
+    audio.load();
+
+    if (isPlaying) {
+      audio.play().catch((err) => {
+        console.error("AUDIO PLAY ERROR:", err);
+        playerStore.getState().pause();
+      });
+    }
+  }, [currentTrack]);
+
+  // Khi bấm play / pause
+  useEffect(() => {
+    const audio = audioRef.current;
+
+    if (!audio || !currentTrack) return;
+
+    if (isPlaying) {
+      audio.play().catch((err) => {
+        console.error("AUDIO PLAY ERROR:", err);
+        playerStore.getState().pause();
+      });
+    } else {
+      audio.pause();
+    }
+  }, [isPlaying, currentTrack]);
+
+  // Đồng bộ volume và mute
+  useEffect(() => {
+    const audio = audioRef.current;
+
+    if (!audio) return;
+
+    audio.volume = Math.max(0, Math.min(1, volume / 100));
+    audio.muted = isMuted;
+  }, [volume, isMuted]);
+
+  // Event audio: duration, progress, hết bài
+  useEffect(() => {
+    const audio = audioRef.current;
+
+    if (!audio) return;
+
+    const handleLoadedMetadata = () => {
+      if (Number.isFinite(audio.duration)) {
+        playerStore.getState().setDuration(audio.duration);
+      }
+    };
+
+    const handleTimeUpdate = () => {
+      playerStore.getState().setPosition(audio.currentTime);
+    };
+
+    const handleEnded = () => {
+      const state = playerStore.getState();
+
+      if (state.repeatMode === "one") {
+        audio.currentTime = 0;
+        audio.play().catch(console.error);
+        return;
+      }
+
+      state.next();
+
+      const nextTrack = playerStore.getState().currentTrack;
+
+      if (!nextTrack || nextTrack.id === currentTrack?.id) {
+        playerStore.getState().pause();
+        playerStore.getState().seek(0);
+      } else {
+        playerStore.getState().play();
+      }
+    };
+
+    const handleError = () => {
+      console.error("AUDIO LOAD ERROR:", {
+        track: currentTrack,
+        src: audio.src,
+        error: audio.error,
+      });
+
+      playerStore.getState().pause();
+    };
+
+    audio.addEventListener("loadedmetadata", handleLoadedMetadata);
+    audio.addEventListener("timeupdate", handleTimeUpdate);
+    audio.addEventListener("ended", handleEnded);
+    audio.addEventListener("error", handleError);
+
+    return () => {
+      audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
+      audio.removeEventListener("timeupdate", handleTimeUpdate);
+      audio.removeEventListener("ended", handleEnded);
+      audio.removeEventListener("error", handleError);
+    };
+  }, [currentTrack]);
 
   return (
     <PlayerContext.Provider
@@ -55,16 +185,16 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
         isLoading,
         playTrack: handlePlayTrack,
         setQueue,
-        togglePlay,
+        togglePlay: handleTogglePlay,
         play,
         pause,
-        seek,
+        seek: handleSeek,
         setVolume,
         setMuted,
         toggleShuffle,
         toggleRepeatMode,
-        next,
-        previous,
+        next: handleNext,
+        previous: handlePrevious,
         addToQueue,
         removeFromQueue,
         clearQueue,
@@ -72,6 +202,8 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
       }}
     >
       {children}
+
+      <audio ref={audioRef} preload="metadata" />
     </PlayerContext.Provider>
   );
 };

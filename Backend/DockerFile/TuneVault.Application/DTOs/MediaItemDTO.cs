@@ -68,3 +68,10 @@ public record SearchResultDto(
     IEnumerable<PlaylistDto> Playlists,
     int TotalPages
 );
+
+public record MediaItemRecommendationDto(
+    int MediaItemID,
+    string? TitleName,
+    string? ArtistName,
+    string? FilePath
+);

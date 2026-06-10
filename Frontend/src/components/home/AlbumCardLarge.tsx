@@ -16,7 +16,7 @@ const AlbumCardLarge = ({ track, tracks, onOpenAlbum }: Props) => {
   const [showAddModal, setShowAddModal] = useState(false);
 
   const { playTrack, setQueue } = usePlayer();
-
+console.log("CARD TRACK:", track);
   return (
     <>
       <div

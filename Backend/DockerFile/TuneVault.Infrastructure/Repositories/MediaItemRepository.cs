@@ -16,6 +16,11 @@ public class MediaItemRepository : IMediaItemRepository
         string sql = @"SELECT * FROM MediaItem WHERE MediaItemID = @MediaItemID AND IsDeleted = 0";
         return await _db.LoadDataSingleAsync<MediaItem>(sql, new { MediaItemID = mediaId});
     }
+    public async Task<MediaItem> GetMediaByNameAsync(string mediaitemname)
+    {
+        string sql = @"SELECT * FROM MediaItem WHERE TitleName = @TitleName AND IsDeleted = 0";
+        return await _db.LoadDataSingleAsync<MediaItem>(sql, new { TitleName = mediaitemname});
+    }
     // Query trả về 1 list dữ liệu 
     public async Task<IEnumerable<MediaItem>> GetAllMediaAsync()
     {

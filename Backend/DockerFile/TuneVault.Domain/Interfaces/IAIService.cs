@@ -5,4 +5,6 @@ public interface IAIService
         string title,
         string artist,
         string genre);
+
+    Task<string> CompleteAsync(string prompt, CancellationToken ct = default);
 }

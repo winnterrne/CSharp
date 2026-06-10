@@ -81,4 +81,53 @@ public class GeminiService : IAIService
             .GetProperty("text")
             .GetString()!;
     }
+
+    public async Task<string> CompleteAsync(string prompt, CancellationToken ct = default)
+    {
+        var body = new
+        {
+            contents = new[]
+            {
+                new 
+                {
+                    parts = new[]
+                    {
+                        new { text = prompt }
+                    }
+                }
+            }
+        };
+
+        var content = new StringContent(
+            JsonSerializer.Serialize(body),
+            Encoding.UTF8,
+            "application/json");
+
+        string url = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={_apiKey}";
+
+        var response = await _httpClient.PostAsync(url, content, ct);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorBody = await response.Content.ReadAsStringAsync(ct);
+            throw new Exception($"Gemini API error: {response.StatusCode}, body: {errorBody}");
+        }
+        var json = await response.Content.ReadAsStringAsync(ct);
+
+        using var doc = JsonDocument.Parse(json);
+
+        try
+        {
+            return doc.RootElement
+                .GetProperty("candidates")[0]
+                .GetProperty("content")
+                .GetProperty("parts")[0]
+                .GetProperty("text")
+                .GetString() ?? string.Empty;
+        }
+        catch
+        {
+            return string.Empty;
+        }
+    }
 }

@@ -8,6 +8,7 @@ namespace TuneVault.Domain.Interfaces
     public interface IMediaItemRepository
     {
         public Task<MediaItem> GetMediaByIdAsync(int mediaId);
+        public Task<MediaItem> GetMediaByNameAsync(string mediaitemname);
         public Task<IEnumerable<MediaItem>> GetAllMediaAsync();
 
         public Task<IEnumerable<MediaItem>> GetMediaByUserIdAsync(string userId);
