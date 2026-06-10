@@ -3,7 +3,7 @@ using MediatR;
 namespace TuneVault.Application.UseCases.Playlist;
 
 public record CreatePlaylistCommand(
-    string PlaylistName,
+    string? PlaylistName,
     bool IsPublic,
     string? Description,
     string UserID

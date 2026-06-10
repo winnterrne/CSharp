@@ -16,6 +16,7 @@ public class PlaylistController : Controller
     {
         _mediator = mediator;
     }
+// Lay id playlist
 [HttpGet("{id}")]
 public async Task<IActionResult> GetPlaylistById(int id)
     {
