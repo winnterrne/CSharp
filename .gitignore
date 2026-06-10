@@ -1,0 +1,11 @@
+# Ignore build outputs
+**/bin/
+**/obj/
+
+# Ignore local settings and temporary files
+.vs/
+*.user
+*.suo
+
+# Ignore appsettings that may contain secrets
+Backend/DockerFile/TuneVault.API/appsettings.json
