@@ -56,3 +56,16 @@ INSERT INTO Favorite(UserID, MediaItemID)
 VALUES
 ('U1',1),('U1',6),
 ('U2',2),('U2',7);
+
+INSERT INTO Follow
+(FollowerID, FollowingUserID, FollowingArtistID)
+VALUES
+('U1', NULL, 1),
+('U1', NULL, 2),
+('U2', NULL, 3);
+
+INSERT INTO Follow
+(FollowerID, FollowingUserID, FollowingArtistID)
+VALUES
+('U1', NULL, 1);
+

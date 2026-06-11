@@ -55,5 +55,7 @@ namespace TuneVault.Infrastructure.Repositories
                            
             return await _db.ExecuteDataAsync(sql, new { ArtistID = artistId});
         }
+
+        
     }
 }

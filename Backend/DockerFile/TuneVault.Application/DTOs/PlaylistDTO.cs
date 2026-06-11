@@ -28,7 +28,7 @@ public record PlaylistDetailSongDto(
 );
 
 public record CreatePlaylistDto(
-    string PlaylistName,
+    string? PlaylistName,
     bool IsPublic,
     string? Description
 );

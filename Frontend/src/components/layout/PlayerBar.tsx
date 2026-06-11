@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import type { Media } from "../../types/media";
 import type { RepeatMode } from "../../types/player";
+import { useFavorite } from "../../hooks/useFavorite";
 
 interface PlayerBarProps {
   currentTrack: Media | null;
@@ -134,7 +135,12 @@ const DeviceIcon = () => (
 const VolumeIcon = ({ muted, volume }: { muted: boolean; volume: number }) => {
   if (muted || volume === 0) {
     return (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+      >
         <path d="M11 5L6 9H3v6h3l5 4z" />
         <path d="M18 9l4 4" />
         <path d="M22 9l-4 4" />
@@ -183,7 +189,7 @@ const Slider = ({
     const rect = trackRef.current.getBoundingClientRect();
     const percent = Math.min(
       Math.max((e.clientX - rect.left) / rect.width, 0),
-      1
+      1,
     );
 
     onChange(percent * 100);
@@ -262,7 +268,10 @@ const IconBtn = ({
       height: "32px",
       border: "none",
       background: "transparent",
-      color: disabled ? "#535353" : active ? "#1ed760" : "#b3b3b3",
+      color:
+        disabled ? "#535353"
+        : active ? "#1ed760"
+        : "#b3b3b3",
       cursor: disabled ? "default" : "pointer",
       padding: 0,
       borderRadius: "50%",
@@ -304,10 +313,10 @@ const PlayerBar = ({
   onToggleRepeatMode,
   onToggleMuted,
 }: PlayerBarProps) => {
-  const [liked, setLiked] = useState(false);
-
   const safeDuration = duration || currentTrack?.duration || 0;
+  const { isFavorite, toggleFavorite } = useFavorite();
 
+  const liked = currentTrack ? isFavorite(currentTrack.id) : false;
   const progressPercent =
     safeDuration > 0 ? Math.min((position / safeDuration) * 100, 100) : 0;
 
@@ -328,7 +337,8 @@ const PlayerBar = ({
         background: "#181818",
         borderTop: "1px solid #282828",
         display: "grid",
-        gridTemplateColumns: "minmax(180px, 1fr) minmax(320px, 1.4fr) minmax(180px, 1fr)",
+        gridTemplateColumns:
+          "minmax(180px, 1fr) minmax(320px, 1.4fr) minmax(180px, 1fr)",
         alignItems: "center",
         padding: "0 16px",
         boxSizing: "border-box",
@@ -359,7 +369,7 @@ const PlayerBar = ({
             color: "#b3b3b3",
           }}
         >
-          {currentTrack?.thumbnailUrl ? (
+          {currentTrack?.thumbnailUrl ?
             <img
               src={currentTrack.thumbnailUrl}
               alt={currentTrack.title}
@@ -369,8 +379,7 @@ const PlayerBar = ({
                 objectFit: "cover",
               }}
             />
-          ) : (
-            <svg
+          : <svg
               viewBox="0 0 24 24"
               width="24"
               height="24"
@@ -382,7 +391,7 @@ const PlayerBar = ({
               <circle cx="6" cy="18" r="3" />
               <circle cx="18" cy="16" r="3" />
             </svg>
-          )}
+          }
         </div>
 
         <div style={{ minWidth: 0 }}>
@@ -421,7 +430,11 @@ const PlayerBar = ({
           title="Thêm vào thư viện"
           active={liked}
           disabled={!currentTrack}
-          onClick={() => setLiked((prev) => !prev)}
+          onClick={() => {
+            if (!currentTrack) return;
+
+            toggleFavorite(currentTrack.id);
+          }}
         >
           <Icon size={18}>
             <HeartIcon />
@@ -489,7 +502,11 @@ const PlayerBar = ({
               e.currentTarget.style.transform = "scale(1)";
             }}
           >
-            <Icon size={20}>{isPlaying ? <PauseIcon /> : <PlayIcon />}</Icon>
+            <Icon size={20}>
+              {isPlaying ?
+                <PauseIcon />
+              : <PlayIcon />}
+            </Icon>
           </button>
 
           <IconBtn title="Tiếp theo" disabled={!currentTrack} onClick={onNext}>
@@ -505,7 +522,9 @@ const PlayerBar = ({
             onClick={onToggleRepeatMode}
           >
             <Icon size={18}>
-              {repeatMode === "one" ? <RepeatOneIcon /> : <RepeatIcon />}
+              {repeatMode === "one" ?
+                <RepeatOneIcon />
+              : <RepeatIcon />}
             </Icon>
           </IconBtn>
         </div>

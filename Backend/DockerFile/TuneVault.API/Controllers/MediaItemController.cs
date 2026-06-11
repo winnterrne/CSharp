@@ -64,6 +64,38 @@ namespace TuneVault.API.Controllers
             }
             return Ok(new { success = true, data = result});
         }
+        [Authorize]
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateMediaRequestDto dto)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return Unauthorized();
+
+            var command = new UpdateMediaCommand(
+                id,
+                userId,
+                dto.TitleName,
+                dto.Description,
+                dto.MediaItemTag,
+                dto.MediaItemImage,
+                dto.ArtistID,
+                dto.AlbumID
+            );
+            var result = await _mediator.Send(command);
+             return Ok(new { success = true, data = result });
+        }
+
+        [Authorize]
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return Unauthorized();
+
+            var command = new DeleteMediaCommand(id, userId);   
+            var result = await _mediator.Send(command);
+            return Ok(new { success = true, data = result });
+        }
 
         [Authorize]
         [HttpGet("my-media")]
@@ -75,19 +107,7 @@ namespace TuneVault.API.Controllers
             return Ok(new { success = true, data = result});
         }
 
-        //ham getall Vinh them
-[HttpGet]
-public async Task<IActionResult> GetAll()
-{
-    var result = await _mediator.Send(new GetAllMediaQuery());
-
-    return Ok(new
-    {
-        success = true,
-        data = result
-    });
-}
-        // [Authorize]
+        [Authorize]
         [HttpGet("{id}/stream")]
         public async Task<IActionResult> Streaming(int id)
         {

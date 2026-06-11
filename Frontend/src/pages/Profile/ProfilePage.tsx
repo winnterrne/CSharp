@@ -1,75 +1,91 @@
 import { useEffect, useState } from "react";
 import { userApi } from "../../api/userApi";
+import { authStore } from "../../store/authStore";
 
-interface ProfileUser {
-  id: string;
-  username: string;
+interface UserProfileDto {
+  userID: string;
+  userName: string;
+  userImage?: string;
   email: string;
-  avatarUrl?: string;
-  playlistCount?: number;
-  followingCount?: number;
-}
-
-interface FollowingUser {
-  id: string | number;
-  name: string;
-  role?: string;
-  avatarUrl?: string;
+  role: string;
+  phone?: string;
 }
 
 const ProfilePage = () => {
-  const [profile, setProfile] = useState<ProfileUser | null>(null);
-  const [following, setFollowing] = useState<FollowingUser[]>([]);
+  const authUser = authStore((state) => state.user);
+  const setUser = authStore((state) => state.setUser);
 
+  const [profile, setProfile] = useState<UserProfileDto | null>(null);
   const [displayName, setDisplayName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
+  const [phone, setPhone] = useState("");
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  const [error, setError] = useState(false);
+  const [error, setError] = useState("");
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         setLoading(true);
-        setError(false);
+        setError("");
 
-        const [profileRes, followingRes] = await Promise.all([
-          userApi.getProfile(),
-          userApi.getFollowing(),
-        ]);
+        if (!authUser?.id) {
+          setError("Không tìm thấy user id. Vui lòng đăng nhập lại.");
+          return;
+        }
 
-        setProfile(profileRes.data);
-        setFollowing(followingRes.data);
+        const res = await userApi.getProfile(authUser.id);
+        const data = res.data?.data as UserProfileDto;
 
-        setDisplayName(profileRes.data.username ?? "");
-        setAvatarUrl(profileRes.data.avatarUrl ?? "");
-      } catch {
-        setError(true);
+        setProfile(data);
+        setDisplayName(data.userName ?? "");
+        setAvatarUrl(data.userImage ?? "");
+        setPhone(data.phone ?? "");
+      } catch (err) {
+        console.error("LOAD PROFILE ERROR:", err);
+        setError("Không thể tải hồ sơ từ backend.");
       } finally {
         setLoading(false);
       }
     };
 
     fetchProfile();
-  }, []);
+  }, [authUser?.id]);
 
   const handleSaveProfile = async () => {
     try {
+      if (!authUser?.id) return;
+
       setSaving(true);
 
-      const res = await userApi.updateProfile({
-        username: displayName,
-        avatarUrl,
+      const res = await userApi.updateProfile(authUser.id, {
+        userName: displayName,
+        userImage: avatarUrl,
+        phone,
       });
 
-      setProfile(res.data);
-      setDisplayName(res.data.username ?? "");
-      setAvatarUrl(res.data.avatarUrl ?? "");
+      const data = res.data?.data as UserProfileDto;
+
+      setProfile(data);
+      setDisplayName(data.userName ?? "");
+      setAvatarUrl(data.userImage ?? "");
+      setPhone(data.phone ?? "");
+
+      setUser({
+        id: data.userID,
+        username: data.userName,
+        email: data.email,
+        role: data.role,
+        avatarUrl: data.userImage,
+        phone: data.phone,
+      });
+
       setIsEditing(false);
-    } catch {
+    } catch (err) {
+      console.error("SAVE PROFILE ERROR:", err);
       alert("Cập nhật hồ sơ thất bại");
     } finally {
       setSaving(false);
@@ -86,11 +102,11 @@ const ProfilePage = () => {
     );
   }
 
-  if (error) {
+  if (error || !profile) {
     return (
       <main style={pageStyle}>
-        <div style={{ padding: "32px", color: "#ff4d4f" }}>
-          Không thể tải hồ sơ từ backend.
+        <div style={{ padding: "32px", color: "#ff7676" }}>
+          {error || "Không tìm thấy hồ sơ."}
         </div>
       </main>
     );
@@ -117,12 +133,11 @@ const ProfilePage = () => {
               style={nameInputStyle}
             />
           ) : (
-            <h1 style={titleStyle}>{profile?.username}</h1>
+            <h1 style={titleStyle}>{profile.userName}</h1>
           )}
 
           <div style={{ color: "#b3b3b3", fontSize: "14px" }}>
-            {profile?.email} • {profile?.playlistCount ?? 0} danh sách phát •{" "}
-            {profile?.followingCount ?? following.length} đang theo dõi
+            {profile.email} • {profile.role}
           </div>
         </div>
       </section>
@@ -137,8 +152,9 @@ const ProfilePage = () => {
 
               <button
                 onClick={() => {
-                  setDisplayName(profile?.username ?? "");
-                  setAvatarUrl(profile?.avatarUrl ?? "");
+                  setDisplayName(profile.userName ?? "");
+                  setAvatarUrl(profile.userImage ?? "");
+                  setPhone(profile.phone ?? "");
                   setIsEditing(false);
                 }}
                 style={buttonSecondaryStyle}
@@ -156,13 +172,30 @@ const ProfilePage = () => {
         {isEditing && (
           <div style={cardStyle}>
             <h2 style={{ fontSize: "20px", marginBottom: "16px" }}>
-              Đổi ảnh đại diện
+              Chỉnh sửa thông tin
             </h2>
 
+            <label style={labelStyle}>Tên người dùng</label>
+            <input
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              placeholder="Tên người dùng"
+              style={inputStyle}
+            />
+
+            <label style={labelStyle}>Ảnh đại diện</label>
             <input
               value={avatarUrl}
               onChange={(e) => setAvatarUrl(e.target.value)}
               placeholder="Dán URL ảnh avatar..."
+              style={inputStyle}
+            />
+
+            <label style={labelStyle}>Số điện thoại</label>
+            <input
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="Số điện thoại"
               style={inputStyle}
             />
           </div>
@@ -173,44 +206,12 @@ const ProfilePage = () => {
         </h2>
 
         <div style={cardStyle}>
-          <InfoRow label="Tên người dùng" value={profile?.username ?? ""} />
-          <InfoRow label="Email" value={profile?.email ?? ""} />
-          <InfoRow label="Trạng thái" value="Đã kết nối backend" />
+          <InfoRow label="User ID" value={profile.userID} />
+          <InfoRow label="Tên người dùng" value={profile.userName} />
+          <InfoRow label="Email" value={profile.email} />
+          <InfoRow label="Vai trò" value={profile.role} />
+          <InfoRow label="Số điện thoại" value={profile.phone ?? "Chưa cập nhật"} />
         </div>
-
-        <h2 style={{ fontSize: "24px", margin: "36px 0 18px" }}>
-          Đang theo dõi
-        </h2>
-
-        {following.length === 0 ? (
-          <p style={{ color: "#b3b3b3" }}>
-            Chưa có dữ liệu theo dõi từ backend.
-          </p>
-        ) : (
-          <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
-            {following.map((person) => (
-              <div key={person.id} style={followCardStyle}>
-                <div style={followAvatarStyle}>
-                  {person.avatarUrl ? (
-                    <img
-                      src={person.avatarUrl}
-                      alt={person.name}
-                      style={avatarImgStyle}
-                    />
-                  ) : (
-                    person.name.charAt(0)
-                  )}
-                </div>
-
-                <div style={followNameStyle}>{person.name}</div>
-
-                <div style={{ color: "#b3b3b3", fontSize: "13px" }}>
-                  {person.role ?? "Người dùng"}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
       </section>
     </main>
   );
@@ -219,7 +220,7 @@ const ProfilePage = () => {
 const InfoRow = ({ label, value }: { label: string; value: string }) => (
   <div style={infoRowStyle}>
     <span style={{ color: "#b3b3b3" }}>{label}</span>
-    <span style={{ fontWeight: 600 }}>{value}</span>
+    <span style={{ fontWeight: 600, textAlign: "right" }}>{value}</span>
   </div>
 );
 
@@ -268,9 +269,6 @@ const titleStyle: React.CSSProperties = {
   margin: "10px 0",
   fontWeight: 900,
   letterSpacing: "-0.04em",
-  whiteSpace: "nowrap",
-  overflow: "hidden",
-  textOverflow: "ellipsis",
 };
 
 const nameInputStyle: React.CSSProperties = {
@@ -295,6 +293,14 @@ const cardStyle: React.CSSProperties = {
   marginBottom: "32px",
 };
 
+const labelStyle: React.CSSProperties = {
+  display: "block",
+  color: "#b3b3b3",
+  fontSize: "13px",
+  fontWeight: 700,
+  margin: "14px 0 8px",
+};
+
 const inputStyle: React.CSSProperties = {
   width: "100%",
   background: "#282828",
@@ -303,6 +309,7 @@ const inputStyle: React.CSSProperties = {
   color: "#fff",
   padding: "12px",
   outline: "none",
+  boxSizing: "border-box",
 };
 
 const buttonPrimaryStyle: React.CSSProperties = {
@@ -331,34 +338,6 @@ const infoRowStyle: React.CSSProperties = {
   padding: "12px 0",
   borderBottom: "1px solid #2a2a2a",
   gap: "16px",
-};
-
-const followCardStyle: React.CSSProperties = {
-  width: "140px",
-  background: "#181818",
-  borderRadius: "12px",
-  padding: "16px",
-  cursor: "pointer",
-};
-
-const followAvatarStyle: React.CSSProperties = {
-  width: "108px",
-  height: "108px",
-  borderRadius: "50%",
-  background: "#333",
-  marginBottom: "12px",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  fontSize: "36px",
-  overflow: "hidden",
-};
-
-const followNameStyle: React.CSSProperties = {
-  fontWeight: 700,
-  whiteSpace: "nowrap",
-  overflow: "hidden",
-  textOverflow: "ellipsis",
 };
 
 export default ProfilePage;

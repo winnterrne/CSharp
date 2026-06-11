@@ -1,49 +1,76 @@
 import { useCallback, useEffect, useState } from "react";
 import { favoriteApi } from "../api/favoriteApi";
 
-const getIdFromFavorite = (item: unknown): string => {
-  const data = item as {
+type FavoriteMediaShape = {
+  mediaItemID?: number;
+  mediaItemId?: number;
+  id?: number;
+  media?: {
+    id?: string | number;
     mediaItemID?: number;
     mediaItemId?: number;
-    id?: number;
-    media?: {
-      id?: string;
-      mediaItemID?: number;
-    };
   };
+};
 
+type FavoriteResponse = {
+  success?: boolean;
+  data?: FavoriteMediaShape[];
+};
+
+let cachedFavoriteIds: string[] = [];
+const listeners = new Set<(ids: string[]) => void>();
+
+const notifyListeners = () => {
+  listeners.forEach((listener) => listener(cachedFavoriteIds));
+};
+
+const getIdFromFavorite = (item: FavoriteMediaShape): string => {
   return String(
-    data.mediaItemID ??
-      data.mediaItemId ??
-      data.id ??
-      data.media?.id ??
-      data.media?.mediaItemID ??
+    item.mediaItemID ??
+      item.mediaItemId ??
+      item.id ??
+      item.media?.id ??
+      item.media?.mediaItemID ??
+      item.media?.mediaItemId ??
       ""
   );
 };
 
+const parseFavoriteIds = (responseData: unknown): string[] => {
+  const body = responseData as FavoriteResponse | FavoriteMediaShape[];
+
+  const rawData = Array.isArray(body)
+    ? body
+    : Array.isArray(body.data)
+      ? body.data
+      : [];
+
+  return rawData
+    .map(getIdFromFavorite)
+    .filter((id) => id.length > 0);
+};
+
 export const useFavorite = () => {
-  const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
+  const [favoriteIds, setFavoriteIds] = useState<string[]>(cachedFavoriteIds);
   const [loading, setLoading] = useState(false);
+
+  const syncFavoriteIds = (ids: string[]) => {
+    cachedFavoriteIds = ids;
+    setFavoriteIds(ids);
+    notifyListeners();
+  };
 
   const loadFavorites = useCallback(async () => {
     try {
       setLoading(true);
 
       const res = await favoriteApi.getFavorites();
+      const ids = parseFavoriteIds(res.data);
 
-      const rawData = Array.isArray(res.data)
-        ? res.data
-        : res.data?.data ?? [];
-
-      const ids = rawData
-        .map(getIdFromFavorite)
-        .filter((id: string) => id.length > 0);
-
-      setFavoriteIds(ids);
-    } catch (err) {
-      console.error("LOAD FAVORITES ERROR:", err);
-      setFavoriteIds([]);
+      syncFavoriteIds(ids);
+    } catch (error) {
+      console.error("LOAD FAVORITES ERROR:", error);
+      syncFavoriteIds([]);
     } finally {
       setLoading(false);
     }
@@ -55,25 +82,45 @@ export const useFavorite = () => {
 
   const toggleFavorite = async (mediaId: string | number) => {
     const id = Number(mediaId);
+
     if (!id) return;
 
-    const existed = isFavorite(id);
+    const idText = String(id);
+    const existed = cachedFavoriteIds.includes(idText);
+
+    const nextIds = existed
+      ? cachedFavoriteIds.filter((item) => item !== idText)
+      : [idText, ...cachedFavoriteIds];
+
+    syncFavoriteIds(nextIds);
 
     try {
       if (existed) {
         await favoriteApi.removeFavorite(id);
-        setFavoriteIds((prev) => prev.filter((item) => item !== String(id)));
       } else {
         await favoriteApi.addFavorite(id);
-        setFavoriteIds((prev) => [String(id), ...prev]);
       }
-    } catch (err) {
-      console.error("TOGGLE FAVORITE ERROR:", err);
+    } catch (error) {
+      console.error("TOGGLE FAVORITE ERROR:", error);
+
+      syncFavoriteIds(cachedFavoriteIds);
     }
   };
 
   useEffect(() => {
-    loadFavorites();
+    const listener = (ids: string[]) => {
+      setFavoriteIds(ids);
+    };
+
+    listeners.add(listener);
+
+    if (cachedFavoriteIds.length === 0) {
+      loadFavorites();
+    }
+
+    return () => {
+      listeners.delete(listener);
+    };
   }, [loadFavorites]);
 
   return {

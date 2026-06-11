@@ -22,40 +22,54 @@ export const authStore = create<AuthStore>()(
       isAuthenticated: false,
       isLoading: false,
 
-      setUser: (user) => set({ user, isAuthenticated: !!user }),
-      setToken: (token) => set({ token }),
-      setLoading: (loading) => set({ isLoading: loading }),
+      setUser: (user) =>
+        set({
+          user,
+          isAuthenticated: !!user,
+        }),
 
-      login: (user, token) => {
-        set({ user, token, isAuthenticated: true, isLoading: false });
-      },
+      setToken: (token) =>
+        set({
+          token,
+          isAuthenticated: !!token && !!get().user,
+        }),
 
-      logout: () => {
+      setLoading: (isLoading) => set({ isLoading }),
+
+      login: (user, token) =>
+        set({
+          user,
+          token,
+          isAuthenticated: true,
+          isLoading: false,
+        }),
+
+      logout: () =>
         set({
           user: null,
           token: null,
           isAuthenticated: false,
           isLoading: false,
-        });
-      },
+        }),
 
       getUser: () => get().user,
+
       getToken: () => get().token,
 
-      clear: () => {
+      clear: () =>
         set({
           user: null,
           token: null,
           isAuthenticated: false,
           isLoading: false,
-        });
-      },
+        }),
     }),
     {
       name: STORAGE_KEYS.USER,
       partialize: (state) => ({
         user: state.user,
         token: state.token,
+        isAuthenticated: state.isAuthenticated,
       }),
     },
   ),

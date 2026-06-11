@@ -75,11 +75,11 @@ public class MediaItemRepository : IMediaItemRepository
                         TitleName = @TitleName,
                         MediaItemImage = @MediaItemImage,
                         Description = @Description,
-                        MediaTag = @MediaTag,
+                        MediaItemTag = @MediaItemTag,
                         ArtistID = @ArtistID,
                         AlbumID = @AlbumID
                     WHERE MediaItemID = @MediaItemID
-                    AND IsDeleted = 0   
+                    AND UserID = @UserID   
                     ";
         return await _db.ExecuteScalarAsync<int>(sql, media);
     }
@@ -107,7 +107,6 @@ public class MediaItemRepository : IMediaItemRepository
                         WHERE m.MediaItemID = @MediaItemID AND m.IsDeleted = 0";
         return await _db.LoadDataSingleAsync<MediaItem>(sql, new { MediaItemID = mediaId});
     }
-    
 
 
 }

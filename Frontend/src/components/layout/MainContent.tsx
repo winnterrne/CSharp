@@ -48,9 +48,8 @@ const MainContent = () => {
 
         const res = await mediaApi.getAll();
 
-        const mediaDtos: MediaItemDto[] = Array.isArray(res.data?.data)
-          ? res.data.data
-          : [];
+        const mediaDtos: MediaItemDto[] =
+          Array.isArray(res.data?.data) ? res.data.data : [];
 
         const mediaList: Media[] = mediaDtos.map(mapMediaItemDtoToMedia);
 
@@ -82,12 +81,17 @@ const MainContent = () => {
     return Array.from(map.values());
   }, [recommended, forYou, upcoming]);
 
-  const handleOpenTrack = (track: Media) => {
-    setSelectedTrack(track);
-    setSelectedAlbum(null);
-    setSelectedArtist(null);
-    setViewMode("track");
-  };
+const handleOpenTrack = (track: Media) => {
+  if (!track || !track.id) {
+    console.error("OPEN TRACK ERROR: track không hợp lệ", track);
+    return;
+  }
+
+  setSelectedTrack(track);
+  setSelectedAlbum(null);
+  setSelectedArtist(null);
+  setViewMode("track");
+};
 
   const handleOpenAlbum = (cover: Media, tracks: Media[], title?: string) => {
     setSelectedAlbum({
@@ -101,9 +105,12 @@ const MainContent = () => {
     setViewMode("album");
   };
 
-  const handleOpenArtist = (artistName: string, tracks: Media[] = allTracks) => {
+  const handleOpenArtist = (
+    artistName: string,
+    tracks: Media[] = allTracks,
+  ) => {
     const artistTracks = tracks.filter(
-      (track) => track.artist?.name === artistName
+      (track) => track.artist?.name === artistName,
     );
 
     setSelectedArtist({
@@ -166,9 +173,9 @@ const MainContent = () => {
         paddingBottom: "120px",
         boxSizing: "border-box",
         background:
-          viewMode === "home"
-            ? "linear-gradient(180deg, #0b3b4a 0%, #121212 320px)"
-            : "linear-gradient(180deg, #16485a 0%, #121212 360px)",
+          viewMode === "home" ?
+            "linear-gradient(180deg, #0b3b4a 0%, #121212 320px)"
+          : "linear-gradient(180deg, #16485a 0%, #121212 360px)",
       }}
     >
       {viewMode !== "home" && (
@@ -214,7 +221,35 @@ const MainContent = () => {
           upcoming={upcoming}
           onOpenTrack={handleOpenTrack}
           onOpenAlbum={handleOpenAlbum}
-          onShowAll={(mode) => setViewMode(mode)}
+          onShowAll={(mode) => {
+            switch (mode) {
+              case "recommended":
+                if (recommended.length > 0) {
+                  handleOpenAlbum(
+                    recommended[0],
+                    recommended,
+                    "Đề xuất cho bạn",
+                  );
+                }
+                break;
+
+              case "forYou":
+                if (forYou.length > 0) {
+                  handleOpenAlbum(forYou[0], forYou, "Dành cho bạn");
+                }
+                break;
+
+              case "upcoming":
+                if (upcoming.length > 0) {
+                  handleOpenAlbum(
+                    upcoming[0],
+                    upcoming,
+                    "Được đề xuất cho hôm nay",
+                  );
+                }
+                break;
+            }
+          }}
         />
       )}
 
@@ -232,10 +267,9 @@ const MainContent = () => {
             {showAllData.title}
           </h1>
 
-          {showAllData.tracks.length === 0 && !loading ? (
+          {showAllData.tracks.length === 0 && !loading ?
             <p style={{ color: "#b3b3b3" }}>Chưa có bài hát nào.</p>
-          ) : (
-            <div
+          : <div
               style={{
                 display: "grid",
                 gridTemplateColumns: "repeat(auto-fill, minmax(170px, 1fr))",
@@ -251,25 +285,45 @@ const MainContent = () => {
                 />
               ))}
             </div>
-          )}
+          }
         </section>
       )}
+{viewMode === "track" && (
+  selectedTrack ? (
+    <TrackDetailView
+      track={selectedTrack}
+      onOpenArtist={handleOpenArtist}
+    />
+  ) : (
+    <div
+      style={{
+        color: "#fff",
+        padding: "40px",
+      }}
+    >
+      Không tìm thấy bài hát.
+      <button
+        onClick={handleBackHome}
+        style={{
+          marginLeft: "12px",
+          padding: "8px 14px",
+          borderRadius: "999px",
+          border: "none",
+          cursor: "pointer",
+          fontWeight: 700,
+        }}
+      >
+        Về trang chủ
+      </button>
+    </div>
+  )
+)}
 
       {viewMode === "album" && selectedAlbum && (
         <AlbumDetailView
-          cover={{
-            ...selectedAlbum.cover,
-            title: selectedAlbum.title ?? selectedAlbum.cover.title,
-          }}
+          cover={selectedAlbum.cover}
           tracks={selectedAlbum.tracks}
           onOpenTrack={handleOpenTrack}
-          onOpenArtist={handleOpenArtist}
-        />
-      )}
-
-      {viewMode === "track" && selectedTrack && (
-        <TrackDetailView
-          track={selectedTrack}
           onOpenArtist={handleOpenArtist}
         />
       )}
