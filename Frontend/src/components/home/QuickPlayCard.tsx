@@ -1,137 +1,135 @@
 import { useState } from "react";
 import type { Media } from "../../types/media";
 import { usePlayer } from "../../hooks/usePlayer";
-import AddToPlaylistModal from "../playlist/AddToPlaylistModal";
+import { useHistoryStore } from "../../store/historyStore";
 
 type Props = {
   track: Media;
   tracks: Media[];
-
-  // NEW: click card mở trang chi tiết bài hát
   onOpenTrack: (track: Media) => void;
 };
 
 const QuickPlayCard = ({ track, tracks, onOpenTrack }: Props) => {
   const [hovered, setHovered] = useState(false);
-  const [showAddModal, setShowAddModal] = useState(false);
 
   const { playTrack, setQueue } = usePlayer();
+  const addRecentTrack = useHistoryStore((state) => state.addRecentTrack);
+
+  const handlePlay = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+
+    setQueue(tracks);
+    addRecentTrack(track);
+    playTrack(track);
+  };
 
   return (
-    <>
+    <div
+      onClick={() => onOpenTrack(track)}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        background: hovered ? "#2a2a2a" : "rgba(255,255,255,.08)",
+        borderRadius: "6px",
+        display: "flex",
+        alignItems: "center",
+        overflow: "hidden",
+        cursor: "pointer",
+        position: "relative",
+        height: "64px",
+        transition: "background .18s ease",
+      }}
+    >
       <div
-        onClick={() => onOpenTrack(track)}
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
         style={{
-          background: hovered ? "#2a2a2a" : "#181818",
-          borderRadius: "8px",
+          width: "64px",
+          height: "64px",
+          background: "#282828",
+          flexShrink: 0,
+          overflow: "hidden",
           display: "flex",
           alignItems: "center",
-          overflow: "hidden",
-          cursor: "pointer",
-          position: "relative",
-          height: "64px",
+          justifyContent: "center",
+          color: "#b3b3b3",
+          fontSize: "26px",
+        }}
+      >
+        {track.thumbnailUrl ?
+          <img
+            src={track.thumbnailUrl}
+            alt={track.title}
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+            }}
+          />
+        : "🎵"}
+      </div>
+
+      <div
+        style={{
+          minWidth: 0,
+          flex: 1,
+          padding: "0 12px",
         }}
       >
         <div
           style={{
-            width: "64px",
-            height: "64px",
-            background: "#2a2a2a",
-            flexShrink: 0,
+            color: "#fff",
+            fontSize: "14px",
+            fontWeight: 700,
+            whiteSpace: "nowrap",
             overflow: "hidden",
+            textOverflow: "ellipsis",
           }}
+          title={track.title}
         >
-          {track.thumbnailUrl ? (
-            <img
-              src={track.thumbnailUrl}
-              alt={track.title}
-              style={{ width: "100%", height: "100%", objectFit: "cover" }}
-            />
-          ) : (
-            "🎵"
-          )}
+          {track.title}
         </div>
 
-        <div style={{ minWidth: 0, flex: 1, padding: "0 12px" }}>
-          <div
-            style={{
-              color: "#fff",
-              fontSize: "14px",
-              fontWeight: 700,
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-            }}
-          >
-            {track.title}
-          </div>
-
-          <div style={{ color: "#b3b3b3", fontSize: "12px" }}>
-            {track.artist.name}
-          </div>
+        <div
+          style={{
+            color: "#b3b3b3",
+            fontSize: "12px",
+            marginTop: "4px",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+          title={track.artist?.name ?? "Unknown Artist"}
+        >
+          {track.artist?.name ?? "Unknown Artist"}
         </div>
-
-        {hovered && (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              paddingRight: "12px",
-            }}
-          >
-            {/* NEW: thêm vào playlist */}
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowAddModal(true);
-              }}
-              title="Thêm vào playlist"
-              style={{
-                width: "36px",
-                height: "36px",
-                borderRadius: "50%",
-                border: "none",
-                background: "rgba(0,0,0,.45)",
-                color: "#fff",
-                cursor: "pointer",
-                fontSize: "20px",
-              }}
-            >
-              ＋
-            </button>
-
-            {/* NEW: phát nhạc */}
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setQueue(tracks);
-                playTrack(track);
-              }}
-              style={{
-                width: "44px",
-                height: "44px",
-                borderRadius: "50%",
-                border: "none",
-                background: "#1DB954",
-                cursor: "pointer",
-                fontWeight: 800,
-              }}
-            >
-              ▶
-            </button>
-          </div>
-        )}
       </div>
 
-      <AddToPlaylistModal
-        open={showAddModal}
-        media={track}
-        onClose={() => setShowAddModal(false)}
-      />
-    </>
+      {hovered && (
+        <button
+          onClick={handlePlay}
+          title="Phát"
+          style={{
+            width: "44px",
+            height: "44px",
+            borderRadius: "50%",
+            border: "none",
+            background: "#1DB954",
+            color: "#000",
+            cursor: "pointer",
+            fontWeight: 900,
+            marginRight: "12px",
+            boxShadow: "0 8px 16px rgba(0,0,0,.35)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: "17px",
+            transform: hovered ? "scale(1)" : "scale(.95)",
+            transition: ".18s ease",
+          }}
+        >
+          ▶
+        </button>
+      )}
+    </div>
   );
 };
 

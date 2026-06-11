@@ -7,6 +7,7 @@ import RegisterPage from "../pages/Auth/RegisterPage";
 import ProfilePage from "../pages/Profile/ProfilePage";
 import SearchPage from "../pages/Search/SearchPage";
 import PlaylistDetailPage from "../pages/Playlist/PlaylistDetailPage";
+import NotificationPage from "../pages/Notification/NotificationPage";
 
 export default function AppRoutes() {
   return (
@@ -37,23 +38,31 @@ export default function AppRoutes() {
         }
       />
       <Route
-  path="/search"
-  element={
-    <ProtectedRoute>
-      <MainLayout>
-        <SearchPage />
-      </MainLayout>
-    </ProtectedRoute>
-  }
-/>
-<Route
-  path="/playlist/:id"
-  element={
-    <MainLayout>
-      <PlaylistDetailPage />
-    </MainLayout>
-  }
-/>
+        path="/search"
+        element={
+          <ProtectedRoute>
+            <MainLayout>
+              <SearchPage />
+            </MainLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/playlist/:id"
+        element={
+          <MainLayout>
+            <PlaylistDetailPage />
+          </MainLayout>
+        }
+      />
+      <Route
+        path="/notifications"
+        element={
+          <MainLayout>
+            <NotificationPage />
+          </MainLayout>
+        }
+      />
     </Routes>
   );
 }

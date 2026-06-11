@@ -1,196 +1,178 @@
-import type { Media } from "../../types/media";
-import { usePlayer } from "../../hooks/usePlayer";
-import AddToPlaylistModal from "../playlist/AddToPlaylistModal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { playlistApi } from "../../api/playlistApi";
+import type { Playlist } from "../../types/playlist";
 
-type TrackDetailViewProps = {
-  track: Media;
-
-  // NEW
-  onOpenArtist: (artistName: string) => void;
+type Props = {
+  mediaId: string | number;
 };
 
-const formatDuration = (seconds?: number) => {
-  if (!seconds) return "0:00";
-
-  const min = Math.floor(seconds / 60);
-  const sec = Math.floor(seconds % 60);
-
-  return `${min}:${String(sec).padStart(2, "0")}`;
+const getPlaylistId = (playlist: Playlist) => {
+  return playlist.id ?? playlist.playlistID ?? 0;
 };
 
-const TrackDetailView = ({ track, onOpenArtist }: TrackDetailViewProps) => {
-  const { playTrack, setQueue } = usePlayer();
-  const [showAddModal, setShowAddModal] = useState(false);
+const getPlaylistName = (playlist: Playlist) => {
+  return playlist.name ?? playlist.playlistName ?? "Playlist chưa có tên";
+};
+
+const AddToPlaylistButton = ({ mediaId }: Props) => {
+  const [open, setOpen] = useState(false);
+  const [playlists, setPlaylists] = useState<Playlist[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    if (!open) return;
+
+    const loadPlaylists = async () => {
+      try {
+        setLoading(true);
+        const res = await playlistApi.getMyPlaylists();
+
+        const data = Array.isArray(res.data)
+          ? res.data
+          : res.data?.data ?? [];
+
+        setPlaylists(data);
+      } catch (err) {
+        console.error("LOAD PLAYLISTS ERROR:", err);
+        setPlaylists([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadPlaylists();
+  }, [open]);
+
+  const handleAdd = async (playlistId: number) => {
+    const id = Number(mediaId);
+    if (!playlistId || !id) return;
+
+    try {
+      await playlistApi.addTrack(playlistId, id);
+      setMessage("Đã thêm vào playlist");
+      setTimeout(() => setMessage(""), 1800);
+      setOpen(false);
+    } catch (err) {
+      console.error("ADD TO PLAYLIST ERROR:", err);
+      setMessage("Không thêm được bài hát");
+      setTimeout(() => setMessage(""), 1800);
+    }
+  };
 
   return (
-    <>
-      <section
+    <div style={{ position: "relative" }}>
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          setOpen((prev) => !prev);
+        }}
+        title="Thêm vào playlist"
         style={{
-          display: "flex",
-          gap: "24px",
-          alignItems: "flex-end",
-          marginBottom: "32px",
+          width: "32px",
+          height: "32px",
+          borderRadius: "50%",
+          border: "1px solid #b3b3b3",
+          background: "transparent",
+          color: "#b3b3b3",
+          cursor: "pointer",
+          fontSize: "20px",
+          lineHeight: 1,
         }}
       >
-        <img
-          src={track.thumbnailUrl}
-          alt={track.title}
-          style={{
-            width: "240px",
-            height: "240px",
-            borderRadius: "12px",
-            objectFit: "cover",
-            boxShadow: "0 18px 50px rgba(0,0,0,.55)",
-          }}
-        />
+        +
+      </button>
 
+      {open && (
         <div
+          onClick={(e) => e.stopPropagation()}
           style={{
-            display: "flex",
-            gap: "12px",
-            alignItems: "center",
-            marginTop: "8px",
+            position: "absolute",
+            right: 0,
+            top: "40px",
+            width: "260px",
+            background: "#282828",
+            borderRadius: "8px",
+            padding: "6px",
+            zIndex: 999,
+            boxShadow: "0 12px 32px rgba(0,0,0,.55)",
           }}
         >
-          <p
-            onClick={() => onOpenArtist(track.artist.name)}
+          <div
             style={{
-              color: "#1DB954",
-              cursor: "pointer",
-              fontWeight: 600,
-              margin: 0,
+              color: "#fff",
+              fontWeight: 700,
+              padding: "10px 12px",
+              borderBottom: "1px solid #3a3a3a",
+              marginBottom: "4px",
             }}
           >
-            {track.artist.name}
-          </p>
+            Thêm vào danh sách phát
+          </div>
 
-          <span style={{ color: "#b3b3b3" }}>
-            • {formatDuration(track.duration)}
-          </span>
+          {loading && (
+            <div style={{ color: "#b3b3b3", padding: "12px" }}>Đang tải...</div>
+          )}
 
-          <span style={{ color: "#b3b3b3" }}>• {track.type}</span>
+          {!loading && playlists.length === 0 && (
+            <div style={{ color: "#b3b3b3", padding: "12px" }}>
+              Bạn chưa có playlist
+            </div>
+          )}
+
+          {!loading &&
+            playlists.map((playlist) => {
+              const playlistId = getPlaylistId(playlist);
+
+              return (
+                <button
+                  key={playlistId}
+                  onClick={() => handleAdd(playlistId)}
+                  style={{
+                    width: "100%",
+                    border: "none",
+                    background: "transparent",
+                    color: "#fff",
+                    padding: "12px",
+                    textAlign: "left",
+                    borderRadius: "6px",
+                    cursor: "pointer",
+                    fontWeight: 600,
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = "#3a3a3a";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = "transparent";
+                  }}
+                >
+                  {getPlaylistName(playlist)}
+                </button>
+              );
+            })}
         </div>
-      </section>
+      )}
 
-      {/* NEW: ACTION */}
-      <div style={{ display: "flex", gap: "14px", marginBottom: "28px" }}>
-        <button
-          onClick={() => {
-            setQueue([track]);
-            playTrack(track);
-          }}
+      {message && (
+        <div
           style={{
-            width: "56px",
-            height: "56px",
-            borderRadius: "50%",
-            border: "none",
-            background: "#1DB954",
-            cursor: "pointer",
-            fontSize: "22px",
-            fontWeight: 800,
-          }}
-        >
-          ▶
-        </button>
-
-        <button
-          onClick={() => setShowAddModal(true)}
-          style={{
-            border: "none",
-            borderRadius: "999px",
-            background: "#2a2a2a",
-            color: "#fff",
-            padding: "0 18px",
-            cursor: "pointer",
+            position: "fixed",
+            bottom: "110px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            background: "#fff",
+            color: "#000",
+            padding: "10px 16px",
+            borderRadius: "8px",
             fontWeight: 700,
+            zIndex: 9999,
           }}
         >
-          + Thêm vào playlist
-        </button>
-      </div>
-
-      {/* NEW: INFO CARD */}
-      {/* NEW: ABOUT ARTIST */}
-      <div
-        style={{
-          background: "#181818",
-          borderRadius: "14px",
-          padding: "20px",
-          marginTop: "24px",
-          maxWidth: "520px",
-        }}
-      >
-        <h2
-          style={{
-            color: "#fff",
-            marginBottom: "14px",
-          }}
-        >
-          Về nghệ sĩ
-        </h2>
-
-        <p
-          style={{
-            color: "#b3b3b3",
-            lineHeight: 1.8,
-          }}
-        >
-          {track.artist.name} là một trong những nghệ sĩ nổi bật trên TuneVault.
-          Các ca khúc của nghệ sĩ thường xuất hiện trong những playlist được
-          nghe nhiều nhất.
-        </p>
-      </div>
-      {/* NEW: ALBUM INFO */}
-      <div
-        style={{
-          background: "#181818",
-          borderRadius: "14px",
-          padding: "20px",
-          marginTop: "24px",
-          maxWidth: "520px",
-        }}
-      >
-        <h2
-          style={{
-            color: "#fff",
-            marginBottom: "14px",
-          }}
-        >
-          Album
-        </h2>
-
-        <p style={{ color: "#b3b3b3" }}>
-          Bài hát này thuộc bộ sưu tập của {track.artist.name}.
-        </p>
-      </div>
-      <div
-        style={{
-          background: "#181818",
-          borderRadius: "14px",
-          padding: "20px",
-          maxWidth: "520px",
-        }}
-      >
-        <h2 style={{ color: "#fff", marginBottom: "14px" }}>
-          Thông tin bài hát
-        </h2>
-
-        <p style={{ color: "#b3b3b3" }}>Tên bài: {track.title}</p>
-        <p style={{ color: "#b3b3b3" }}>Nghệ sĩ: {track.artist.name}</p>
-        <p style={{ color: "#b3b3b3" }}>
-          Thời lượng: {formatDuration(track.duration)}
-        </p>
-        <p style={{ color: "#b3b3b3" }}>Thể loại: {track.genre ?? "Unknown"}</p>
-      </div>
-
-      <AddToPlaylistModal
-        open={showAddModal}
-        media={track}
-        onClose={() => setShowAddModal(false)}
-      />
-    </>
+          {message}
+        </div>
+      )}
+    </div>
   );
 };
 
-export default TrackDetailView;
+export default AddToPlaylistButton;

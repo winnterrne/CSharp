@@ -131,9 +131,7 @@ const Sidebar = ({
       const res = await playlistApi.getMyPlaylists();
 
       // BE trả { succes: true, data: [...] }
-      const data = Array.isArray(res.data)
-        ? res.data
-        : res.data?.data ?? [];
+      const data = Array.isArray(res.data) ? res.data : (res.data?.data ?? []);
 
       setPlaylists(data);
     } catch (err) {
@@ -222,9 +220,9 @@ const Sidebar = ({
                   height: "52px",
                   borderRadius: "10px",
                   border:
-                    location.pathname === ROUTES.PLAYLIST(playlistId)
-                      ? "2px solid #1DB954"
-                      : "none",
+                    location.pathname === ROUTES.PLAYLIST(playlistId) ?
+                      "2px solid #1DB954"
+                    : "none",
                   background: "#2a2a2a",
                   overflow: "hidden",
                   cursor: "pointer",
@@ -233,7 +231,7 @@ const Sidebar = ({
                   padding: 0,
                 }}
               >
-                {playlist.coverUrl ? (
+                {playlist.coverUrl ?
                   <img
                     src={playlist.coverUrl}
                     alt={playlistName}
@@ -243,9 +241,14 @@ const Sidebar = ({
                       objectFit: "cover",
                     }}
                   />
-                ) : (
-                  "🎵"
-                )}
+                : <div
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      background: "linear-gradient(135deg,#3a3a3a,#1a1a1a)",
+                    }}
+                  />
+                }
               </button>
             );
           })}
@@ -266,8 +269,9 @@ const Sidebar = ({
         width: isWide ? "calc(100vw - 380px)" : "100%",
         minWidth: 0,
         height: "100%",
-        background: isWide
-          ? "linear-gradient(180deg, #181818 0%, #121212 100%)"
+        background:
+          isWide ?
+            "linear-gradient(180deg, #181818 0%, #121212 100%)"
           : "#121212",
         borderRadius: "12px",
         display: "flex",
@@ -385,8 +389,16 @@ const Sidebar = ({
             position: "relative",
             flex: "1 1 auto",
             minWidth: 0,
-            width: searchOpen ? (isWide ? "100%" : "170px") : "42px",
-            maxWidth: searchOpen ? (isWide ? "360px" : "170px") : "42px",
+            width:
+              searchOpen ?
+                isWide ? "100%"
+                : "170px"
+              : "42px",
+            maxWidth:
+              searchOpen ?
+                isWide ? "360px"
+                : "170px"
+              : "42px",
             transition: "all .25s ease",
           }}
         >
@@ -471,11 +483,10 @@ const Sidebar = ({
           padding: isWide ? "0 16px 16px" : "0 8px 8px",
         }}
       >
-        {showRecent ? (
-          recentTracks.length === 0 ? (
+        {showRecent ?
+          recentTracks.length === 0 ?
             <EmptyText text="Chưa có bài hát gần đây" />
-          ) : (
-            recentTracks.map((track) => (
+          : recentTracks.map((track) => (
               <RecentTrackRow
                 key={track.id}
                 track={track}
@@ -486,19 +497,18 @@ const Sidebar = ({
                 }}
               />
             ))
-          )
-        ) : loading ? (
+
+        : loading ?
           <LoadingText />
-        ) : filteredPlaylists.length === 0 ? (
+        : filteredPlaylists.length === 0 ?
           <EmptyText
             text={
-              activeTab === "artist"
-                ? "Chưa có nghệ sĩ theo dõi"
-                : "Chưa có dữ liệu"
+              activeTab === "artist" ?
+                "Chưa có nghệ sĩ theo dõi"
+              : "Chưa có dữ liệu"
             }
           />
-        ) : (
-          filteredPlaylists.map((playlist) => {
+        : filteredPlaylists.map((playlist) => {
             const playlistId = getPlaylistId(playlist);
 
             return (
@@ -511,7 +521,7 @@ const Sidebar = ({
               />
             );
           })
-        )}
+        }
       </div>
 
       <CreatePlaylistModal
@@ -551,7 +561,10 @@ const PlaylistRow = ({
         gap: isWide ? "16px" : "12px",
         padding: isWide ? "12px" : "8px",
         borderRadius: "8px",
-        background: active ? "#2a2a2a" : hovered ? "#1a1a1a" : "transparent",
+        background:
+          active ? "#2a2a2a"
+          : hovered ? "#1a1a1a"
+          : "transparent",
         cursor: "pointer",
       }}
     >
@@ -569,15 +582,20 @@ const PlaylistRow = ({
           fontSize: isWide ? "24px" : "20px",
         }}
       >
-        {playlist.coverUrl ? (
+        {playlist.coverUrl ?
           <img
             src={playlist.coverUrl}
             alt={playlistName}
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
-        ) : (
-          "🎵"
-        )}
+        : <div
+  style={{
+    width: "100%",
+    height: "100%",
+    background:
+      "linear-gradient(135deg,#3a3a3a,#1a1a1a)",
+  }}
+/>}
       </div>
 
       <div style={{ minWidth: 0, flex: 1 }}>
@@ -648,15 +666,20 @@ const RecentTrackRow = ({
           justifyContent: "center",
         }}
       >
-        {track.thumbnailUrl ? (
+        {track.thumbnailUrl ?
           <img
             src={track.thumbnailUrl}
             alt={track.title}
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
-        ) : (
-          "🎵"
-        )}
+        : <div
+            style={{
+              width: "100%",
+              height: "100%",
+              background: "linear-gradient(135deg,#3a3a3a,#1a1a1a)",
+            }}
+          />
+        }
       </div>
 
       <div style={{ minWidth: 0, flex: 1 }}>
@@ -680,7 +703,7 @@ const RecentTrackRow = ({
             marginTop: "3px",
           }}
         >
-          Bài hát • {track.artist.name}
+          Bài hát • {track.artist?.name ?? "Unknown Artist"}
         </div>
       </div>
     </div>

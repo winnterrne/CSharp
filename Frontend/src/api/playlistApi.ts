@@ -1,5 +1,5 @@
 import api from "./axios";
-import type { CreatePlaylistRequest } from "../types/playlist";
+import type { CreatePlaylistDto } from "../types/playlist";
 
 export const playlistApi = {
   // BE: [Route("api/[controller]")] => /api/Playlist
@@ -7,11 +7,11 @@ export const playlistApi = {
 
   getById: (id: number) => api.get(`/Playlist/${id}`),
 
-  create: (data: CreatePlaylistRequest) =>
+  create: (data: CreatePlaylistDto) =>
     api.post("/Playlist", {
-      playlistName: data.playlistName,
-      description: data.description ?? "",
-      isPublic: data.isPublic,
+      playlistName: data.PlaylistName,
+      description: data.Description ?? "",
+      isPublic: data.IsPublic,
     }),
 
   delete: (id: number) => api.delete(`/Playlist/${id}`),
@@ -22,3 +22,4 @@ export const playlistApi = {
   removeTrack: (playlistId: number, mediaItemId: number) =>
     api.delete(`/Playlist/${playlistId}/tracks/${mediaItemId}`),
 };
+

@@ -1,11 +1,10 @@
-import { useState } from "react";
 import type { Media } from "../../types/media";
 import { usePlayer } from "../../hooks/usePlayer";
+import { useFavorite } from "../../hooks/useFavorite";
+import AddToPlaylistButton from "../playlist/AddToPlaylistButton";
 
-type AlbumDetailViewProps = {
-  cover: Media;
-  tracks: Media[];
-  onOpenTrack: (track: Media) => void;
+type TrackDetailViewProps = {
+  track: Media;
   onOpenArtist: (artistName: string) => void;
 };
 
@@ -18,232 +17,246 @@ const formatDuration = (seconds?: number) => {
   return `${min}:${String(sec).padStart(2, "0")}`;
 };
 
-const AlbumDetailView = ({
-  cover,
-  tracks,
-  onOpenTrack,
-  onOpenArtist,
-}: AlbumDetailViewProps) => {
+const TrackDetailView = ({ track, onOpenArtist }: TrackDetailViewProps) => {
   const { playTrack, setQueue } = usePlayer();
-  // NEW: trạng thái yêu thích playlist
-  const [liked, setLiked] = useState(false);
+  const { isFavorite, toggleFavorite } = useFavorite();
 
-  const handlePlayAlbum = () => {
-    if (tracks.length === 0) return;
-
-    setQueue(tracks);
-    playTrack(tracks[0]);
-  };
+  const artistName = track.artist?.name ?? "Unknown Artist";
+  const liked = isFavorite(track.id);
 
   return (
-    <div>
-      {/* NEW: HEADER ALBUM */}
+    <>
       <section
         style={{
           display: "flex",
-          gap: "24px",
+          gap: "28px",
           alignItems: "flex-end",
-          marginBottom: "28px",
+          padding: "24px 0 40px",
         }}
       >
-        <img
-          src={cover.thumbnailUrl}
-          alt={cover.title}
+        <div
           style={{
-            width: "220px",
-            height: "220px",
-            borderRadius: "10px",
-            objectFit: "cover",
-            boxShadow: "0 18px 50px rgba(0,0,0,.55)",
+            width: "260px",
+            height: "260px",
+            borderRadius: "8px",
+            overflow: "hidden",
+            background: "#282828",
+            boxShadow: "0 20px 50px rgba(0,0,0,.5)",
+            flexShrink: 0,
           }}
-        />
+        >
+          {track.thumbnailUrl ? (
+            <img
+              src={track.thumbnailUrl}
+              alt={track.title}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+              }}
+            />
+          ) : (
+            <div
+              style={{
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#b3b3b3",
+                fontSize: "76px",
+              }}
+            >
+              ♪
+            </div>
+          )}
+        </div>
 
-        <div>
-          <p style={{ color: "#fff", fontWeight: 700 }}>Playlist</p>
+        <div style={{ minWidth: 0 }}>
+          <p style={{ color: "#fff", fontWeight: 700, marginBottom: "8px" }}>
+            Bài hát
+          </p>
 
           <h1
             style={{
               color: "#fff",
-              fontSize: "56px",
-              margin: "8px 0",
+              fontSize: "clamp(48px,6vw,82px)",
+              margin: 0,
               lineHeight: 1,
+              wordBreak: "break-word",
             }}
           >
-            {cover.title}
+            {track.title}
           </h1>
 
-          <p style={{ color: "#b3b3b3" }}>
-            <span
-              onClick={() => onOpenArtist(cover.artist.name)}
-              style={{
-                color: "#1DB954",
-                cursor: "pointer",
-              }}
-            >
-              {cover.artist.name}
-            </span>{" "}
-            • {tracks.length} bài hát
-          </p>
-          <p
+          <div
             style={{
-              color: "#8a8a8a",
-              marginTop: "10px",
-              maxWidth: "700px",
-              lineHeight: 1.6,
+              marginTop: "14px",
+              color: "#b3b3b3",
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "8px",
+              alignItems: "center",
             }}
           >
-            Playlist tuyển chọn từ {cover.artist.name}. Những bài hát được nghe
-            nhiều nhất và phù hợp với sở thích của bạn.
-          </p>
+            <span
+              onClick={() => onOpenArtist(artistName)}
+              style={{
+                color: "#fff",
+                cursor: "pointer",
+                fontWeight: 700,
+              }}
+            >
+              {artistName}
+            </span>
+
+            <span>•</span>
+            <span>{formatDuration(track.duration)}</span>
+            <span>•</span>
+            <span>{track.type}</span>
+          </div>
         </div>
       </section>
 
-      {/* NEW: ACTION */}
-      <div
+      <section
         style={{
           display: "flex",
           alignItems: "center",
           gap: "18px",
-          marginBottom: "28px",
+          marginBottom: "36px",
         }}
       >
-        {/* NEW: Like */}
         <button
-          onClick={() => setLiked(!liked)}
-          style={{
-            background: "none",
-            border: "none",
-            fontSize: "28px",
-            cursor: "pointer",
-            color: liked ? "#1DB954" : "#b3b3b3",
+          onClick={() => {
+            setQueue([track]);
+            playTrack(track);
           }}
-        >
-          ♥
-        </button>
-
-        {/* NEW: Play */}
-        <button
-          onClick={handlePlayAlbum}
+          title="Phát"
           style={{
-            width: "58px",
-            height: "58px",
+            width: "64px",
+            height: "64px",
             borderRadius: "50%",
             border: "none",
             background: "#1DB954",
+            color: "#000",
+            fontSize: "24px",
+            fontWeight: 900,
             cursor: "pointer",
-            fontSize: "22px",
-            fontWeight: 800,
-            boxShadow: "0 8px 20px rgba(0,0,0,.3)",
           }}
         >
           ▶
         </button>
 
-        {/* NEW: More */}
         <button
+          onClick={() => toggleFavorite(track.id)}
+          title="Lưu vào bài hát đã thích"
           style={{
-            background: "none",
             border: "none",
-            color: "#b3b3b3",
-            fontSize: "26px",
+            background: "transparent",
+            fontSize: "34px",
             cursor: "pointer",
+            color: liked ? "#1DB954" : "#b3b3b3",
+          }}
+        >
+          {liked ? "♥" : "♡"}
+        </button>
+
+        <AddToPlaylistButton mediaId={track.id} />
+
+        <button
+          onClick={() => navigator.clipboard.writeText(window.location.href)}
+          title="Chia sẻ"
+          style={{
+            border: "none",
+            background: "transparent",
+            fontSize: "28px",
+            cursor: "pointer",
+            color: "#b3b3b3",
+          }}
+        >
+          ↗
+        </button>
+
+        <button
+          title="Tùy chọn khác"
+          style={{
+            border: "none",
+            background: "transparent",
+            fontSize: "30px",
+            cursor: "pointer",
+            color: "#b3b3b3",
           }}
         >
           ⋯
         </button>
-      </div>
-      {/* NEW: TRACK LIST */}
-      <div>
+      </section>
+
+      <section
+        style={{
+          display: "grid",
+          gridTemplateColumns: "minmax(0,1fr) minmax(280px,400px)",
+          gap: "24px",
+        }}
+      >
         <div
           style={{
-            display: "grid",
-            gridTemplateColumns: "40px minmax(0, 1fr) 180px 120px",
-            color: "#b3b3b3",
-            fontSize: "13px",
-            borderBottom: "1px solid #333",
-            padding: "0 8px 10px",
+            background: "#181818",
+            borderRadius: "14px",
+            padding: "22px",
           }}
         >
-          <div>#</div>
-          <div>Tiêu đề</div>
+          <h2 style={{ color: "#fff", marginBottom: "18px" }}>
+            Thông tin bài hát
+          </h2>
 
-          <div>Nghệ sĩ</div>
-
-          <div style={{ textAlign: "right" }}>Thời lượng</div>
+          <InfoRow label="Tên bài" value={track.title} />
+          <InfoRow label="Nghệ sĩ" value={artistName} />
+          <InfoRow label="Thời lượng" value={formatDuration(track.duration)} />
+          <InfoRow label="Thể loại" value={track.genre ?? "Unknown"} />
+          <InfoRow label="Loại" value={track.type} />
         </div>
 
-        {tracks.map((track, index) => (
-          <div
-            key={track.id}
-            // NEW: click mở TrackDetail
-            onClick={() => onOpenTrack(track)}
-            // NEW: double click phát nhạc
-            onDoubleClick={() => {
-              setQueue(tracks);
-              playTrack(track);
-            }}
-            style={{
-              display: "grid",
-              gridTemplateColumns: "40px minmax(0, 1fr) 180px 120px",
-              alignItems: "center",
-              height: "64px",
-              padding: "0 8px",
-              borderRadius: "8px",
-              cursor: "pointer",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = "#1a1a1a";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = "transparent";
-            }}
-          >
-            <div style={{ color: "#b3b3b3" }}>{index + 1}</div>
+        <div
+          style={{
+            background: "#181818",
+            borderRadius: "14px",
+            padding: "22px",
+          }}
+        >
+          <h2 style={{ color: "#fff", marginBottom: "16px" }}>Về nghệ sĩ</h2>
 
-            <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-              <img
-                src={track.thumbnailUrl}
-                alt={track.title}
-                style={{
-                  width: "44px",
-                  height: "44px",
-                  borderRadius: "6px",
-                  objectFit: "cover",
-                }}
-              />
-
-              <div>
-                <div style={{ color: "#fff", fontWeight: 700 }}>
-                  {track.title}
-                </div>
-
-                <div style={{ color: "#b3b3b3", fontSize: "12px" }}>
-                  {track.artist.name}
-                </div>
-              </div>
-            </div>
-            {/* FIX: cột nghệ sĩ */}
-            <div
-              onClick={() => onOpenArtist(track.artist.name)}
-              style={{
-                color: "#b3b3b3",
-                cursor: "pointer",
-                fontSize: "14px",
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-              }}
-            >
-              {track.artist.name}
-            </div>
-            <div style={{ color: "#b3b3b3", textAlign: "right" }}>
-              {formatDuration(track.duration)}
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
+          <p style={{ color: "#b3b3b3", lineHeight: 1.8 }}>
+            {artistName} hiện đang có mặt trên TuneVault. Bạn có thể mở trang
+            nghệ sĩ để xem thêm các bài hát liên quan.
+          </p>
+        </div>
+      </section>
+    </>
   );
 };
 
-export default AlbumDetailView;
+const InfoRow = ({ label, value }: { label: string; value: string }) => (
+  <div
+    style={{
+      display: "flex",
+      justifyContent: "space-between",
+      gap: "12px",
+      padding: "12px 0",
+      borderBottom: "1px solid #2a2a2a",
+    }}
+  >
+    <span style={{ color: "#b3b3b3" }}>{label}</span>
+
+    <span
+      style={{
+        color: "#fff",
+        fontWeight: 700,
+        textAlign: "right",
+      }}
+    >
+      {value}
+    </span>
+  </div>
+);
+
+export default TrackDetailView;

@@ -24,7 +24,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   const togglePlay = playerStore((state) => state.togglePlay);
   const play = playerStore((state) => state.play);
   const pause = playerStore((state) => state.pause);
-  const seek = playerStore((state) => state.seek);
+  // const seek = playerStore((state) => state.seek);
   const setVolume = playerStore((state) => state.setVolume);
   const setMuted = playerStore((state) => state.setMuted);
   const toggleShuffle = playerStore((state) => state.toggleShuffle);
@@ -36,11 +36,20 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   const clearQueue = playerStore((state) => state.clearQueue);
 
   const handlePlayTrack = (track: Media) => {
-    playerStore.getState().setCurrentTrack(track);
-    playerStore.getState().seek(0);
-    playerStore.getState().play();
-  };
+    const state = playerStore.getState();
 
+    state.setCurrentTrack(track);
+
+    if (
+      state.queue.length === 0 ||
+      !state.queue.some((t) => t.id === track.id)
+    ) {
+      state.setQueue([track]);
+    }
+
+    state.seek(0);
+    state.play();
+  };
   const handleTogglePlay = () => {
     if (!currentTrack) return;
     togglePlay();
@@ -57,12 +66,29 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const handleNext = () => {
-    next();
-    playerStore.getState().play();
-  };
+    const currentId = playerStore.getState().currentTrack?.id;
 
+    next();
+
+    const nextTrack = playerStore.getState().currentTrack;
+
+    if (nextTrack && nextTrack.id !== currentId) {
+      playerStore.getState().play();
+    }
+  };
   const handlePrevious = () => {
+    const audio = audioRef.current;
+
+    if (audio && audio.currentTime > 5) {
+      audio.currentTime = 0;
+
+      playerStore.getState().seek(0);
+
+      return;
+    }
+
     previous();
+
     playerStore.getState().play();
   };
 
