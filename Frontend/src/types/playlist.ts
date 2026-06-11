@@ -1,3 +1,4 @@
+
 import type { Media, MediaItemDto } from "./media";
 import { mapMediaItemDtoToMedia } from "./media";
 
@@ -54,3 +55,9 @@ export const mapPlaylistDetailDtoToPlaylist = (
     isPublic: item.isPublic ?? true,
   };
 };
+export interface CreatePlaylistDto {
+  PlaylistName: string;
+    Description?: string;
+  IsPublic: boolean;
+
+}

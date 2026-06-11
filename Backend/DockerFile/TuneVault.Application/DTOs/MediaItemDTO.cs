@@ -53,3 +53,11 @@ public record MediaStreamInfoDto
     string? ArtistName 
 );
 
+public record UpdateMediaRequestDto(
+    string? TitleName,
+    string? Description,
+    string? MediaItemTag,
+    string? MediaItemImage,
+    int? ArtistID,
+    int? AlbumID
+);

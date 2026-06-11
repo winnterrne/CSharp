@@ -1,5 +1,5 @@
 namespace TuneVault.Application.DTOs;
-public record PlayHistoryDTO
+public class PlayHistoryDTO
 {
     public int MediaItemID { get; set; }
     public string? TitleName { get; set; }

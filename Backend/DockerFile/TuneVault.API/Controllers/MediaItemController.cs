@@ -1,9 +1,14 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using TuneVault.Application.DTOs;
+using TuneVault.Application.UseCases.MediaItem;
 using TuneVault.Application.UseCases.MediaItem.MediaUploading;
 using TuneVault.Application.UseCases.MediaItem.MediaStreaming;
 using TuneVault.Application.UseCases.Interaction;
@@ -58,6 +63,38 @@ namespace TuneVault.API.Controllers
                 return NotFound(new { success = false, message = "Không tìm thấy"});
             }
             return Ok(new { success = true, data = result});
+        }
+        [Authorize]
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateMediaRequestDto dto)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return Unauthorized();
+
+            var command = new UpdateMediaCommand(
+                id,
+                userId,
+                dto.TitleName,
+                dto.Description,
+                dto.MediaItemTag,
+                dto.MediaItemImage,
+                dto.ArtistID,
+                dto.AlbumID
+            );
+            var result = await _mediator.Send(command);
+             return Ok(new { success = true, data = result });
+        }
+
+        [Authorize]
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return Unauthorized();
+
+            var command = new DeleteMediaCommand(id, userId);   
+            var result = await _mediator.Send(command);
+            return Ok(new { success = true, data = result });
         }
 
         [Authorize]

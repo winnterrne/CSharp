@@ -12,6 +12,7 @@ public class FollowHandler : IRequestHandler<FollowCommand, int>
     {
         var follow = new Domain.Entities.Follow
         {
+            FollowID = 0,
             FollowerID = request.FollowerID,
             FollowingUserID = request.FollowingUserID,
             FollowingArtistID = null
