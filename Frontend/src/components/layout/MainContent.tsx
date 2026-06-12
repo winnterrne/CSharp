@@ -1,14 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import type { Media } from "../../types/media";
-<<<<<<< HEAD
-import AlbumDetailView from "../home/AlbumDetailView";
-import TrackDetailView from "../home/TrackDetailView";
-import HomeView from "../home/HomeView";
-import ArtistDetailView from "../home/ArtistDetailView";
-import AlbumCardLarge from "../home/AlbumCardLarge";
-import { mediaApi } from "../../api/mediaApi";
-import { mapMediaItemDtoToMedia, type MediaItemDto } from "../../types/media";
-=======
 import {
   mapMediaItemDtoToMedia,
   type MediaItemDto,
@@ -20,7 +11,6 @@ import AlbumDetailView from "../home/AlbumDetailView";
 import TrackDetailView from "../home/TrackDetailView";
 import ArtistDetailView from "../home/ArtistDetailView";
 import AlbumCardLarge from "../home/AlbumCardLarge";
->>>>>>> origin/vinh-branch
 
 type ViewMode =
   | "home"
@@ -31,8 +21,6 @@ type ViewMode =
   | "track"
   | "artist";
 
-<<<<<<< HEAD
-=======
 const uniqueTracks = (tracks: Media[]) => {
   const map = new Map<string, Media>();
 
@@ -43,7 +31,6 @@ const uniqueTracks = (tracks: Media[]) => {
   return Array.from(map.values());
 };
 
->>>>>>> origin/vinh-branch
 const MainContent = () => {
   const [viewMode, setViewMode] = useState<ViewMode>("home");
 
@@ -79,13 +66,6 @@ const MainContent = () => {
           ? res.data.data
           : [];
 
-<<<<<<< HEAD
-        const mediaList: Media[] = mediaDtos.map(mapMediaItemDtoToMedia);
-
-        setRecommended(mediaList);
-        setForYou(mediaList);
-        setUpcoming(mediaList);
-=======
         const mediaList = uniqueTracks(mediaDtos.map(mapMediaItemDtoToMedia));
 
         setRecommended(mediaList.slice(0, 12));
@@ -95,7 +75,6 @@ const MainContent = () => {
         if (mediaList.length === 0) {
           setError("Chưa có dữ liệu bài hát từ server.");
         }
->>>>>>> origin/vinh-branch
       } catch (err) {
         console.error("FETCH HOME DATA ERROR:", err);
 
@@ -112,25 +91,12 @@ const MainContent = () => {
   }, []);
 
   const allTracks = useMemo(() => {
-<<<<<<< HEAD
-    const map = new Map<string | number, Media>();
-
-    [...recommended, ...forYou, ...upcoming].forEach((track) => {
-      map.set(track.id, track);
-    });
-
-    return Array.from(map.values());
-  }, [recommended, forYou, upcoming]);
-
-  const handleOpenTrack = (track: Media) => {
-=======
     return uniqueTracks([...recommended, ...forYou, ...upcoming]);
   }, [recommended, forYou, upcoming]);
 
   const handleOpenTrack = (track: Media) => {
     if (!track?.id) return;
 
->>>>>>> origin/vinh-branch
     setSelectedTrack(track);
     setSelectedAlbum(null);
     setSelectedArtist(null);
@@ -151,11 +117,7 @@ const MainContent = () => {
 
   const handleOpenArtist = (artistName: string, tracks: Media[] = allTracks) => {
     const artistTracks = tracks.filter(
-<<<<<<< HEAD
-      (track) => track.artist?.name === artistName
-=======
       (track) => track.artist?.name === artistName,
->>>>>>> origin/vinh-branch
     );
 
     setSelectedArtist({
@@ -183,30 +145,18 @@ const MainContent = () => {
           tracks: recommended,
         };
 
-<<<<<<< HEAD
-      case "upcoming":
-        return {
-          title: "Được đề xuất cho hôm nay",
-          tracks: upcoming,
-        };
-
-=======
->>>>>>> origin/vinh-branch
       case "forYou":
         return {
           title: "Dành cho bạn",
           tracks: forYou,
         };
 
-<<<<<<< HEAD
-=======
       case "upcoming":
         return {
           title: "Được đề xuất cho hôm nay",
           tracks: upcoming,
         };
 
->>>>>>> origin/vinh-branch
       default:
         return {
           title: "",
@@ -227,11 +177,7 @@ const MainContent = () => {
         overflowY: "auto",
         overflowX: "hidden",
         padding: "30px",
-<<<<<<< HEAD
-        paddingBottom: "120px",
-=======
         paddingBottom: "160px",
->>>>>>> origin/vinh-branch
         boxSizing: "border-box",
         background:
           viewMode === "home"
@@ -282,26 +228,17 @@ const MainContent = () => {
           upcoming={upcoming}
           onOpenTrack={handleOpenTrack}
           onOpenAlbum={handleOpenAlbum}
-<<<<<<< HEAD
-          onShowAll={(mode) => setViewMode(mode)}
-=======
           onShowAll={(mode) => {
             if (mode === "recommended") setViewMode("recommended");
             if (mode === "forYou") setViewMode("forYou");
             if (mode === "upcoming") setViewMode("upcoming");
           }}
->>>>>>> origin/vinh-branch
         />
       )}
 
       {(viewMode === "recommended" ||
-<<<<<<< HEAD
-        viewMode === "upcoming" ||
-        viewMode === "forYou") && (
-=======
         viewMode === "forYou" ||
         viewMode === "upcoming") && (
->>>>>>> origin/vinh-branch
         <section>
           <h1
             style={{
@@ -336,15 +273,6 @@ const MainContent = () => {
         </section>
       )}
 
-<<<<<<< HEAD
-      {viewMode === "album" && selectedAlbum && (
-        <AlbumDetailView
-          cover={{
-            ...selectedAlbum.cover,
-            title: selectedAlbum.title ?? selectedAlbum.cover.title,
-          }}
-          tracks={selectedAlbum.tracks}
-=======
       {viewMode === "track" &&
         (selectedTrack ? (
           <TrackDetailView
@@ -362,33 +290,17 @@ const MainContent = () => {
           cover={selectedAlbum.cover}
           tracks={selectedAlbum.tracks}
           title={selectedAlbum.title}
->>>>>>> origin/vinh-branch
           onOpenTrack={handleOpenTrack}
           onOpenArtist={handleOpenArtist}
         />
       )}
 
-<<<<<<< HEAD
-      {viewMode === "track" && selectedTrack && (
-        <TrackDetailView
-          track={selectedTrack}
-          onOpenArtist={handleOpenArtist}
-        />
-      )}
-
-=======
->>>>>>> origin/vinh-branch
       {viewMode === "artist" && selectedArtist && (
         <ArtistDetailView
           artistName={selectedArtist.name}
           tracks={selectedArtist.tracks}
-<<<<<<< HEAD
-          onOpenAlbum={handleOpenAlbum}
-          onOpenTrack={handleOpenTrack}
-=======
           onOpenTrack={handleOpenTrack}
           onOpenAlbum={handleOpenAlbum}
->>>>>>> origin/vinh-branch
         />
       )}
     </main>

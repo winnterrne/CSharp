@@ -1,12 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { playlistApi } from "../../api/playlistApi";
-<<<<<<< HEAD
-import type { Playlist, PlaylistTrack, PlaylistDetailDto } from "../../types/playlist";
-import { mapPlaylistDetailDtoToPlaylist } from "../../types/playlist";
-import type { Media } from "../../types/media";
-import { usePlayer } from "../../hooks/usePlayer";
-=======
 import type {
   Playlist,
   PlaylistTrack,
@@ -17,7 +11,6 @@ import type { Media } from "../../types/media";
 import { usePlayer } from "../../hooks/usePlayer";
 import { useFavorite } from "../../hooks/useFavorite";
 import TrackActionMenu from "../../components/common/TrackActionMenu";
->>>>>>> origin/vinh-branch
 
 const formatDuration = (seconds?: number) => {
   if (!seconds || Number.isNaN(seconds)) return "0:00";
@@ -53,31 +46,17 @@ const PlaylistDetailPage = () => {
   const mediaTracks = useMemo<Media[]>(() => {
     return playlistTracks.map((item) => item.media).filter(Boolean);
   }, [playlistTracks]);
-<<<<<<< HEAD
-  // NEW: tổng thời lượng playlist
-  const totalDuration = useMemo(() => {
-    const totalSeconds = mediaTracks.reduce(
-      (sum, track) => sum + (track.duration ?? 0),
-      0,
-=======
 
   const totalDuration = useMemo(() => {
     const totalSeconds = mediaTracks.reduce(
       (sum, track) => sum + (track.duration ?? 0),
       0
->>>>>>> origin/vinh-branch
     );
 
     const hours = Math.floor(totalSeconds / 3600);
     const mins = Math.floor((totalSeconds % 3600) / 60);
 
-<<<<<<< HEAD
-    if (hours > 0) {
-      return `${hours} giờ ${mins} phút`;
-    }
-=======
     if (hours > 0) return `${hours} giờ ${mins} phút`;
->>>>>>> origin/vinh-branch
 
     return `${mins} phút`;
   }, [mediaTracks]);
@@ -112,60 +91,6 @@ const PlaylistDetailPage = () => {
     playTrack(mediaTracks[0]);
   };
 
-<<<<<<< HEAD
-  const handlePlayTrack = (playlistTrack: PlaylistTrack) => {
-    if (!playlistTrack.media) return;
-
-    setQueue(mediaTracks);
-    playTrack(playlistTrack.media);
-  };
-
-  if (!id) {
-    return (
-      <div
-        style={{
-          height: "100%",
-          background: "#121212",
-          color: "#ff4d4f",
-          padding: "24px",
-          boxSizing: "border-box",
-        }}
-      >
-        Thiếu id playlist
-      </div>
-    );
-  }
-  if (loading) {
-    return (
-      <div
-        style={{
-          height: "100%",
-          background: "#121212",
-          color: "#fff",
-          padding: "24px",
-          boxSizing: "border-box",
-        }}
-      >
-        Đang tải playlist...
-      </div>
-    );
-  }
-
-  if (error || !playlist) {
-    return (
-      <div
-        style={{
-          height: "100%",
-          background: "#121212",
-          color: "#ff4d4f",
-          padding: "24px",
-          boxSizing: "border-box",
-        }}
-      >
-        {error || "Không tìm thấy playlist"}
-      </div>
-    );
-=======
   const handlePlayTrack = (track: Media) => {
     setQueue(mediaTracks);
     playTrack(track);
@@ -181,7 +106,6 @@ const PlaylistDetailPage = () => {
 
   if (error || !playlist) {
     return <StatusPage text={error || "Không tìm thấy playlist"} danger />;
->>>>>>> origin/vinh-branch
   }
 
   return (
@@ -195,40 +119,16 @@ const PlaylistDetailPage = () => {
         boxSizing: "border-box",
       }}
     >
-<<<<<<< HEAD
-      {/* HEADER PLAYLIST */}
-=======
->>>>>>> origin/vinh-branch
       <section
         style={{
           display: "flex",
           gap: "24px",
           padding: "32px",
           alignItems: "flex-end",
-<<<<<<< HEAD
-          background: "linear-gradient(180deg, #333 0%, #121212 100%)",
-        }}
-      >
-        <button
-          style={{
-            border: "1px solid #555",
-            background: "transparent",
-            color: "#fff",
-            borderRadius: "999px",
-            padding: "10px 18px",
-            cursor: "pointer",
-            fontWeight: 600,
-          }}
-        >
-          + Thêm bài hát
-        </button>
-        {/* COVER */}
-=======
           background:
             "linear-gradient(180deg, rgba(140, 70, 130, .95) 0%, #121212 100%)",
         }}
       >
->>>>>>> origin/vinh-branch
         <div
           style={{
             width: "220px",
@@ -240,20 +140,12 @@ const PlaylistDetailPage = () => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-<<<<<<< HEAD
-            fontSize: "64px",
-            boxShadow: "0 16px 40px rgba(0,0,0,.45)",
-          }}
-        >
-          {playlist.coverUrl ?
-=======
             color: "#b3b3b3",
             fontSize: "72px",
             boxShadow: "0 16px 40px rgba(0,0,0,.45)",
           }}
         >
           {playlist.coverUrl ? (
->>>>>>> origin/vinh-branch
             <img
               src={playlist.coverUrl}
               alt={playlist.name || playlist.playlistName}
@@ -263,18 +155,11 @@ const PlaylistDetailPage = () => {
                 objectFit: "cover",
               }}
             />
-<<<<<<< HEAD
-          : "🎵"}
-        </div>
-
-        {/* INFO */}
-=======
           ) : (
             "♪"
           )}
         </div>
 
->>>>>>> origin/vinh-branch
         <div style={{ minWidth: 0 }}>
           <div
             style={{
@@ -284,11 +169,7 @@ const PlaylistDetailPage = () => {
               marginBottom: "8px",
             }}
           >
-<<<<<<< HEAD
-            Playlist
-=======
             Danh sách phát công khai
->>>>>>> origin/vinh-branch
           </div>
 
           <h1
@@ -306,11 +187,7 @@ const PlaylistDetailPage = () => {
           {playlist.description && (
             <p
               style={{
-<<<<<<< HEAD
-                color: "#b3b3b3",
-=======
                 color: "#d7d7d7",
->>>>>>> origin/vinh-branch
                 marginBottom: "10px",
                 maxWidth: "680px",
               }}
@@ -321,42 +198,23 @@ const PlaylistDetailPage = () => {
 
           <div
             style={{
-<<<<<<< HEAD
-              color: "#b3b3b3",
-              fontSize: "14px",
-            }}
-          >
-            <strong style={{ color: "#fff" }}>
-              {playlist.owner?.username ?? "Người dùng"}
-            </strong>{" "}
-            • {playlist.trackCount ?? playlistTracks.length} bài hát •{" "}
-=======
               color: "#d7d7d7",
               fontSize: "14px",
             }}
           >
             <strong style={{ color: "#fff" }}>TuneVault</strong> •{" "}
             {playlist.trackCount ?? playlistTracks.length} bài hát •{" "}
->>>>>>> origin/vinh-branch
             {totalDuration}
           </div>
         </div>
       </section>
 
-<<<<<<< HEAD
-      {/* ACTION BAR */}
-=======
->>>>>>> origin/vinh-branch
       <section
         style={{
           padding: "24px 32px",
           display: "flex",
           alignItems: "center",
-<<<<<<< HEAD
-          gap: "16px",
-=======
           gap: "18px",
->>>>>>> origin/vinh-branch
         }}
       >
         <button
@@ -364,75 +222,21 @@ const PlaylistDetailPage = () => {
           disabled={mediaTracks.length === 0}
           title="Phát playlist"
           style={{
-<<<<<<< HEAD
-            width: "56px",
-            height: "56px",
-=======
             width: "60px",
             height: "60px",
->>>>>>> origin/vinh-branch
             borderRadius: "50%",
             border: "none",
             background: mediaTracks.length === 0 ? "#3a3a3a" : "#1DB954",
             color: "#000",
             cursor: mediaTracks.length === 0 ? "not-allowed" : "pointer",
             fontSize: "22px",
-<<<<<<< HEAD
-            fontWeight: 800,
-=======
             fontWeight: 900,
->>>>>>> origin/vinh-branch
             boxShadow: "0 8px 24px rgba(0,0,0,.35)",
           }}
         >
           ▶
         </button>
 
-<<<<<<< HEAD
-        <span
-          style={{
-            color: "#b3b3b3",
-            fontSize: "14px",
-          }}
-        >
-          Double click vào bài hát để phát
-        </span>
-      </section>
-
-      {/* TRACK LIST */}
-      <section style={{ padding: "0 32px 32px" }}>
-        {playlistTracks.length === 0 ?
-          <div
-            style={{
-              color: "#b3b3b3",
-              padding: "24px 0",
-            }}
-          >
-            <div
-              style={{
-                textAlign: "center",
-                padding: "80px 20px",
-              }}
-            >
-              <div
-                style={{
-                  fontSize: "72px",
-                  marginBottom: "20px",
-                }}
-              >
-                🎵
-              </div>
-
-              <h2 style={{ color: "#fff" }}>Playlist trống</h2>
-
-              <p style={{ color: "#b3b3b3" }}>
-                Hãy thêm bài hát vào playlist của bạn.
-              </p>
-            </div>{" "}
-          </div>
-        : <div>
-            {/* TABLE HEADER */}
-=======
         <button
           title="Phát ngẫu nhiên"
           style={{
@@ -494,16 +298,11 @@ const PlaylistDetailPage = () => {
           <EmptyPlaylist />
         ) : (
           <>
->>>>>>> origin/vinh-branch
             <div
               style={{
                 display: "grid",
                 gridTemplateColumns:
-<<<<<<< HEAD
-                  "40px minmax(0, 1.6fr) minmax(120px, 1fr) 90px",
-=======
                   "40px minmax(0, 1.6fr) 48px minmax(120px, 1fr) 110px",
->>>>>>> origin/vinh-branch
                 gap: "12px",
                 color: "#b3b3b3",
                 fontSize: "13px",
@@ -514,37 +313,22 @@ const PlaylistDetailPage = () => {
             >
               <div>#</div>
               <div>Tiêu đề</div>
-<<<<<<< HEAD
-=======
               <div></div>
->>>>>>> origin/vinh-branch
               <div>Nghệ sĩ</div>
               <div style={{ textAlign: "right" }}>Thời lượng</div>
             </div>
 
-<<<<<<< HEAD
-            {/* TABLE BODY */}
-=======
->>>>>>> origin/vinh-branch
             {playlistTracks.map((item, index) => (
               <PlaylistTrackRow
                 key={item.id}
                 item={item}
                 index={index}
-<<<<<<< HEAD
-                onPlay={() => handlePlayTrack(item)}
-              />
-            ))}
-          </div>
-        }
-=======
                 tracks={mediaTracks}
                 onPlay={() => handlePlayTrack(item.media)}
               />
             ))}
           </>
         )}
->>>>>>> origin/vinh-branch
       </section>
     </main>
   );
@@ -553,21 +337,11 @@ const PlaylistDetailPage = () => {
 const PlaylistTrackRow = ({
   item,
   index,
-<<<<<<< HEAD
-=======
   tracks,
->>>>>>> origin/vinh-branch
   onPlay,
 }: {
   item: PlaylistTrack;
   index: number;
-<<<<<<< HEAD
-  onPlay: () => void;
-}) => {
-  const [hovered, setHovered] = useState(false);
-
-  const media = item.media;
-=======
   tracks: Media[];
   onPlay: () => void;
 }) => {
@@ -580,7 +354,6 @@ const PlaylistTrackRow = ({
   const media = item.media;
   const liked = isFavorite(media.id);
   const artistName = media.artist?.name ?? "Unknown Artist";
->>>>>>> origin/vinh-branch
 
   return (
     <div
@@ -589,27 +362,13 @@ const PlaylistTrackRow = ({
       onMouseLeave={() => setHovered(false)}
       style={{
         display: "grid",
-<<<<<<< HEAD
-        gridTemplateColumns: "40px minmax(0, 1.6fr) minmax(120px, 1fr) 90px",
-=======
         gridTemplateColumns:
           "40px minmax(0, 1.6fr) 48px minmax(120px, 1fr) 110px",
->>>>>>> origin/vinh-branch
         gap: "12px",
         alignItems: "center",
         height: "64px",
         padding: "0 8px",
         borderRadius: "8px",
-<<<<<<< HEAD
-        background: hovered ? "#1a1a1a" : "transparent",
-        cursor: "pointer",
-      }}
-    >
-      <div style={{ color: "#b3b3b3", fontSize: "14px" }}>
-        {hovered ?
-          <span style={{ color: "#fff" }}>▶</span>
-        : index + 1}{" "}
-=======
         background: hovered ? "#555" : "transparent",
         cursor: "pointer",
         position: "relative",
@@ -636,7 +395,6 @@ const PlaylistTrackRow = ({
         ) : (
           index + 1
         )}
->>>>>>> origin/vinh-branch
       </div>
 
       <div
@@ -655,20 +413,13 @@ const PlaylistTrackRow = ({
             background: "#282828",
             overflow: "hidden",
             flexShrink: 0,
-<<<<<<< HEAD
-=======
             color: "#b3b3b3",
->>>>>>> origin/vinh-branch
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
           }}
         >
-<<<<<<< HEAD
-          {media.thumbnailUrl ?
-=======
           {media.thumbnailUrl ? (
->>>>>>> origin/vinh-branch
             <img
               src={media.thumbnailUrl}
               alt={media.title}
@@ -678,13 +429,9 @@ const PlaylistTrackRow = ({
                 objectFit: "cover",
               }}
             />
-<<<<<<< HEAD
-          : "🎵"}
-=======
           ) : (
             "♪"
           )}
->>>>>>> origin/vinh-branch
         </div>
 
         <div style={{ minWidth: 0 }}>
@@ -692,11 +439,7 @@ const PlaylistTrackRow = ({
             style={{
               color: "#fff",
               fontSize: "14px",
-<<<<<<< HEAD
-              fontWeight: 600,
-=======
               fontWeight: 700,
->>>>>>> origin/vinh-branch
               whiteSpace: "nowrap",
               overflow: "hidden",
               textOverflow: "ellipsis",
@@ -707,26 +450,16 @@ const PlaylistTrackRow = ({
 
           <div
             style={{
-<<<<<<< HEAD
-              color: "#b3b3b3",
-=======
               color: "#d0d0d0",
->>>>>>> origin/vinh-branch
               fontSize: "12px",
               marginTop: "3px",
             }}
           >
-<<<<<<< HEAD
-            {media.type}
-=======
             {artistName}
->>>>>>> origin/vinh-branch
           </div>
         </div>
       </div>
 
-<<<<<<< HEAD
-=======
       <div>
         {hovered && (
           <button
@@ -747,7 +480,6 @@ const PlaylistTrackRow = ({
         )}
       </div>
 
->>>>>>> origin/vinh-branch
       <div
         style={{
           color: "#b3b3b3",
@@ -757,11 +489,7 @@ const PlaylistTrackRow = ({
           textOverflow: "ellipsis",
         }}
       >
-<<<<<<< HEAD
-        {media.artist?.name ?? "Unknown Artist"}
-=======
         {artistName}
->>>>>>> origin/vinh-branch
       </div>
 
       <div
@@ -769,11 +497,6 @@ const PlaylistTrackRow = ({
           color: "#b3b3b3",
           fontSize: "14px",
           textAlign: "right",
-<<<<<<< HEAD
-        }}
-      >
-        {formatDuration(media.duration)}
-=======
           display: "flex",
           justifyContent: "flex-end",
           alignItems: "center",
@@ -806,15 +529,11 @@ const PlaylistTrackRow = ({
           open={menuOpen}
           onClose={() => setMenuOpen(false)}
         />
->>>>>>> origin/vinh-branch
       </div>
     </div>
   );
 };
 
-<<<<<<< HEAD
-export default PlaylistDetailPage;
-=======
 const StatusPage = ({ text, danger }: { text: string; danger?: boolean }) => (
   <div
     style={{
@@ -844,4 +563,3 @@ const EmptyPlaylist = () => (
 );
 
 export default PlaylistDetailPage;
->>>>>>> origin/vinh-branch

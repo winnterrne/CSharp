@@ -13,6 +13,10 @@ obj/
 # Visual Studio temporary files
 .vs/
 
+# VS Code / Rider / JetBrains
+.vscode/
+.idea/
+
 # Rider
 .idea/
 *.sln.iml

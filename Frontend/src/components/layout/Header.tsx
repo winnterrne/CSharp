@@ -1,12 +1,9 @@
 import { useState } from "react";
 import type { Media } from "../../types/media";
-<<<<<<< HEAD
-=======
 import { authStore } from "../../store/authStore";
 import { userApi } from "../../api/userApi";
 import type { UserProfile } from "../../types/profile";
 import { useEffect } from "react";
->>>>>>> origin/vinh-branch
 
 export interface HeaderUser {
   displayName: string;
@@ -53,8 +50,6 @@ const Header = ({
   const avatarBg = user?.avatarColor ?? "#e91429";
   const showDropdown = searchFocused && searchValue.trim().length > 0;
 
-<<<<<<< HEAD
-=======
   const authUser = authStore((state) => state.user);
   const logout = authStore((state) => state.logout);
 
@@ -78,7 +73,6 @@ const Header = ({
     loadProfile();
   }, [authUser?.id]);
 
->>>>>>> origin/vinh-branch
   return (
     <header
       style={{
@@ -441,21 +435,15 @@ const Header = ({
               />
               <MenuItem
                 label="Đăng xuất"
-<<<<<<< HEAD
-                onClick={() => setShowAccountMenu(false)}
-=======
                 onClick={() => {
                   logout();
                   window.location.reload();
                 }}
->>>>>>> origin/vinh-branch
               />
             </div>
           )}
         </div>
       </div>
-<<<<<<< HEAD
-=======
       {showProfileModal && profile && (
         <div
           onClick={() => setShowProfileModal(false)}
@@ -516,7 +504,6 @@ const Header = ({
           </div>
         </div>
       )}
->>>>>>> origin/vinh-branch
     </header>
   );
 };
@@ -581,8 +568,6 @@ const MenuItem = ({
     {label}
   </button>
 );
-<<<<<<< HEAD
-=======
 const ProfileRow = ({ label, value }: { label: string; value: string }) => (
   <div
     style={{
@@ -603,6 +588,5 @@ const ProfileRow = ({ label, value }: { label: string; value: string }) => (
     <span>{value}</span>
   </div>
 );
->>>>>>> origin/vinh-branch
 
 export default Header;
