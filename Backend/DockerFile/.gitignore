@@ -1,0 +1,26 @@
+# Ignore build outputs
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Visual Studio temporary files
+.vs/
+
+# Rider
+.idea/
+*.sln.iml
+
+# ASP.NET core sensitive files
+appsettings.Development.json
+
+# Log files
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db

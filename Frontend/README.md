@@ -51,7 +51,7 @@ frontend/
 │   │   │   └── Loading.tsx     
 │   │   │
 │   │   ├── layout/             
-│   │   │   ├── Sidebar.tsx     
+│   │   │   ├── LeftPanel.tsx     
 │   │   │   ├── Header.tsx      
 │   │   │   ├── RightPanel.tsx  
 │   │   │   ├── PlayerBar.tsx   

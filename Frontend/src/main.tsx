@@ -2,13 +2,18 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App";
+import { AuthProvider } from "./contexts/AuthProvider";
+import { PlayerProvider } from "./contexts/PlayerProvider";
 import "./styles/globals.css";
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    {" "}
     <BrowserRouter>
-      {" "}
-      <App />{" "}
-    </BrowserRouter>{" "}
-  </React.StrictMode>,
+      <AuthProvider>
+        <PlayerProvider>
+          <App />
+        </PlayerProvider>
+      </AuthProvider>
+    </BrowserRouter>
+  </React.StrictMode>
 );

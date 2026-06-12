@@ -1,18 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using TuneVault.Application.DTOs;
-using TuneVault.Application.UseCases.MediaItem;
 using TuneVault.Application.UseCases.MediaItem.MediaUploading;
 using TuneVault.Application.UseCases.MediaItem.MediaStreaming;
 using TuneVault.Application.UseCases.Interaction;
-using System.IO;
+
 
 namespace TuneVault.API.Controllers
 {
@@ -50,6 +44,14 @@ namespace TuneVault.API.Controllers
             );
 
             var result = await _mediator.Send(command);
+            return Ok(new { success = true, data = result});
+        }
+
+        [HttpGet("get-all")]
+        public async Task<IActionResult> GetAll()
+        {
+            var query = new GetAllMediaQuery();
+            var result = await _mediator.Send(query);
             return Ok(new { success = true, data = result});
         }
 
