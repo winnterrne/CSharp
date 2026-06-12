@@ -6,6 +6,7 @@ using TuneVault.Application.DTOs;
 using TuneVault.Application.UseCases.MediaItem.MediaUploading;
 using TuneVault.Application.UseCases.MediaItem.MediaStreaming;
 using TuneVault.Application.UseCases.Interaction;
+using TuneVault.Application.UseCases;
 
 
 namespace TuneVault.API.Controllers
@@ -144,7 +145,26 @@ namespace TuneVault.API.Controllers
             }
 
             return PhysicalFile(physicalPath, contentType, enableRangeProcessing: true);
-            
+
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Search([FromQuery] SearchMediaQuery query)
+        {
+            var result = await _mediator.Send(query);
+            return Ok(new { success = true, data = result });
+        }
+        // GET: /api/media/all
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllMedia()
+        {
+            var result = await _mediator.Send(new GetAllMediaQuery());
+
+            return Ok(new
+            {
+                success = true,
+                data = result
+            });
         }
     }
 }

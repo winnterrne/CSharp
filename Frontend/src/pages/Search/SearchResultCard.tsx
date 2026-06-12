@@ -1,66 +1,91 @@
-import { useState } from "react";
 import type { Media } from "../../types/media";
 import { usePlayer } from "../../hooks/usePlayer";
-import AddToPlaylistModal from "../../components/playlist/AddToPlaylistModal";
+import AddToPlaylistButton from "../../components/playlist/AddToPlaylistButton";
+import TrackActionMenu from "../../components/common/TrackActionMenu";
+import { useState } from "react";
 
 const SearchResultCard = ({ item }: { item: Media }) => {
   const { playTrack, setQueue } = usePlayer();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [addModalOpen, setAddModalOpen] = useState(false);
 
   return (
-    <>
+    <div
+      onClick={() => {
+        setQueue([item]);
+        playTrack(item);
+      }}
+      style={{
+        background: "#181818",
+        borderRadius: "8px",
+        padding: "10px",
+        cursor: "pointer",
+        display: "grid",
+        gridTemplateColumns: "50px minmax(0,1fr) 40px 40px",
+        alignItems: "center",
+        gap: "12px",
+        position: "relative",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.background = "#242424";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.background = "#181818";
+      }}
+    >
       <div
-        onClick={() => {
-          setQueue([item]);
-          playTrack(item);
-        }}
         style={{
-          background: "#181818",
-          borderRadius: "8px",
-          padding: "10px",
-          cursor: "pointer",
+          width: "50px",
+          height: "50px",
+          borderRadius: "6px",
+          overflow: "hidden",
+          background: "#333",
           display: "flex",
           alignItems: "center",
-          gap: "12px",
-          position: "relative",
+          justifyContent: "center",
+          color: "#b3b3b3",
         }}
       >
-        <img
-          src={item.thumbnailUrl}
-          alt={item.title}
+        {item.thumbnailUrl ? (
+          <img
+            src={item.thumbnailUrl}
+            alt={item.title}
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+            }}
+          />
+        ) : (
+          "♪"
+        )}
+      </div>
+
+      <div style={{ minWidth: 0 }}>
+        <div
           style={{
-            width: "50px",
-            height: "50px",
-            borderRadius: "6px",
-            objectFit: "cover",
-            background: "#333",
+            color: "#fff",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            fontWeight: 700,
           }}
-        />
-
-        <div style={{ minWidth: 0, flex: 1 }}>
-          <div
-            style={{
-              color: "#fff",
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-            }}
-          >
-            {item.title}
-          </div>
-
-          <div
-            style={{
-              color: "#b3b3b3",
-              fontSize: "13px",
-            }}
-          >
-            {item.artist.name}
-          </div>
+        >
+          {item.title}
         </div>
 
-        {/* NEW: nút menu */}
+        <div
+          style={{
+            color: "#b3b3b3",
+            fontSize: "13px",
+          }}
+        >
+          {item.artist?.name ?? "Unknown Artist"}
+        </div>
+      </div>
+
+      <AddToPlaylistButton mediaId={item.id} />
+
+      <div style={{ position: "relative" }}>
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -74,71 +99,20 @@ const SearchResultCard = ({ item }: { item: Media }) => {
             background: "transparent",
             color: "#b3b3b3",
             cursor: "pointer",
-            fontSize: "20px",
+            fontSize: "22px",
           }}
         >
-          ⋮
+          ⋯
         </button>
 
-        {/* NEW: dropdown menu */}
-        {menuOpen && (
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              position: "absolute",
-              right: "10px",
-              top: "48px",
-              width: "190px",
-              background: "#282828",
-              borderRadius: "8px",
-              padding: "6px",
-              zIndex: 20,
-              boxShadow: "0 12px 40px rgba(0,0,0,.45)",
-            }}
-          >
-            <button
-              onClick={() => {
-                setQueue([item]);
-                playTrack(item);
-                setMenuOpen(false);
-              }}
-              style={menuItemStyle}
-            >
-              ▶ Phát ngay
-            </button>
-
-            <button
-              onClick={() => {
-                setMenuOpen(false);
-                setAddModalOpen(true);
-              }}
-              style={menuItemStyle}
-            >
-              ＋ Thêm vào playlist
-            </button>
-          </div>
-        )}
+        <TrackActionMenu
+          track={item}
+          open={menuOpen}
+          onClose={() => setMenuOpen(false)}
+        />
       </div>
-
-      <AddToPlaylistModal
-        open={addModalOpen}
-        media={item}
-        onClose={() => setAddModalOpen(false)}
-      />
-    </>
+    </div>
   );
-};
-
-const menuItemStyle: React.CSSProperties = {
-  width: "100%",
-  padding: "10px",
-  border: "none",
-  borderRadius: "6px",
-  background: "transparent",
-  color: "#fff",
-  cursor: "pointer",
-  textAlign: "left",
-  fontSize: "14px",
 };
 
 export default SearchResultCard;

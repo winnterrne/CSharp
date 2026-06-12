@@ -56,6 +56,24 @@ namespace TuneVault.Infrastructure.Repositories
             return await _db.ExecuteDataAsync(sql, new { ArtistID = artistId});
         }
 
-        
+        public async Task<(IEnumerable<Artist>Artists, int TotalCount)> SearchAsync(string keyword, int skip, int take)
+        {
+            string sql = @"
+                SELECT * FROM Artist 
+                WHERE ArtistName LIKE @keyword AND IsDeleted = 0
+                ORDER BY ArtistName ASC
+                OFFSET @skip ROWS FETCH NEXT @take ROWS ONLY";
+
+            string countSql = @"
+            SELECT COUNT(*) FROM Artist 
+            WHERE ArtistName LIKE @keyword AND IsDeleted = 0";
+
+            var parameters = new { Keyword = $"%{keyword}%", skip, take };
+
+            var artists = await _db.LoadAllDataSingleAsync<Artist>(sql, parameters);
+            var totalCount = await _db.ExecuteScalarAsync<int>(countSql, parameters);
+
+            return (artists, totalCount);
+        }
     }
 }

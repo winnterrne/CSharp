@@ -1,49 +1,114 @@
 import { useCallback, useEffect, useState } from "react";
 import { favoriteApi } from "../api/favoriteApi";
+import type { Media } from "../types/media";
+import { emitFavoriteUpdated } from "../utils/appEvents";
+import { authStore } from "../store/authStore";
 
-const getIdFromFavorite = (item: unknown): string => {
-  const data = item as {
-    mediaItemID?: number;
-    mediaItemId?: number;
-    id?: number;
-    media?: {
-      id?: string;
-      mediaItemID?: number;
-    };
+type FavoriteMediaShape = {
+  mediaItemID?: number;
+  mediaItemId?: number;
+  id?: number;
+  titleName?: string;
+  mediaItemImage?: string;
+};
+
+type FavoriteResponse = {
+  success?: boolean;
+  data?: FavoriteMediaShape[];
+};
+
+let cachedFavoriteIds: string[] = [];
+let cachedFavoriteTracks: Media[] = [];
+
+const listeners = new Set<(ids: string[], tracks: Media[]) => void>();
+
+const getIdFromFavorite = (item: FavoriteMediaShape): string => {
+  return String(item.mediaItemID ?? item.mediaItemId ?? item.id ?? "");
+};
+
+const toMedia = (item: FavoriteMediaShape): Media => {
+  const id = getIdFromFavorite(item);
+
+  return {
+    id,
+    title: item.titleName ?? "Bài hát yêu thích",
+    description: "",
+    type: "audio",
+    status: "published",
+    url: `http://localhost:5081/api/media/${id}/stream`,
+    thumbnailUrl: item.mediaItemImage
+      ? `http://localhost:5081/images/${item.mediaItemImage}`
+      : undefined,
+    duration: 0,
+    artist: {
+      id: 0,
+      name: "Unknown Artist",
+    },
+    createdAt: new Date().toISOString(),
   };
+};
 
-  return String(
-    data.mediaItemID ??
-      data.mediaItemId ??
-      data.id ??
-      data.media?.id ??
-      data.media?.mediaItemID ??
-      ""
+const parseFavorites = (responseData: unknown) => {
+  const body = responseData as FavoriteResponse | FavoriteMediaShape[];
+
+  const rawData = Array.isArray(body)
+    ? body
+    : Array.isArray(body.data)
+      ? body.data
+      : [];
+
+  const validItems = rawData.filter(
+    (item) => getIdFromFavorite(item).length > 0,
+  );
+
+  return {
+    ids: validItems.map(getIdFromFavorite),
+    tracks: validItems.map(toMedia),
+  };
+};
+
+const notifyListeners = () => {
+  listeners.forEach((listener) =>
+    listener(cachedFavoriteIds, cachedFavoriteTracks),
   );
 };
 
 export const useFavorite = () => {
-  const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
+  const [favoriteIds, setFavoriteIds] = useState<string[]>(cachedFavoriteIds);
+  const [favoriteTracks, setFavoriteTracks] =
+    useState<Media[]>(cachedFavoriteTracks);
+
   const [loading, setLoading] = useState(false);
+
+  const syncFavorites = (ids: string[], tracks: Media[]) => {
+    cachedFavoriteIds = ids;
+    cachedFavoriteTracks = tracks;
+
+    setFavoriteIds(ids);
+    setFavoriteTracks(tracks);
+
+    notifyListeners();
+    emitFavoriteUpdated();
+  };
 
   const loadFavorites = useCallback(async () => {
     try {
+      const token = authStore.getState().token;
+
+      if (!token) {
+        syncFavorites([], []);
+        return;
+      }
+
       setLoading(true);
 
       const res = await favoriteApi.getFavorites();
+      const parsed = parseFavorites(res.data);
 
-      const rawData = Array.isArray(res.data)
-        ? res.data
-        : res.data?.data ?? [];
-
-      const ids = rawData
-        .map(getIdFromFavorite)
-        .filter((id: string) => id.length > 0);
-
-      setFavoriteIds(ids);
-    } catch (err) {
-      console.error("LOAD FAVORITES ERROR:", err);
-      setFavoriteIds([]);
+      syncFavorites(parsed.ids, parsed.tracks);
+    } catch (error) {
+      console.error("LOAD FAVORITES ERROR:", error);
+      syncFavorites([], []);
     } finally {
       setLoading(false);
     }
@@ -54,30 +119,47 @@ export const useFavorite = () => {
   };
 
   const toggleFavorite = async (mediaId: string | number) => {
+    const token = authStore.getState().token;
+
+    if (!token) {
+      alert("Bạn cần đăng nhập để thêm bài hát yêu thích");
+      return;
+    }
+
     const id = Number(mediaId);
+
     if (!id) return;
 
-    const existed = isFavorite(id);
-
     try {
-      if (existed) {
+      if (cachedFavoriteIds.includes(String(id))) {
         await favoriteApi.removeFavorite(id);
-        setFavoriteIds((prev) => prev.filter((item) => item !== String(id)));
       } else {
         await favoriteApi.addFavorite(id);
-        setFavoriteIds((prev) => [String(id), ...prev]);
       }
-    } catch (err) {
-      console.error("TOGGLE FAVORITE ERROR:", err);
+
+      await loadFavorites();
+    } catch (error) {
+      console.error("TOGGLE FAVORITE ERROR:", error);
     }
   };
 
   useEffect(() => {
+    const listener = (ids: string[], tracks: Media[]) => {
+      setFavoriteIds(ids);
+      setFavoriteTracks(tracks);
+    };
+
+    listeners.add(listener);
     loadFavorites();
+
+    return () => {
+      listeners.delete(listener);
+    };
   }, [loadFavorites]);
 
   return {
     favoriteIds,
+    favoriteTracks,
     loading,
     isFavorite,
     toggleFavorite,

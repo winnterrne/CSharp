@@ -16,5 +16,6 @@ namespace TuneVault.Domain.Interfaces
         // Thao tác với bảng trung gian PlaylistTrack (Chức năng 6)
         Task<int> AddTrackToPlaylistAsync(int playlistId, int mediaItemId);
         Task<int> RemoveTrackFromPlaylistAsync(int playlistId, int mediaItemId);
+        Task<(IEnumerable<Playlist> Playlists, int TotalCount)> SearchAsync(string keyword, int skip, int take);
     }
 }

@@ -5,7 +5,6 @@ import type { Media } from "../types/media";
 import { STORAGE_KEYS } from "../constant/storage";
 
 interface PlayerStore extends PlayerState {
-  // Actions
   setCurrentTrack: (track: Media | null) => void;
   setQueue: (queue: Media[]) => void;
   setPlaying: (playing: boolean) => void;
@@ -15,9 +14,9 @@ interface PlayerStore extends PlayerState {
   setShuffle: (shuffle: boolean) => void;
   setRepeatMode: (mode: RepeatMode) => void;
   setLoading: (loading: boolean) => void;
-  setDuration: (duration: number) => void; //them moi cho Playeraudio de hien thi thoi luong bai hat
+  setDuration: (duration: number) => void;
 
-  // Playback control helpers
+  playTrack: (track: Media, queue?: Media[]) => void;
   play: () => void;
   pause: () => void;
   togglePlay: () => void;
@@ -27,12 +26,9 @@ interface PlayerStore extends PlayerState {
   toggleShuffle: () => void;
   toggleRepeatMode: () => void;
 
-  // Queue management
   addToQueue: (media: Media) => void;
   removeFromQueue: (mediaId: string) => void;
   clearQueue: () => void;
-
-  // Clear all
   clear: () => void;
 }
 
@@ -50,27 +46,66 @@ export const playerStore = create<PlayerStore>()(
       repeatMode: "off",
       isLoading: false,
 
-      setCurrentTrack: (track) => set({ currentTrack: track }),
+      setCurrentTrack: (track) =>
+        set({
+          currentTrack: track,
+          position: 0,
+        }),
+
       setQueue: (queue) => set({ queue }),
+
       setPlaying: (isPlaying) => set({ isPlaying }),
-      setPosition: (position) => set({ position }),
+
+      setPosition: (position) =>
+        set({
+          position: Math.max(0, position),
+        }),
+
       setVolume: (volume) =>
-        set({ volume: Math.max(0, Math.min(100, volume)) }),
-      setDuration: (duration) => set({ duration }),
+        set({
+          volume: Math.max(0, Math.min(100, volume)),
+        }),
+
       setMuted: (isMuted) => set({ isMuted }),
+
       setShuffle: (isShuffle) => set({ isShuffle }),
+
       setRepeatMode: (repeatMode) => set({ repeatMode }),
+
       setLoading: (isLoading) => set({ isLoading }),
 
+      setDuration: (duration) =>
+        set({
+          duration: Math.max(0, duration),
+        }),
+
+      playTrack: (track, queue) =>
+        set((state) => ({
+          currentTrack: track,
+          queue: queue && queue.length > 0 ? queue : state.queue,
+          isPlaying: true,
+          position: 0,
+        })),
+
       play: () => set({ isPlaying: true }),
+
       pause: () => set({ isPlaying: false }),
-      togglePlay: () => set((state) => ({ isPlaying: !state.isPlaying })),
+
+      togglePlay: () =>
+        set((state) => ({
+          isPlaying: !state.isPlaying,
+        })),
+
       next: () => {
         const { currentTrack, queue, isShuffle, repeatMode } = get();
 
         if (!currentTrack || queue.length === 0) return;
 
-        const currentIdx = queue.findIndex((m) => m.id === currentTrack.id);
+        const currentIdx = queue.findIndex(
+          (m) => m.id === currentTrack.id,
+        );
+
+        if (currentIdx === -1) return;
 
         if (isShuffle) {
           if (queue.length === 1) return;
@@ -83,6 +118,7 @@ export const playerStore = create<PlayerStore>()(
 
           set({
             currentTrack: queue[randomIdx],
+            isPlaying: true,
             position: 0,
           });
 
@@ -92,6 +128,7 @@ export const playerStore = create<PlayerStore>()(
         if (currentIdx < queue.length - 1) {
           set({
             currentTrack: queue[currentIdx + 1],
+            isPlaying: true,
             position: 0,
           });
 
@@ -101,6 +138,7 @@ export const playerStore = create<PlayerStore>()(
         if (repeatMode === "all") {
           set({
             currentTrack: queue[0],
+            isPlaying: true,
             position: 0,
           });
         }
@@ -111,11 +149,16 @@ export const playerStore = create<PlayerStore>()(
 
         if (!currentTrack || queue.length === 0) return;
 
-        const currentIdx = queue.findIndex((m) => m.id === currentTrack.id);
+        const currentIdx = queue.findIndex(
+          (m) => m.id === currentTrack.id,
+        );
+
+        if (currentIdx === -1) return;
 
         if (currentIdx > 0) {
           set({
             currentTrack: queue[currentIdx - 1],
+            isPlaying: true,
             position: 0,
           });
 
@@ -125,29 +168,40 @@ export const playerStore = create<PlayerStore>()(
         if (repeatMode === "all") {
           set({
             currentTrack: queue[queue.length - 1],
+            isPlaying: true,
             position: 0,
           });
         }
       },
-      seek: (position) => set({ position: Math.max(0, position) }),
 
-      toggleShuffle: () => set((state) => ({ isShuffle: !state.isShuffle })),
+      seek: (position) =>
+        set({
+          position: Math.max(0, position),
+        }),
+
+      toggleShuffle: () =>
+        set((state) => ({
+          isShuffle: !state.isShuffle,
+        })),
 
       toggleRepeatMode: () => {
         const { repeatMode } = get();
         const modes: RepeatMode[] = ["off", "one", "all"];
         const currentIdx = modes.indexOf(repeatMode);
         const nextMode = modes[(currentIdx + 1) % modes.length];
-        set({ repeatMode: nextMode });
+
+        set({
+          repeatMode: nextMode,
+        });
       },
 
       addToQueue: (media) =>
         set((state) => {
-          const existed = state.queue.some((item) => item.id === media.id);
+          const existed = state.queue.some(
+            (item) => item.id === media.id,
+          );
 
-          if (existed) {
-            return state;
-          }
+          if (existed) return state;
 
           return {
             queue: [...state.queue, media],
@@ -171,7 +225,6 @@ export const playerStore = create<PlayerStore>()(
           isLoading: false,
         }),
     }),
-
     {
       name: STORAGE_KEYS.VOLUME,
       partialize: (state) => ({

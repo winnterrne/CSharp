@@ -2,10 +2,9 @@ using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TuneVault.Application.DTOs;
+using Microsoft.VisualBasic;
 using TuneVault.Application.UseCases.Interaction;
 using TuneVault.Domain.Interfaces;
-
 
 namespace TuneVault.API.Controllers;
 
@@ -63,14 +62,14 @@ public async Task<IActionResult> GetUserFavorites()
     }
 
 [Authorize]
-[HttpPost("playhistory")]
-public async Task<IActionResult> RecordPlayHistory(CreatePlayHistoryDto dto)
+[HttpPost("playhistory/{mediaItemId}")]
+public async Task<IActionResult> RecordPlayHistory(int mediaItemId)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if(userId == null) return Unauthorized();
         var result = await _mediator.Send(new RecordPlayHistoryCommand(
             userId,
-            dto.MediaItemID
+            mediaItemId
         ));
         if(result > 0) {
             return Ok(new { success = true, message = "Play history recorded"});

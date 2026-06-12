@@ -24,5 +24,15 @@
     "C:\\Users\\ADMIN\\.nuget\\packages\\swashbuckle.aspnetcore.swaggergen\\10.2.1\\swashbuckle.aspnetcore.swaggergen.10.2.1.nupkg.sha512",
     "C:\\Users\\ADMIN\\.nuget\\packages\\swashbuckle.aspnetcore.swaggerui\\10.2.1\\swashbuckle.aspnetcore.swaggerui.10.2.1.nupkg.sha512"
   ],
-  "logs": []
+  "logs": [
+    {
+      "code": "Undefined",
+      "level": "Warning",
+      "message": "Problem reading the cache file C:\\DoAnMonHoc\\CSharp\\Backend\\DockerFile\\TuneVault.Application\\obj\\project.nuget.cache : '<' is an invalid start of a property name. Expected a '\"'. Path: $ | LineNumber: 2 | BytePositionInLine: 0.",
+      "projectPath": "C:\\DoAnMonHoc\\CSharp\\Backend\\DockerFile\\TuneVault.Application\\TuneVault.Application.csproj",
+      "warningLevel": 1,
+      "filePath": "C:\\DoAnMonHoc\\CSharp\\Backend\\DockerFile\\TuneVault.Application\\TuneVault.Application.csproj",
+      "targetGraphs": []
+    }
+  ]
 }

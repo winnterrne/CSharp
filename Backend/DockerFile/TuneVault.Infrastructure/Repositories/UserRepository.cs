@@ -114,5 +114,25 @@ namespace TuneVault.Infrastructure.Repositories
                             WHERE UserID = @UserID";
             return await _db.ExecuteDataAsync(sql, user);
         }
+
+        public async Task<(IEnumerable<AspNetUsers> Users, int TotalCount)> SearchAsync(string keyword, int skip, int take)
+        {
+            string sql = @"
+                SELECT * FROM AspNetUsers 
+                WHERE UserName LIKE @keyword AND IsDeleted = 0
+                ORDER BY UserName ASC
+                OFFSET @skip ROWS FETCH NEXT @take ROWS ONLY";
+
+            string countSql = @"
+            SELECT COUNT(*) FROM AspNetUsers 
+            WHERE UserName LIKE @keyword AND IsDeleted = 0";
+
+            var parameters = new { Keyword = $"%{keyword}%", skip, take };
+
+            var users = await _db.LoadAllDataSingleAsync<AspNetUsers>(sql, parameters);
+            var totalCount = await _db.ExecuteScalarAsync<int>(countSql, parameters);
+
+            return (users, totalCount);
+        }
     }
 }

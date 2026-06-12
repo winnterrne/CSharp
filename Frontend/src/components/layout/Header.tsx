@@ -1,5 +1,12 @@
 import { useState } from "react";
 import type { Media } from "../../types/media";
+<<<<<<< HEAD
+=======
+import { authStore } from "../../store/authStore";
+import { userApi } from "../../api/userApi";
+import type { UserProfile } from "../../types/profile";
+import { useEffect } from "react";
+>>>>>>> origin/vinh-branch
 
 export interface HeaderUser {
   displayName: string;
@@ -46,6 +53,32 @@ const Header = ({
   const avatarBg = user?.avatarColor ?? "#e91429";
   const showDropdown = searchFocused && searchValue.trim().length > 0;
 
+<<<<<<< HEAD
+=======
+  const authUser = authStore((state) => state.user);
+  const logout = authStore((state) => state.logout);
+
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+
+  const [showProfileModal, setShowProfileModal] = useState(false);
+
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        if (!authUser?.id) return;
+
+        const res = await userApi.getProfile(authUser.id);
+
+        setProfile(res.data.data);
+      } catch (error) {
+        console.error("LOAD PROFILE ERROR:", error);
+      }
+    };
+
+    loadProfile();
+  }, [authUser?.id]);
+
+>>>>>>> origin/vinh-branch
   return (
     <header
       style={{
@@ -408,12 +441,82 @@ const Header = ({
               />
               <MenuItem
                 label="Đăng xuất"
+<<<<<<< HEAD
                 onClick={() => setShowAccountMenu(false)}
+=======
+                onClick={() => {
+                  logout();
+                  window.location.reload();
+                }}
+>>>>>>> origin/vinh-branch
               />
             </div>
           )}
         </div>
       </div>
+<<<<<<< HEAD
+=======
+      {showProfileModal && profile && (
+        <div
+          onClick={() => setShowProfileModal(false)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,.7)",
+            zIndex: 99999,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              width: "500px",
+              background: "#181818",
+              borderRadius: "16px",
+              padding: "24px",
+              color: "#fff",
+            }}
+          >
+            <h2
+              style={{
+                marginBottom: "24px",
+              }}
+            >
+              Hồ sơ cá nhân
+            </h2>
+
+            <ProfileRow label="Tên" value={profile.userName} />
+
+            <ProfileRow label="Email" value={profile.email} />
+
+            <ProfileRow label="Vai trò" value={profile.role} />
+
+            <ProfileRow
+              label="Số điện thoại"
+              value={profile.phone ?? "Chưa cập nhật"}
+            />
+
+            <button
+              onClick={() => setShowProfileModal(false)}
+              style={{
+                marginTop: "24px",
+                width: "100%",
+                height: "42px",
+                border: "none",
+                borderRadius: "999px",
+                background: "#1DB954",
+                cursor: "pointer",
+                fontWeight: 700,
+              }}
+            >
+              Đóng
+            </button>
+          </div>
+        </div>
+      )}
+>>>>>>> origin/vinh-branch
     </header>
   );
 };
@@ -478,5 +581,28 @@ const MenuItem = ({
     {label}
   </button>
 );
+<<<<<<< HEAD
+=======
+const ProfileRow = ({ label, value }: { label: string; value: string }) => (
+  <div
+    style={{
+      display: "flex",
+      justifyContent: "space-between",
+      padding: "12px 0",
+      borderBottom: "1px solid #2f2f2f",
+    }}
+  >
+    <span
+      style={{
+        color: "#b3b3b3",
+      }}
+    >
+      {label}
+    </span>
+
+    <span>{value}</span>
+  </div>
+);
+>>>>>>> origin/vinh-branch
 
 export default Header;

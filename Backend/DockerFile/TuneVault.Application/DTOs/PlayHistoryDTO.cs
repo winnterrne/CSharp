@@ -1,12 +1,4 @@
 namespace TuneVault.Application.DTOs;
-public class PlayHistoryDTO
-{
-    public int MediaItemID { get; set; }
-    public string? TitleName { get; set; }
-    public string? MediaItemImage { get; set; }
-    public DateTime PlayedAt { get; set; }
-}
-
 public record PlayHistoryResponeDto (
     int HistoryID,
     string UserID,
@@ -17,4 +9,10 @@ public record PlayHistoryResponeDto (
 public record CreatePlayHistoryDto
 (
     int MediaItemID 
+);
+public record PlayHistoryDto(
+    int MediaItemID,
+    string? TitleName,
+    string? MediaItemImage,
+    DateTime PlayedAt
 );

@@ -16,6 +16,11 @@ public class MediaItemRepository : IMediaItemRepository
         string sql = @"SELECT * FROM MediaItem WHERE MediaItemID = @MediaItemID AND IsDeleted = 0";
         return await _db.LoadDataSingleAsync<MediaItem>(sql, new { MediaItemID = mediaId});
     }
+    public async Task<MediaItem> GetMediaByNameAsync(string mediaitemname)
+    {
+        string sql = @"SELECT * FROM MediaItem WHERE TitleName = @TitleName AND IsDeleted = 0";
+        return await _db.LoadDataSingleAsync<MediaItem>(sql, new { TitleName = mediaitemname});
+    }
     // Query trả về 1 list dữ liệu 
     public async Task<IEnumerable<MediaItem>> GetAllMediaAsync()
     {
@@ -75,11 +80,11 @@ public class MediaItemRepository : IMediaItemRepository
                         TitleName = @TitleName,
                         MediaItemImage = @MediaItemImage,
                         Description = @Description,
-                        MediaItemTag = @MediaItemTag,
+                        MediaTag = @MediaTag,
                         ArtistID = @ArtistID,
                         AlbumID = @AlbumID
                     WHERE MediaItemID = @MediaItemID
-                    AND UserID = @UserID   
+                    AND IsDeleted = 0   
                     ";
         return await _db.ExecuteScalarAsync<int>(sql, media);
     }
@@ -106,6 +111,26 @@ public class MediaItemRepository : IMediaItemRepository
                         JOIN Artist a ON m.ArtistID = a.ArtistID
                         WHERE m.MediaItemID = @MediaItemID AND m.IsDeleted = 0";
         return await _db.LoadDataSingleAsync<MediaItem>(sql, new { MediaItemID = mediaId});
+    }
+
+    public async Task<(IEnumerable<MediaItem> Items, int TotalCount)> SearchAsync(string keyword, int skip, int take)
+    {
+        string dataSql = @"
+            SELECT * FROM MediaItem 
+            WHERE TitleName LIKE @keyword AND IsDeleted = 0
+            ORDER BY TitleName ASC
+            OFFSET @skip ROWS FETCH NEXT @take ROWS ONLY";
+
+        string countSql = @"
+            SELECT COUNT(*) FROM MediaItem 
+            WHERE TitleName LIKE @keyword AND IsDeleted = 0";
+
+        var parameters = new { Keyword = $"%{keyword}%", skip, take };
+
+        var items = await _db.LoadAllDataSingleAsync<MediaItem>(dataSql, parameters);
+        var totalCount = await _db.ExecuteScalarAsync<int>(countSql, parameters);
+
+        return (items, totalCount);
     }
 
 

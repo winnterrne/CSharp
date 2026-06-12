@@ -98,7 +98,12 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
 
     if (!audio || !currentTrack) return;
 
-    audio.src = currentTrack.url;
+    const mediaId = Number(currentTrack.id);
+
+    audio.src =
+      currentTrack.url && currentTrack.url.trim().length > 0 ?
+        currentTrack.url
+      : `http://localhost:5081/api/media/${mediaId}/stream`;
     audio.currentTime = 0;
     audio.load();
 
