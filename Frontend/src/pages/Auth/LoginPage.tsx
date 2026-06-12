@@ -22,6 +22,7 @@ const LoginPage = () => {
     try {
       // BE trả: { success: true, data: { userID, userName, email, role, token } }
       const res = await authApi.login(email, password);
+      console.log("LOGIN RESPONSE", res.data);
       const authData = res.data.data;
 
       login(

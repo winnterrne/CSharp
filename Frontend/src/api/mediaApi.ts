@@ -5,17 +5,18 @@ const API_BASE_URL = "http://localhost:5081/api";
 export const mediaApi = {
   getMyMedia: () => api.get("/media/my-media"),
 
-  // BE hiện chưa có GET /api/media.
-  // Nếu sau này BE thêm endpoint này thì dùng được ngay.
-  getAll: () => api.get("/media"),
+  getAll: () => api.get("/media/all"),
 
   getById: (id: number | string) => api.get(`/media/${id}`),
 
-  // BE hiện chưa thấy endpoint search.
-  // Nếu BE thêm GET /api/media/search?keyword=... thì đổi lại dòng này.
   search: (keyword: string) =>
-    api.get(`/media/search?keyword=${encodeURIComponent(keyword)}`),
+    api.get("/media", {
+      params: {
+        keyWord: keyword,
+        pageNumber: 1,
+        pageSize: 20,
+      },
+    }),
 
-  getStreamUrl: (id: number | string) =>
-    `${API_BASE_URL}/media/${id}/stream`,
-};
+ getStreamUrl: (id: number | string) =>
+  `http://localhost:5081/api/media/${id}/stream?t=${Date.now()}`,};

@@ -2,10 +2,9 @@ using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TuneVault.Application.DTOs;
+using Microsoft.VisualBasic;
 using TuneVault.Application.UseCases.Interaction;
 using TuneVault.Domain.Interfaces;
-
 
 namespace TuneVault.API.Controllers;
 
@@ -19,7 +18,7 @@ public class InteractionController : Controller
         _mediator = mediator;
     }
     
-[Authorize] 
+[Authorize]
 [HttpPost("favorite/{mediaItemId}")]
 public async Task<IActionResult> AddLike(int mediaItemId)
     {
@@ -63,14 +62,14 @@ public async Task<IActionResult> GetUserFavorites()
     }
 
 [Authorize]
-[HttpPost("playhistory")]
-public async Task<IActionResult> RecordPlayHistory(CreatePlayHistoryDto dto)
+[HttpPost("playhistory/{mediaItemId}")]
+public async Task<IActionResult> RecordPlayHistory(int mediaItemId)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if(userId == null) return Unauthorized();
         var result = await _mediator.Send(new RecordPlayHistoryCommand(
             userId,
-            dto.MediaItemID
+            mediaItemId
         ));
         if(result > 0) {
             return Ok(new { success = true, message = "Play history recorded"});
@@ -111,31 +110,5 @@ public async Task<IActionResult> FollowArtist(int artistId)
         var followID = await _mediator.Send(new FollowArtistCommand(userID, artistId));
         if(followID == 0) return Conflict("Đã theo dõi nghệ sĩ này");
         return Ok(new { success = true, message = "Đã theo dõi nghệ sĩ", followID });
-    }
-[Authorize]
-[HttpDelete("unfollow/user/{followingUserId}")]
-public async Task<IActionResult> UnfollowUser(string followingUserId)
-    {
-        var userID = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if(userID == null) return Unauthorized();
-        var result = await _mediator.Send(new UnfollowUserCommand(userID, followingUserId));
-        if(result > 0) {
-            return Ok(new { success = true, message = "Đã hủy theo dõi người dùng"});
-        } else {
-            return BadRequest(new { success = false, message = "Failed to unfollow user"});
-        }
-    }
-[Authorize]
-[HttpDelete("unfollow/artist/{artistId}")]
-public async Task<IActionResult> UnfollowArtist(int artistId)
-    {
-        var userID = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if(userID == null) return Unauthorized();
-        var result = await _mediator.Send(new UnfollowArtistCommand(userID, artistId));
-        if(result > 0) {
-            return Ok(new { success = true, message = "Đã hủy theo dõi nghệ sĩ"});
-        } else {
-            return BadRequest(new { success = false, message = "Failed to unfollow artist"});
-        }
     }
 }

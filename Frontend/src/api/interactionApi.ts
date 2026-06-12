@@ -12,12 +12,6 @@ export const interactionApi = {
   followArtist: (artistId: number) =>
     api.post(`/Interaction/follow/artist/${artistId}`),
 
-  unfollowArtist: (artistId: number) =>
-    api.delete(`/Interaction/unfollow/artist/${artistId}`),
-
   followUser: (followingUserId: string) =>
     api.post(`/Interaction/follow/user/${followingUserId}`),
-
-  unfollowUser: (followingUserId: string) =>
-    api.delete(`/Interaction/unfollow/user/${followingUserId}`),
 };

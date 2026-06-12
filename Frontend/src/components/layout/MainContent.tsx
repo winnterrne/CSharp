@@ -1,12 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
 import type { Media } from "../../types/media";
+import {
+  mapMediaItemDtoToMedia,
+  type MediaItemDto,
+} from "../../types/media";
+import { mediaApi } from "../../api/mediaApi";
+
+import HomeView from "../home/HomeView";
 import AlbumDetailView from "../home/AlbumDetailView";
 import TrackDetailView from "../home/TrackDetailView";
-import HomeView from "../home/HomeView";
 import ArtistDetailView from "../home/ArtistDetailView";
 import AlbumCardLarge from "../home/AlbumCardLarge";
-import { mediaApi } from "../../api/mediaApi";
-import { mapMediaItemDtoToMedia, type MediaItemDto } from "../../types/media";
 
 type ViewMode =
   | "home"
@@ -16,6 +20,16 @@ type ViewMode =
   | "album"
   | "track"
   | "artist";
+
+const uniqueTracks = (tracks: Media[]) => {
+  const map = new Map<string, Media>();
+
+  tracks.forEach((track) => {
+    map.set(String(track.id), track);
+  });
+
+  return Array.from(map.values());
+};
 
 const MainContent = () => {
   const [viewMode, setViewMode] = useState<ViewMode>("home");
@@ -48,14 +62,19 @@ const MainContent = () => {
 
         const res = await mediaApi.getAll();
 
-        const mediaDtos: MediaItemDto[] =
-          Array.isArray(res.data?.data) ? res.data.data : [];
+        const mediaDtos: MediaItemDto[] = Array.isArray(res.data?.data)
+          ? res.data.data
+          : [];
 
-        const mediaList: Media[] = mediaDtos.map(mapMediaItemDtoToMedia);
+        const mediaList = uniqueTracks(mediaDtos.map(mapMediaItemDtoToMedia));
 
-        setRecommended(mediaList);
-        setForYou(mediaList);
-        setUpcoming(mediaList);
+        setRecommended(mediaList.slice(0, 12));
+        setForYou(mediaList.slice(4, 16));
+        setUpcoming(mediaList.slice(8, 20));
+
+        if (mediaList.length === 0) {
+          setError("Chưa có dữ liệu bài hát từ server.");
+        }
       } catch (err) {
         console.error("FETCH HOME DATA ERROR:", err);
 
@@ -72,26 +91,17 @@ const MainContent = () => {
   }, []);
 
   const allTracks = useMemo(() => {
-    const map = new Map<string | number, Media>();
-
-    [...recommended, ...forYou, ...upcoming].forEach((track) => {
-      map.set(track.id, track);
-    });
-
-    return Array.from(map.values());
+    return uniqueTracks([...recommended, ...forYou, ...upcoming]);
   }, [recommended, forYou, upcoming]);
 
-const handleOpenTrack = (track: Media) => {
-  if (!track || !track.id) {
-    console.error("OPEN TRACK ERROR: track không hợp lệ", track);
-    return;
-  }
+  const handleOpenTrack = (track: Media) => {
+    if (!track?.id) return;
 
-  setSelectedTrack(track);
-  setSelectedAlbum(null);
-  setSelectedArtist(null);
-  setViewMode("track");
-};
+    setSelectedTrack(track);
+    setSelectedAlbum(null);
+    setSelectedArtist(null);
+    setViewMode("track");
+  };
 
   const handleOpenAlbum = (cover: Media, tracks: Media[], title?: string) => {
     setSelectedAlbum({
@@ -105,10 +115,7 @@ const handleOpenTrack = (track: Media) => {
     setViewMode("album");
   };
 
-  const handleOpenArtist = (
-    artistName: string,
-    tracks: Media[] = allTracks,
-  ) => {
+  const handleOpenArtist = (artistName: string, tracks: Media[] = allTracks) => {
     const artistTracks = tracks.filter(
       (track) => track.artist?.name === artistName,
     );
@@ -138,16 +145,16 @@ const handleOpenTrack = (track: Media) => {
           tracks: recommended,
         };
 
-      case "upcoming":
-        return {
-          title: "Được đề xuất cho hôm nay",
-          tracks: upcoming,
-        };
-
       case "forYou":
         return {
           title: "Dành cho bạn",
           tracks: forYou,
+        };
+
+      case "upcoming":
+        return {
+          title: "Được đề xuất cho hôm nay",
+          tracks: upcoming,
         };
 
       default:
@@ -170,12 +177,12 @@ const handleOpenTrack = (track: Media) => {
         overflowY: "auto",
         overflowX: "hidden",
         padding: "30px",
-        paddingBottom: "120px",
+        paddingBottom: "160px",
         boxSizing: "border-box",
         background:
-          viewMode === "home" ?
-            "linear-gradient(180deg, #0b3b4a 0%, #121212 320px)"
-          : "linear-gradient(180deg, #16485a 0%, #121212 360px)",
+          viewMode === "home"
+            ? "linear-gradient(180deg, #0b3b4a 0%, #121212 320px)"
+            : "linear-gradient(180deg, #16485a 0%, #121212 360px)",
       }}
     >
       {viewMode !== "home" && (
@@ -222,40 +229,16 @@ const handleOpenTrack = (track: Media) => {
           onOpenTrack={handleOpenTrack}
           onOpenAlbum={handleOpenAlbum}
           onShowAll={(mode) => {
-            switch (mode) {
-              case "recommended":
-                if (recommended.length > 0) {
-                  handleOpenAlbum(
-                    recommended[0],
-                    recommended,
-                    "Đề xuất cho bạn",
-                  );
-                }
-                break;
-
-              case "forYou":
-                if (forYou.length > 0) {
-                  handleOpenAlbum(forYou[0], forYou, "Dành cho bạn");
-                }
-                break;
-
-              case "upcoming":
-                if (upcoming.length > 0) {
-                  handleOpenAlbum(
-                    upcoming[0],
-                    upcoming,
-                    "Được đề xuất cho hôm nay",
-                  );
-                }
-                break;
-            }
+            if (mode === "recommended") setViewMode("recommended");
+            if (mode === "forYou") setViewMode("forYou");
+            if (mode === "upcoming") setViewMode("upcoming");
           }}
         />
       )}
 
       {(viewMode === "recommended" ||
-        viewMode === "upcoming" ||
-        viewMode === "forYou") && (
+        viewMode === "forYou" ||
+        viewMode === "upcoming") && (
         <section>
           <h1
             style={{
@@ -267,9 +250,10 @@ const handleOpenTrack = (track: Media) => {
             {showAllData.title}
           </h1>
 
-          {showAllData.tracks.length === 0 && !loading ?
+          {showAllData.tracks.length === 0 && !loading ? (
             <p style={{ color: "#b3b3b3" }}>Chưa có bài hát nào.</p>
-          : <div
+          ) : (
+            <div
               style={{
                 display: "grid",
                 gridTemplateColumns: "repeat(auto-fill, minmax(170px, 1fr))",
@@ -285,44 +269,27 @@ const handleOpenTrack = (track: Media) => {
                 />
               ))}
             </div>
-          }
+          )}
         </section>
       )}
-{viewMode === "track" && (
-  selectedTrack ? (
-    <TrackDetailView
-      track={selectedTrack}
-      onOpenArtist={handleOpenArtist}
-    />
-  ) : (
-    <div
-      style={{
-        color: "#fff",
-        padding: "40px",
-      }}
-    >
-      Không tìm thấy bài hát.
-      <button
-        onClick={handleBackHome}
-        style={{
-          marginLeft: "12px",
-          padding: "8px 14px",
-          borderRadius: "999px",
-          border: "none",
-          cursor: "pointer",
-          fontWeight: 700,
-        }}
-      >
-        Về trang chủ
-      </button>
-    </div>
-  )
-)}
+
+      {viewMode === "track" &&
+        (selectedTrack ? (
+          <TrackDetailView
+            track={selectedTrack}
+            onOpenArtist={handleOpenArtist}
+          />
+        ) : (
+          <div style={{ color: "#fff", padding: "40px" }}>
+            Không tìm thấy bài hát.
+          </div>
+        ))}
 
       {viewMode === "album" && selectedAlbum && (
         <AlbumDetailView
           cover={selectedAlbum.cover}
           tracks={selectedAlbum.tracks}
+          title={selectedAlbum.title}
           onOpenTrack={handleOpenTrack}
           onOpenArtist={handleOpenArtist}
         />
@@ -332,8 +299,8 @@ const handleOpenTrack = (track: Media) => {
         <ArtistDetailView
           artistName={selectedArtist.name}
           tracks={selectedArtist.tracks}
-          onOpenAlbum={handleOpenAlbum}
           onOpenTrack={handleOpenTrack}
+          onOpenAlbum={handleOpenAlbum}
         />
       )}
     </main>

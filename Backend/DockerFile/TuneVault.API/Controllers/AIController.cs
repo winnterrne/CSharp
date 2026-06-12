@@ -1,6 +1,8 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TuneVault.Application.UseCases.AI;
+using System.Security.Claims;
 
 namespace TuneVault.API.Controllers;
 
@@ -21,4 +23,20 @@ public class AIController : ControllerBase
         var result =await _mediator.Send(new GenerateMediaDescriptionCommand(mediaId));
         return Ok(result);
     }
+
+    [Authorize]
+    [HttpGet("recommendations")] 
+        public async Task<IActionResult> GetRecommendations()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("Không tìm thấy thông tin User trong Token.");
+            }
+            
+            var result = await _mediator.Send(new GetRecommendationsQuery(userId));
+            
+            return Ok(new { success = true, data = result });
+        }
 }

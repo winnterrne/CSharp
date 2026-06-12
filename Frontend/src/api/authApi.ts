@@ -1,12 +1,5 @@
 import api from "./axios";
 
-export interface RegisterPayload {
-  username: string;
-  email: string;
-  password: string;
-  phone?: string;
-}
-
 export const authApi = {
   login: (email: string, password: string) =>
     api.post("/Auth/login", {
@@ -14,7 +7,12 @@ export const authApi = {
       password,
     }),
 
-  register: (data: RegisterPayload) =>
+  register: (data: {
+    username: string;
+    email: string;
+    password: string;
+    phone?: string;
+  }) =>
     api.post("/Auth/register", {
       userName: data.username,
       email: data.email,

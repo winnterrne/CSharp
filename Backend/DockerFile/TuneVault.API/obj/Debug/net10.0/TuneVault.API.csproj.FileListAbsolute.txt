@@ -1,87 +1,174 @@
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\appsettings.Development.json
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\appsettings.json
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\TuneVault.API.staticwebassets.runtime.json
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\TuneVault.API.staticwebassets.endpoints.json
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\TuneVault.API.exe
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\TuneVault.API.deps.json
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\TuneVault.API.runtimeconfig.json
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\TuneVault.API.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\TuneVault.API.pdb
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\BCrypt-Net-Next.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Dapper.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\FluentValidation.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\FluentValidation.DependencyInjectionExtensions.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\MediatR.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\MediatR.Contracts.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.AspNetCore.OpenApi.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.Bcl.Cryptography.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.Data.SqlClient.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.Data.SqlClient.Extensions.Abstractions.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.Data.SqlClient.Internal.Logging.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.EntityFrameworkCore.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.EntityFrameworkCore.Abstractions.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.EntityFrameworkCore.Relational.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.EntityFrameworkCore.SqlServer.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.IdentityModel.Abstractions.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.IdentityModel.JsonWebTokens.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.IdentityModel.Logging.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.IdentityModel.Protocols.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.IdentityModel.Tokens.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.OpenApi.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.SqlServer.Server.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Swashbuckle.AspNetCore.Swagger.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Swashbuckle.AspNetCore.SwaggerGen.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Swashbuckle.AspNetCore.SwaggerUI.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\System.Configuration.ConfigurationManager.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\System.IdentityModel.Tokens.Jwt.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\System.Security.Cryptography.ProtectedData.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\cs\Microsoft.Data.SqlClient.resources.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\de\Microsoft.Data.SqlClient.resources.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\es\Microsoft.Data.SqlClient.resources.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\fr\Microsoft.Data.SqlClient.resources.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\it\Microsoft.Data.SqlClient.resources.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\ja\Microsoft.Data.SqlClient.resources.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\ko\Microsoft.Data.SqlClient.resources.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\pl\Microsoft.Data.SqlClient.resources.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\pt-BR\Microsoft.Data.SqlClient.resources.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\ru\Microsoft.Data.SqlClient.resources.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\tr\Microsoft.Data.SqlClient.resources.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\zh-Hans\Microsoft.Data.SqlClient.resources.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\zh-Hant\Microsoft.Data.SqlClient.resources.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\runtimes\unix\lib\net9.0\Microsoft.Data.SqlClient.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\runtimes\win\lib\net9.0\Microsoft.Data.SqlClient.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\runtimes\win-arm64\native\Microsoft.Data.SqlClient.SNI.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\runtimes\win-x64\native\Microsoft.Data.SqlClient.SNI.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\TuneVault.Application.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\TuneVault.Domain.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\TuneVault.Infrastructure.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\TuneVault.Application.pdb
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\TuneVault.Domain.pdb
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\TuneVault.Infrastructure.pdb
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.csproj.AssemblyReference.cache
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\rpswa.dswa.cache.json
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.AssemblyInfoInputs.cache
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.AssemblyInfo.cs
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.csproj.CoreCompileInputs.cache
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.MvcApplicationPartsAssemblyInfo.cs
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.MvcApplicationPartsAssemblyInfo.cache
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.sourcelink.json
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\rjimswa.dswa.cache.json
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\rjsmrazor.dswa.cache.json
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\rjsmcshtml.dswa.cache.json
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\scopedcss\bundle\TuneVault.API.styles.css
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\staticwebassets.build.json
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\staticwebassets.build.json.cache
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\staticwebassets.development.json
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\staticwebassets.build.endpoints.json
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\swae.build.ex.cache
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVaul.BE12D78A.Up2Date
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\refint\TuneVault.API.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.pdb
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.genruntimeconfig.cache
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\ref\TuneVault.API.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\appsettings.Development.json
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\appsettings.json
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\TuneVault.API.staticwebassets.runtime.json
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\TuneVault.API.staticwebassets.endpoints.json
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\TuneVault.API.exe
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\TuneVault.API.deps.json
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\TuneVault.API.runtimeconfig.json
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\TuneVault.API.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\TuneVault.API.pdb
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\BCrypt-Net-Next.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Dapper.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\FluentValidation.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\FluentValidation.DependencyInjectionExtensions.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\MediatR.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\MediatR.Contracts.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.AspNetCore.OpenApi.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.Bcl.Cryptography.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.Data.SqlClient.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.Data.SqlClient.Extensions.Abstractions.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.Data.SqlClient.Internal.Logging.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.EntityFrameworkCore.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.EntityFrameworkCore.Abstractions.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.EntityFrameworkCore.Relational.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.EntityFrameworkCore.SqlServer.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.IdentityModel.Abstractions.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.IdentityModel.Logging.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.IdentityModel.Protocols.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.IdentityModel.Tokens.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.OpenApi.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.SqlServer.Server.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Swashbuckle.AspNetCore.Swagger.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\System.Configuration.ConfigurationManager.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\System.IdentityModel.Tokens.Jwt.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\System.Security.Cryptography.ProtectedData.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\cs\Microsoft.Data.SqlClient.resources.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\de\Microsoft.Data.SqlClient.resources.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\es\Microsoft.Data.SqlClient.resources.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\fr\Microsoft.Data.SqlClient.resources.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\it\Microsoft.Data.SqlClient.resources.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\ja\Microsoft.Data.SqlClient.resources.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\ko\Microsoft.Data.SqlClient.resources.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\pl\Microsoft.Data.SqlClient.resources.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\pt-BR\Microsoft.Data.SqlClient.resources.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\ru\Microsoft.Data.SqlClient.resources.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\tr\Microsoft.Data.SqlClient.resources.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\zh-Hans\Microsoft.Data.SqlClient.resources.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\zh-Hant\Microsoft.Data.SqlClient.resources.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\runtimes\unix\lib\net9.0\Microsoft.Data.SqlClient.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\runtimes\win\lib\net9.0\Microsoft.Data.SqlClient.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\runtimes\win-arm64\native\Microsoft.Data.SqlClient.SNI.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\runtimes\win-x64\native\Microsoft.Data.SqlClient.SNI.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\TuneVault.Application.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\TuneVault.Domain.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\TuneVault.Infrastructure.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\TuneVault.Application.pdb
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\TuneVault.Domain.pdb
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\TuneVault.Infrastructure.pdb
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.csproj.AssemblyReference.cache
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\rpswa.dswa.cache.json
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.GeneratedMSBuildEditorConfig.editorconfig
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.AssemblyInfoInputs.cache
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.AssemblyInfo.cs
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.csproj.CoreCompileInputs.cache
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.MvcApplicationPartsAssemblyInfo.cs
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.MvcApplicationPartsAssemblyInfo.cache
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.sourcelink.json
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\rjimswa.dswa.cache.json
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\rjsmrazor.dswa.cache.json
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\rjsmcshtml.dswa.cache.json
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\scopedcss\bundle\TuneVault.API.styles.css
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\staticwebassets.build.json
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\staticwebassets.build.json.cache
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\staticwebassets.development.json
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\staticwebassets.build.endpoints.json
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\swae.build.ex.cache
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVaul.BE12D78A.Up2Date
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\refint\TuneVault.API.dll
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.pdb
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.genruntimeconfig.cache
+C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\ref\TuneVault.API.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\refint\TuneVault.API.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.pdb
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\appsettings.Development.json
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\appsettings.json
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\TuneVault.API.staticwebassets.runtime.json
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\TuneVault.API.staticwebassets.endpoints.json
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\TuneVault.API.exe
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\TuneVault.API.deps.json
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\TuneVault.API.runtimeconfig.json
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\TuneVault.API.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\TuneVault.API.pdb
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\BCrypt-Net-Next.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Dapper.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\FluentValidation.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\FluentValidation.DependencyInjectionExtensions.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\MediatR.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\MediatR.Contracts.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.AspNetCore.OpenApi.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.Bcl.Cryptography.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.Data.SqlClient.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.Data.SqlClient.Extensions.Abstractions.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.Data.SqlClient.Internal.Logging.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.EntityFrameworkCore.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.EntityFrameworkCore.Abstractions.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.EntityFrameworkCore.Relational.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.EntityFrameworkCore.SqlServer.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.IdentityModel.Abstractions.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.IdentityModel.JsonWebTokens.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.IdentityModel.Logging.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.IdentityModel.Protocols.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.IdentityModel.Tokens.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.OpenApi.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Microsoft.SqlServer.Server.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Swashbuckle.AspNetCore.Swagger.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\System.Configuration.ConfigurationManager.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\System.IdentityModel.Tokens.Jwt.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\System.Security.Cryptography.ProtectedData.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\cs\Microsoft.Data.SqlClient.resources.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\de\Microsoft.Data.SqlClient.resources.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\es\Microsoft.Data.SqlClient.resources.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\fr\Microsoft.Data.SqlClient.resources.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\it\Microsoft.Data.SqlClient.resources.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\ja\Microsoft.Data.SqlClient.resources.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\ko\Microsoft.Data.SqlClient.resources.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\pl\Microsoft.Data.SqlClient.resources.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\pt-BR\Microsoft.Data.SqlClient.resources.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\ru\Microsoft.Data.SqlClient.resources.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\tr\Microsoft.Data.SqlClient.resources.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\zh-Hans\Microsoft.Data.SqlClient.resources.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\zh-Hant\Microsoft.Data.SqlClient.resources.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\runtimes\unix\lib\net9.0\Microsoft.Data.SqlClient.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\runtimes\win\lib\net9.0\Microsoft.Data.SqlClient.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\runtimes\win-arm64\native\Microsoft.Data.SqlClient.SNI.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\runtimes\win-x64\native\Microsoft.Data.SqlClient.SNI.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\TuneVault.Application.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\TuneVault.Domain.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\TuneVault.Infrastructure.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\TuneVault.Application.pdb
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\TuneVault.Domain.pdb
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\bin\Debug\net10.0\TuneVault.Infrastructure.pdb
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.csproj.AssemblyReference.cache
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\rpswa.dswa.cache.json
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.GeneratedMSBuildEditorConfig.editorconfig
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.AssemblyInfoInputs.cache
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.AssemblyInfo.cs
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.csproj.CoreCompileInputs.cache
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.MvcApplicationPartsAssemblyInfo.cs
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.MvcApplicationPartsAssemblyInfo.cache
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.sourcelink.json
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\rjimswa.dswa.cache.json
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\rjsmrazor.dswa.cache.json
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\rjsmcshtml.dswa.cache.json
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\scopedcss\bundle\TuneVault.API.styles.css
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\staticwebassets.build.json
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\staticwebassets.build.json.cache
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\staticwebassets.development.json
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\staticwebassets.build.endpoints.json
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\swae.build.ex.cache
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVaul.BE12D78A.Up2Date
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\TuneVault.API.genruntimeconfig.cache
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.API\obj\Debug\net10.0\ref\TuneVault.API.dll

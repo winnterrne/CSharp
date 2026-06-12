@@ -28,6 +28,5 @@ public class GetMediaInfoQueryHandler : IRequestHandler<GetMediaInfoQuery, Media
             media.ArtistName
         );
     }
- // sửa lại 
 }
 

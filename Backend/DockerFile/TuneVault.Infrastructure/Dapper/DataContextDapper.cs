@@ -19,7 +19,7 @@ namespace TuneVault.Infrastructure.Dapper
         public async Task<T> LoadDataSingleAsync<T>(string sql, object? parameters = null)
         {
             using var conn = CreateConnection();
-            return await conn.QueryFirstOrDefaultAsync<T>(sql, parameters) ;
+            return await conn.QueryFirstOrDefaultAsync<T>(sql, parameters);
         }
         public async Task<IEnumerable<T>> LoadAllDataSingleAsync<T>(string sql,object? parameters = null)
         {

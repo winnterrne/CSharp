@@ -61,4 +61,24 @@ public class PlaylistRepository : IPlaylistRepository
         return await _db.ExecuteDataAsync(sql, new {PlaylistID = playlistId, MediaItemID = mediaItemID});
     }
 
+    public async Task<(IEnumerable<Playlist> Playlists, int TotalCount)> SearchAsync(string keyword, int skip, int take)
+    {
+        string sql = @"
+            SELECT * FROM Playlist 
+            WHERE PlaylistName LIKE @keyword AND IsPublic = 1 AND IsDeleted = 0
+            ORDER BY PlaylistName ASC
+            OFFSET @skip ROWS FETCH NEXT @take ROWS ONLY";
+
+        string countSql = @"
+            SELECT COUNT(*) FROM Playlist 
+            WHERE PlaylistName LIKE @keyword AND IsDeleted = 0";
+
+        var parameters = new { Keyword = $"%{keyword}%", skip, take };
+
+        var playlists = await _db.LoadAllDataSingleAsync<Playlist>(sql, parameters);
+        var totalCount = await _db.ExecuteScalarAsync<int>(countSql, parameters);
+
+        return (playlists, totalCount);
+    }
+
 }

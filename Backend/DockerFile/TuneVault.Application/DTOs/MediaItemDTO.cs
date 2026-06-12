@@ -61,3 +61,17 @@ public record UpdateMediaRequestDto(
     int? ArtistID,
     int? AlbumID
 );
+
+public record SearchResultDto(
+    IEnumerable<MediaItemDto> Tracks,
+    IEnumerable<ArtistDto> Artists,
+    IEnumerable<PlaylistDto> Playlists,
+    int TotalPages
+);
+
+public record MediaItemRecommendationDto(
+    int MediaItemID,
+    string? TitleName,
+    string? ArtistName,
+    string? FilePath
+);

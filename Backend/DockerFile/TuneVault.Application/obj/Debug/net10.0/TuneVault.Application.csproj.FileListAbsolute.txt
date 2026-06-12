@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.Application\bin\Debug\net10.0\TuneVault.Application.deps.json
 C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.Application\bin\Debug\net10.0\TuneVault.Application.dll
 C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.Application\bin\Debug\net10.0\TuneVault.Application.pdb
@@ -16,6 +14,8 @@ C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.Application\obj\D
 C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.Application\obj\Debug\net10.0\refint\TuneVault.Application.dll
 C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.Application\obj\Debug\net10.0\TuneVault.Application.pdb
 C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.Application\obj\Debug\net10.0\ref\TuneVault.Application.dll
+<<<<<<< HEAD
+=======
 C:\DoAnMonHoc\CSharp\Backend\DockerFile\TuneVault.Application\obj\Debug\net10.0\TuneVault.Application.csproj.AssemblyReference.cache
 C:\DoAnMonHoc\CSharp\Backend\DockerFile\TuneVault.Application\obj\Debug\net10.0\TuneVault.Application.GeneratedMSBuildEditorConfig.editorconfig
 C:\DoAnMonHoc\CSharp\Backend\DockerFile\TuneVault.Application\obj\Debug\net10.0\TuneVault.Application.AssemblyInfoInputs.cache
@@ -33,19 +33,19 @@ C:\DoAnMonHoc\CSharp\Backend\DockerFile\TuneVault.Application\bin\Debug\net10.0\
 C:\DoAnMonHoc\CSharp\Backend\DockerFile\TuneVault.Application\obj\Debug\net10.0\TuneVaul.CD6889CD.Up2Date
 C:\DoAnMonHoc\CSharp\Backend\DockerFile\TuneVault.Application\obj\Debug\net10.0\ref\TuneVault.Application.dll
 >>>>>>> origin/DangKhanh
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Application\bin\Debug\net10.0\TuneVault.Application.deps.json
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Application\bin\Debug\net10.0\TuneVault.Application.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Application\bin\Debug\net10.0\TuneVault.Application.pdb
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Application\bin\Debug\net10.0\TuneVault.Domain.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Application\bin\Debug\net10.0\TuneVault.Domain.pdb
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Application\obj\Debug\net10.0\TuneVault.Application.csproj.AssemblyReference.cache
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Application\obj\Debug\net10.0\TuneVault.Application.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Application\obj\Debug\net10.0\TuneVault.Application.AssemblyInfoInputs.cache
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Application\obj\Debug\net10.0\TuneVault.Application.AssemblyInfo.cs
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Application\obj\Debug\net10.0\TuneVault.Application.csproj.CoreCompileInputs.cache
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Application\obj\Debug\net10.0\TuneVault.Application.sourcelink.json
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Application\obj\Debug\net10.0\TuneVaul.CD6889CD.Up2Date
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Application\obj\Debug\net10.0\TuneVault.Application.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Application\obj\Debug\net10.0\refint\TuneVault.Application.dll
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Application\obj\Debug\net10.0\TuneVault.Application.pdb
-C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Application\obj\Debug\net10.0\ref\TuneVault.Application.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.Application\bin\Debug\net10.0\TuneVault.Application.deps.json
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.Application\bin\Debug\net10.0\TuneVault.Application.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.Application\bin\Debug\net10.0\TuneVault.Application.pdb
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.Application\bin\Debug\net10.0\TuneVault.Domain.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.Application\bin\Debug\net10.0\TuneVault.Domain.pdb
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.Application\obj\Debug\net10.0\TuneVault.Application.csproj.AssemblyReference.cache
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.Application\obj\Debug\net10.0\TuneVault.Application.GeneratedMSBuildEditorConfig.editorconfig
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.Application\obj\Debug\net10.0\TuneVault.Application.AssemblyInfoInputs.cache
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.Application\obj\Debug\net10.0\TuneVault.Application.AssemblyInfo.cs
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.Application\obj\Debug\net10.0\TuneVault.Application.csproj.CoreCompileInputs.cache
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.Application\obj\Debug\net10.0\TuneVault.Application.sourcelink.json
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.Application\obj\Debug\net10.0\TuneVaul.CD6889CD.Up2Date
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.Application\obj\Debug\net10.0\TuneVault.Application.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.Application\obj\Debug\net10.0\refint\TuneVault.Application.dll
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.Application\obj\Debug\net10.0\TuneVault.Application.pdb
+D:\TuneVault\CSharp\Backend\DockerFile\TuneVault.Application\obj\Debug\net10.0\ref\TuneVault.Application.dll
