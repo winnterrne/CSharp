@@ -52,6 +52,4 @@ public class ShareController : ControllerBase
         var result = await _mediator.Send(query);
         return Ok(new {success = true, data = result});
     }
-
-    
 }
