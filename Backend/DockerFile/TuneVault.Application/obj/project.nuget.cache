@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "CgTg4MkFJgc=",
+  "dgSpecHash": "KiMAfRROl6U=",
   "success": true,
-  "projectFilePath": "c:\\Users\\Tran Duc\\Documents\\HOC KI 3 NAM 2\\DOAN\\CSharp\\Backend\\DockerFile\\TuneVault.Application\\TuneVault.Application.csproj",
+  "projectFilePath": "C:\\Users\\Tran Duc\\Documents\\HOC KI 3 NAM 2\\DOAN\\CSharp\\Backend\\DockerFile\\TuneVault.Application\\TuneVault.Application.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Tran Duc\\.nuget\\packages\\bcrypt.net-next\\4.2.0\\bcrypt.net-next.4.2.0.nupkg.sha512",
     "C:\\Users\\Tran Duc\\.nuget\\packages\\fluentvalidation\\12.1.1\\fluentvalidation.12.1.1.nupkg.sha512",

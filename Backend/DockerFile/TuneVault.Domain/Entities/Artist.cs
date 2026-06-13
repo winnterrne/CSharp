@@ -10,6 +10,7 @@ namespace TuneVault.Domain.Entities
     public required int ArtistID{get; set;} //Primary Key
     public string? ArtistName{get; set;}
     public string? ArtistImage{get; set;}
+    public string? Bio {get; set;}
     public DateTime? CreateAt{get; set;}
     public bool? IsDeleted{get; set;}
     }

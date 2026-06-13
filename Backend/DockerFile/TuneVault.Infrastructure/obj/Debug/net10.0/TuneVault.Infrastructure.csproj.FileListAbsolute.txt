@@ -34,3 +34,21 @@ C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.Infrastructure\ob
 C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.Infrastructure\obj\Debug\net10.0\refint\TuneVault.Infrastructure.dll
 C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVault.Infrastructure.pdb
 C:\CODE\C Sharp\DoanCsharp\CSharp\Backend\DockerFile\TuneVault.Infrastructure\obj\Debug\net10.0\ref\TuneVault.Infrastructure.dll
+C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Infrastructure\bin\Debug\net10.0\TuneVault.Infrastructure.deps.json
+C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Infrastructure\bin\Debug\net10.0\TuneVault.Infrastructure.dll
+C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Infrastructure\bin\Debug\net10.0\TuneVault.Infrastructure.pdb
+C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Infrastructure\bin\Debug\net10.0\TuneVault.Application.dll
+C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Infrastructure\bin\Debug\net10.0\TuneVault.Domain.dll
+C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Infrastructure\bin\Debug\net10.0\TuneVault.Application.pdb
+C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Infrastructure\bin\Debug\net10.0\TuneVault.Domain.pdb
+C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVault.Infrastructure.csproj.AssemblyReference.cache
+C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVault.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVault.Infrastructure.AssemblyInfoInputs.cache
+C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVault.Infrastructure.AssemblyInfo.cs
+C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVault.Infrastructure.csproj.CoreCompileInputs.cache
+C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVault.Infrastructure.sourcelink.json
+C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVaul.F19165C9.Up2Date
+C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVault.Infrastructure.dll
+C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Infrastructure\obj\Debug\net10.0\refint\TuneVault.Infrastructure.dll
+C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Infrastructure\obj\Debug\net10.0\TuneVault.Infrastructure.pdb
+C:\Users\Tran Duc\Documents\HOC KI 3 NAM 2\DOAN\CSharp\Backend\DockerFile\TuneVault.Infrastructure\obj\Debug\net10.0\ref\TuneVault.Infrastructure.dll
