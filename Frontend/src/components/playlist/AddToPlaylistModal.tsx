@@ -9,6 +9,18 @@ interface AddToPlaylistModalProps {
   onClose: () => void;
 }
 
+const getPlaylistId = (playlist: Playlist): number => {
+  return playlist.id ?? playlist.playlistID ?? 0;
+};
+
+const getPlaylistName = (playlist: Playlist): string => {
+  return playlist.name ?? playlist.playlistName ?? "Playlist";
+};
+
+const getTrackCount = (playlist: Playlist): number => {
+  return playlist.trackCount ?? playlist.tracks?.length ?? 0;
+};
+
 const AddToPlaylistModal = ({
   open,
   media,
@@ -28,9 +40,12 @@ const AddToPlaylistModal = ({
         setError("");
 
         const res = await playlistApi.getMyPlaylists();
+
         const data: Playlist[] = Array.isArray(res.data)
           ? res.data
           : res.data?.data ?? [];
+
+        console.log("PLAYLIST DATA:", data);
 
         setPlaylists(data);
       } catch (err) {
@@ -48,11 +63,16 @@ const AddToPlaylistModal = ({
 
   const handleAdd = async (playlistId: number) => {
     try {
+      console.log("playlistId =", playlistId);
+      console.log("mediaId =", media.id);
+
       setAddingId(playlistId);
       setError("");
 
-      // BE nhận mediaItemId là int
-      await playlistApi.addTrack(playlistId, Number(media.id));
+      await playlistApi.addTrack(
+        playlistId,
+        Number(media.id),
+      );
 
       onClose();
     } catch (err) {
@@ -152,14 +172,24 @@ const AddToPlaylistModal = ({
               {media.title}
             </div>
 
-            <div style={{ color: "#b3b3b3", fontSize: "13px" }}>
-              {media.artist.name}
+            <div
+              style={{
+                color: "#b3b3b3",
+                fontSize: "13px",
+              }}
+            >
+              {media.artist?.name}
             </div>
           </div>
         </div>
 
         {error && (
-          <p style={{ color: "#ff4d4f", fontSize: "13px" }}>
+          <p
+            style={{
+              color: "#ff4d4f",
+              fontSize: "13px",
+            }}
+          >
             {error}
           </p>
         )}
@@ -171,77 +201,101 @@ const AddToPlaylistModal = ({
           }}
         >
           {loading ? (
-            <p style={{ color: "#b3b3b3" }}>Đang tải playlist...</p>
+            <p style={{ color: "#b3b3b3" }}>
+              Đang tải playlist...
+            </p>
           ) : playlists.length === 0 ? (
-            <p style={{ color: "#b3b3b3" }}>Bạn chưa có playlist nào</p>
+            <p style={{ color: "#b3b3b3" }}>
+              Bạn chưa có playlist nào
+            </p>
           ) : (
-            playlists.map((playlist) => (
-              <button
-                key={playlist.id}
-                onClick={() => handleAdd(playlist.id)}
-                disabled={addingId === playlist.id}
-                style={{
-                  width: "100%",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "12px",
-                  padding: "10px",
-                  border: "none",
-                  borderRadius: "8px",
-                  background: "transparent",
-                  color: "#fff",
-                  cursor: "pointer",
-                  textAlign: "left",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "#3a3a3a";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "transparent";
-                }}
-              >
-                <div
+            playlists.map((playlist) => {
+              const playlistId = getPlaylistId(playlist);
+              const playlistName = getPlaylistName(playlist);
+
+              return (
+                <button
+                  key={playlistId}
+                  onClick={() => handleAdd(playlistId)}
+                  disabled={addingId === playlistId}
                   style={{
-                    width: "44px",
-                    height: "44px",
-                    borderRadius: "6px",
-                    background: "#3a3a3a",
+                    width: "100%",
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "center",
-                    overflow: "hidden",
-                    flexShrink: 0,
+                    gap: "12px",
+                    padding: "10px",
+                    border: "none",
+                    borderRadius: "8px",
+                    background: "transparent",
+                    color: "#fff",
+                    cursor: "pointer",
+                    textAlign: "left",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background =
+                      "#3a3a3a";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background =
+                      "transparent";
                   }}
                 >
-                  {playlist.coverUrl ? (
-                    <img
-                      src={playlist.coverUrl}
-                      alt={playlist.name}
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                      }}
-                    />
-                  ) : (
-                    "🎵"
-                  )}
-                </div>
-
-                <div>
-                  <div style={{ fontWeight: 700 }}>{playlist.name}</div>
-                  <div style={{ color: "#b3b3b3", fontSize: "12px" }}>
-                    {playlist.trackCount} bài hát
+                  <div
+                    style={{
+                      width: "44px",
+                      height: "44px",
+                      borderRadius: "6px",
+                      background: "#3a3a3a",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      overflow: "hidden",
+                      flexShrink: 0,
+                    }}
+                  >
+                    {playlist.coverUrl ? (
+                      <img
+                        src={playlist.coverUrl}
+                        alt={playlistName}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
+                    ) : (
+                      "🎵"
+                    )}
                   </div>
-                </div>
 
-                {addingId === playlist.id && (
-                  <span style={{ marginLeft: "auto", color: "#b3b3b3" }}>
-                    Đang thêm...
-                  </span>
-                )}
-              </button>
-            ))
+                  <div>
+                    <div style={{ fontWeight: 700 }}>
+                      {playlistName}
+                    </div>
+
+                    <div
+                      style={{
+                        color: "#b3b3b3",
+                        fontSize: "12px",
+                      }}
+                    >
+                      {getTrackCount(playlist)} bài hát
+                    </div>
+                  </div>
+
+                  {addingId === playlistId && (
+                    <span
+                      style={{
+                        marginLeft: "auto",
+                        color: "#b3b3b3",
+                      }}
+                    >
+                      Đang thêm...
+                    </span>
+                  )}
+                </button>
+              );
+            })
           )}
         </div>
       </div>

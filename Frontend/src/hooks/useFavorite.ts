@@ -11,6 +11,8 @@ type FavoriteMediaShape = {
   id?: number;
   titleName?: string;
   mediaItemImage?: string;
+  artistName?: string;
+  artistID?: number;
 };
 
 type FavoriteResponse = {
@@ -40,8 +42,8 @@ const toMedia = (item: FavoriteMediaShape): Media => {
     thumbnailUrl: buildImageUrl(item.mediaItemImage),
     duration: 0,
     artist: {
-      id: 0,
-      name: "Unknown Artist",
+      id: item.artistID ?? 0,
+      name: item.artistName ?? "Unknown Artist",
     },
     createdAt: new Date().toISOString(),
   };
