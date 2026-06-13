@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { favoriteApi } from "../api/favoriteApi";
 import type { Media } from "../types/media";
+import { buildImageUrl } from "../types/media";
 import { emitFavoriteUpdated } from "../utils/appEvents";
 import { authStore } from "../store/authStore";
 
@@ -36,9 +37,7 @@ const toMedia = (item: FavoriteMediaShape): Media => {
     type: "audio",
     status: "published",
     url: `http://localhost:5081/api/media/${id}/stream`,
-    thumbnailUrl: item.mediaItemImage
-      ? `http://localhost:5081/images/${item.mediaItemImage}`
-      : undefined,
+    thumbnailUrl: buildImageUrl(item.mediaItemImage),
     duration: 0,
     artist: {
       id: 0,

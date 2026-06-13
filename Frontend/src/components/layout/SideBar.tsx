@@ -86,11 +86,15 @@ const Sidebar = ({
   }, [canUseAuthApi]);
 
   useEffect(() => {
-    fetchPlaylists();
+    // Avoid calling setState synchronously inside effect body by running
+    // the async work in an immediately-invoked async function.
+    (async () => {
+      await fetchPlaylists();
 
-    if (canUseAuthApi) {
-      loadFavorites();
-    }
+      if (canUseAuthApi) {
+        await loadFavorites();
+      }
+    })();
   }, [fetchPlaylists, loadFavorites, canUseAuthApi]);
 
   const filteredPlaylists = playlists.filter((playlist) =>

@@ -49,6 +49,18 @@ export interface MediaItemDto {
   uploadAT?: string;
 }
 
+export const buildImageUrl = (img?: string) => {
+  if (!img) return undefined;
+  // absolute URL
+  if (img.startsWith("http")) return img;
+  // already a rooted path e.g. /media/...
+  if (img.startsWith("/")) return `http://localhost:5081${img}`;
+  // contains folder segments (images or media) — prefix host
+  if (img.includes("/")) return `http://localhost:5081/${img}`;
+  // bare filename from seed data — images live under /media/images/media/
+  return `http://localhost:5081/media/images/media/${img}`;
+};
+
 export const mapMediaItemDtoToMedia = (item: MediaItemDto): Media => {
   const type: MediaType =
     item.mediaItemType?.toLowerCase() === "video" ? "video" : "audio";
@@ -60,10 +72,7 @@ export const mapMediaItemDtoToMedia = (item: MediaItemDto): Media => {
     type,
     status: "published",
     url: `http://localhost:5081/api/media/${item.mediaItemID}/stream`,
-    thumbnailUrl:
-      item.mediaItemImage ?
-        `http://localhost:5081/images/${item.mediaItemImage}`
-      : undefined,
+    thumbnailUrl: buildImageUrl(item.mediaItemImage),
     duration: item.duration ?? 0,
     artist: {
       id: item.artistID ?? 0,
