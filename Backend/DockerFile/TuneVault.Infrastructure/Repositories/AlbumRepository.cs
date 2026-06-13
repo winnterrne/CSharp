@@ -58,7 +58,7 @@ namespace TuneVault.Infrastructure.Repositories
             return await _db.ExecuteDataAsync(sql, new { AlbumID = albumId });
         }
 
-       public async Task<IEnumerable<(Album Album, string ArtistName)>> GetAllAlbumsAsync()
+        public async Task<IEnumerable<(Album Album, string ArtistName)>> GetAllAlbumsAsync()
         {
             string sql = @"
                 SELECT 
