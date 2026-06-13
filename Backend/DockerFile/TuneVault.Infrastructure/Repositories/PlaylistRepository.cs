@@ -81,4 +81,21 @@ public class PlaylistRepository : IPlaylistRepository
         return (playlists, totalCount);
     }
 
+    public async Task<IEnumerable<MediaItem>> GetTracksByPlaylistIdAsync(int playlistId)
+    {
+        string sql = @"
+        SELECT m.*
+        FROM PlaylistTrack pt
+        INNER JOIN MediaItem m
+            ON pt.MediaItemID = m.MediaItemID
+        WHERE pt.PlaylistID = @PlaylistID";
+
+        return await _db.LoadAllDataSingleAsync<MediaItem>(
+            sql,
+            new
+            {
+                PlaylistID = playlistId
+            });
+
+    }
 }

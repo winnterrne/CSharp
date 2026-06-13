@@ -1,5 +1,5 @@
 using MediatR;
-using TuneVault.Application.Dtos;
+using TuneVault.Application.DTOs;
 using TuneVault.Domain.Interfaces;
 
 namespace TuneVault.Application.UseCases.User;
@@ -26,8 +26,7 @@ public class SearchUsersHandler : IRequestHandler<SearchUserQuery, IEnumerable<U
             user.UserImage,
             user.Email,
             user.Role,
-            user.Phone,
-            user.Bio
+            user.Phone
         ));
 
         return userDtos;

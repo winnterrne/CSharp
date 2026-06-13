@@ -54,6 +54,15 @@ public class MediaItemRepository : IMediaItemRepository
                     ORDER BY m.UploadAT DESC";
         return await _db.LoadAllDataSingleAsync<MediaItem> (sql, new {UserID = userID});
     }
+
+    public async Task<IEnumerable<MediaItem>> GetTracksByAlbumIdAsync(int albumId)
+    {
+        string sql = @"
+            SELECT * FROM MediaItem 
+            WHERE AlbumID = @AlbumID AND IsDeleted = 0";
+
+        return await _db.LoadAllDataSingleAsync<MediaItem>(sql, new { AlbumID = albumId });
+    }
     // Query tra ve 1 list ten bai hat 
     public async Task<IEnumerable<MediaItem>> SearchMediaByNameAsync(string keyword)
     {

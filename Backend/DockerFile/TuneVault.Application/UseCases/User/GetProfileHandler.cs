@@ -1,5 +1,5 @@
 using MediatR;
-using TuneVault.Application.Dtos;
+using TuneVault.Application.DTOs;
 using TuneVault.Domain.Interfaces;
 
 namespace TuneVault.Application.UseCases.User;
@@ -25,8 +25,7 @@ public class GetProfileHandler : IRequestHandler<GetProfileQuery, UserProfileDto
             user.UserImage,
             user.Email,
             user.Role,
-            user.Phone,
-            user.Bio
+            user.Phone
         );
     }
 }

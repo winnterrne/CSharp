@@ -1,6 +1,5 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using TuneVault.Application.Dtos;
 using TuneVault.Application.DTOs;
 using TuneVault.Application.UseCases.Auth;
 namespace TuneVault.API.Controllers;

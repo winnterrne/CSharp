@@ -1,5 +1,4 @@
 using MediatR;
-using TuneVault.Application.Dtos;
 using TuneVault.Application.DTOs;
 using TuneVault.Application.Interfaces;
 using TuneVault.Domain.Entities;

@@ -21,6 +21,7 @@ namespace TuneVault.Domain.Entities
         public required int? ArtistID{get; set;} //Foreign Key to Artist
         public string? ArtistName { get; set; }
         public string? AlbumName { get; set; }
+        public string? Bio {get; set;}
         public bool IsDeleted{get; set;} = false;
     }
 }
