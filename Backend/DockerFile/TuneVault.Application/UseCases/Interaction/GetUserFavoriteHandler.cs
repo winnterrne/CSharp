@@ -17,7 +17,9 @@ public class GetUserFavoriteHandler : IRequestHandler<GetUserFavoriteQuery, IEnu
         return result.Select(x => new FavoriteDto (
             x.MediaItemID,
             x.TitleName,
-            x.MediaItemImage
+            x.MediaItemImage,
+            x.ArtistID,
+            x.ArtistName
         ));
     }
 
