@@ -1,12 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
 import type { Media } from "../../types/media";
+import {
+  mapMediaItemDtoToMedia,
+  type MediaItemDto,
+} from "../../types/media";
+import { mediaApi } from "../../api/mediaApi";
+
+import HomeView from "../home/HomeView";
 import AlbumDetailView from "../home/AlbumDetailView";
 import TrackDetailView from "../home/TrackDetailView";
-import HomeView from "../home/HomeView";
 import ArtistDetailView from "../home/ArtistDetailView";
 import AlbumCardLarge from "../home/AlbumCardLarge";
-import { mediaApi } from "../../api/mediaApi";
-import { mapMediaItemDtoToMedia, type MediaItemDto } from "../../types/media";
 
 type ViewMode =
   | "home"
@@ -16,6 +20,16 @@ type ViewMode =
   | "album"
   | "track"
   | "artist";
+
+const uniqueTracks = (tracks: Media[]) => {
+  const map = new Map<string, Media>();
+
+  tracks.forEach((track) => {
+    map.set(String(track.id), track);
+  });
+
+  return Array.from(map.values());
+};
 
 const MainContent = () => {
   const [viewMode, setViewMode] = useState<ViewMode>("home");
@@ -52,11 +66,15 @@ const MainContent = () => {
           ? res.data.data
           : [];
 
-        const mediaList: Media[] = mediaDtos.map(mapMediaItemDtoToMedia);
+        const mediaList = uniqueTracks(mediaDtos.map(mapMediaItemDtoToMedia));
 
-        setRecommended(mediaList);
-        setForYou(mediaList);
-        setUpcoming(mediaList);
+        setRecommended(mediaList.slice(0, 12));
+        setForYou(mediaList.slice(4, 16));
+        setUpcoming(mediaList.slice(8, 20));
+
+        if (mediaList.length === 0) {
+          setError("Chưa có dữ liệu bài hát từ server.");
+        }
       } catch (err) {
         console.error("FETCH HOME DATA ERROR:", err);
 
@@ -73,16 +91,12 @@ const MainContent = () => {
   }, []);
 
   const allTracks = useMemo(() => {
-    const map = new Map<string | number, Media>();
-
-    [...recommended, ...forYou, ...upcoming].forEach((track) => {
-      map.set(track.id, track);
-    });
-
-    return Array.from(map.values());
+    return uniqueTracks([...recommended, ...forYou, ...upcoming]);
   }, [recommended, forYou, upcoming]);
 
   const handleOpenTrack = (track: Media) => {
+    if (!track?.id) return;
+
     setSelectedTrack(track);
     setSelectedAlbum(null);
     setSelectedArtist(null);
@@ -103,7 +117,7 @@ const MainContent = () => {
 
   const handleOpenArtist = (artistName: string, tracks: Media[] = allTracks) => {
     const artistTracks = tracks.filter(
-      (track) => track.artist?.name === artistName
+      (track) => track.artist?.name === artistName,
     );
 
     setSelectedArtist({
@@ -131,16 +145,16 @@ const MainContent = () => {
           tracks: recommended,
         };
 
-      case "upcoming":
-        return {
-          title: "Được đề xuất cho hôm nay",
-          tracks: upcoming,
-        };
-
       case "forYou":
         return {
           title: "Dành cho bạn",
           tracks: forYou,
+        };
+
+      case "upcoming":
+        return {
+          title: "Được đề xuất cho hôm nay",
+          tracks: upcoming,
         };
 
       default:
@@ -163,7 +177,7 @@ const MainContent = () => {
         overflowY: "auto",
         overflowX: "hidden",
         padding: "30px",
-        paddingBottom: "120px",
+        paddingBottom: "160px",
         boxSizing: "border-box",
         background:
           viewMode === "home"
@@ -214,13 +228,17 @@ const MainContent = () => {
           upcoming={upcoming}
           onOpenTrack={handleOpenTrack}
           onOpenAlbum={handleOpenAlbum}
-          onShowAll={(mode) => setViewMode(mode)}
+          onShowAll={(mode) => {
+            if (mode === "recommended") setViewMode("recommended");
+            if (mode === "forYou") setViewMode("forYou");
+            if (mode === "upcoming") setViewMode("upcoming");
+          }}
         />
       )}
 
       {(viewMode === "recommended" ||
-        viewMode === "upcoming" ||
-        viewMode === "forYou") && (
+        viewMode === "forYou" ||
+        viewMode === "upcoming") && (
         <section>
           <h1
             style={{
@@ -255,21 +273,24 @@ const MainContent = () => {
         </section>
       )}
 
+      {viewMode === "track" &&
+        (selectedTrack ? (
+          <TrackDetailView
+            track={selectedTrack}
+            onOpenArtist={handleOpenArtist}
+          />
+        ) : (
+          <div style={{ color: "#fff", padding: "40px" }}>
+            Không tìm thấy bài hát.
+          </div>
+        ))}
+
       {viewMode === "album" && selectedAlbum && (
         <AlbumDetailView
-          cover={{
-            ...selectedAlbum.cover,
-            title: selectedAlbum.title ?? selectedAlbum.cover.title,
-          }}
+          cover={selectedAlbum.cover}
           tracks={selectedAlbum.tracks}
+          title={selectedAlbum.title}
           onOpenTrack={handleOpenTrack}
-          onOpenArtist={handleOpenArtist}
-        />
-      )}
-
-      {viewMode === "track" && selectedTrack && (
-        <TrackDetailView
-          track={selectedTrack}
           onOpenArtist={handleOpenArtist}
         />
       )}
@@ -278,8 +299,8 @@ const MainContent = () => {
         <ArtistDetailView
           artistName={selectedArtist.name}
           tracks={selectedArtist.tracks}
-          onOpenAlbum={handleOpenAlbum}
           onOpenTrack={handleOpenTrack}
+          onOpenAlbum={handleOpenAlbum}
         />
       )}
     </main>

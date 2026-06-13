@@ -60,14 +60,29 @@ builder.Services
     {
         opt.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuer           = true,
-            ValidateAudience         = true,
-            ValidateLifetime         = true,
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer    = builder.Configuration["Jwt:Issuer"],
-            ValidAudience  = builder.Configuration["Jwt:Audience"],
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+        };
+
+        opt.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var token = context.Request.Query["token"];
+
+                if (!string.IsNullOrEmpty(token))
+                {
+                    context.Token = token;
+                }
+
+                return Task.CompletedTask;
+            }
         };
     });
 
@@ -107,8 +122,8 @@ var app = builder.Build();
 // ── Middleware Pipeline ───────────────────────────────
 app.UseSwagger();
 app.UseSwaggerUI();
-app.UseStaticFiles();         // ← serve file mp3/mp4
 app.UseCors("AllowReact");    // ← phải trước Authentication
+app.UseStaticFiles();         // ← serve file mp3/mp4
 app.UseAuthentication();      // ← phải trước Authorization
 app.UseAuthorization();
 app.MapControllers();

@@ -98,7 +98,16 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
 
     if (!audio || !currentTrack) return;
 
-    audio.src = currentTrack.url;
+    const mediaId = Number(currentTrack.id);
+
+    const storage = JSON.parse(
+  localStorage.getItem("user") || "{}"
+);
+
+const token = storage?.state?.token;
+
+audio.src =
+  `http://localhost:5081/api/media/${mediaId}/stream?token=${encodeURIComponent(token ?? "")}`;
     audio.currentTime = 0;
     audio.load();
 
@@ -228,8 +237,6 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
       }}
     >
       {children}
-
-      <audio ref={audioRef} preload="metadata" />
     </PlayerContext.Provider>
   );
 };

@@ -1,8 +1,11 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePlayer } from "../../hooks/usePlayer";
+import { authStore } from "../../store/authStore";
 
 const AudioPlayer = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
+  const [blobUrl, setBlobUrl] = useState<string>("");
+
   const {
     currentTrack,
     isPlaying,
@@ -15,52 +18,89 @@ const AudioPlayer = () => {
     setDuration,
   } = usePlayer();
 
-  // đổi bài hát
-  // FIX: chỉ load lại audio khi đổi bài, không load lại khi play/pause
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio || !currentTrack) return;
 
-    audio.src = currentTrack.url;
-    audio.load();
+    let objectUrl = "";
+    let cancelled = false;
 
-    audio.play().catch(console.error);
+    const loadAudio = async () => {
+      try {
+        const token = authStore.getState().token;
+
+        const res = await fetch(currentTrack.url, {
+          headers: token
+            ? {
+                Authorization: `Bearer ${token}`,
+              }
+            : {},
+        });
+
+        if (!res.ok) {
+          throw new Error(`Stream lỗi: ${res.status}`);
+        }
+
+        const blob = await res.blob();
+        objectUrl = URL.createObjectURL(blob);
+
+        if (cancelled) {
+          URL.revokeObjectURL(objectUrl);
+          return;
+        }
+
+        setBlobUrl(objectUrl);
+        audio.src = objectUrl;
+        audio.load();
+
+        if (isPlaying) {
+          await audio.play();
+        }
+      } catch (error) {
+        console.error("AUDIO LOAD ERROR:", error);
+      }
+    };
+
+    loadAudio();
+
+    return () => {
+      cancelled = true;
+
+      if (objectUrl) {
+        URL.revokeObjectURL(objectUrl);
+      }
+    };
   }, [currentTrack]);
 
-  // play / pause
   useEffect(() => {
     const audio = audioRef.current;
-
-    if (!audio) return;
+    if (!audio || !blobUrl) return;
 
     if (isPlaying) {
-      audio.play().catch(console.error);
+      audio.play().catch((error) => {
+        console.error("AUDIO PLAY ERROR:", error);
+      });
     } else {
       audio.pause();
     }
-  }, [isPlaying]);
-  // volume
+  }, [isPlaying, blobUrl]);
+
   useEffect(() => {
     const audio = audioRef.current;
-
     if (!audio) return;
 
     audio.volume = volume / 100;
   }, [volume]);
 
-  // mute
   useEffect(() => {
     const audio = audioRef.current;
-
     if (!audio) return;
 
     audio.muted = isMuted;
   }, [isMuted]);
 
-  // seek
   useEffect(() => {
     const audio = audioRef.current;
-
     if (!audio) return;
 
     if (Math.abs(audio.currentTime - position) > 1) {
@@ -78,16 +118,12 @@ const AudioPlayer = () => {
       onTimeUpdate={(e) => {
         seek(e.currentTarget.currentTime);
       }}
-      // NEW: Repeat One
       onEnded={() => {
-        if (repeatMode === "one") {
-          const audio = audioRef.current;
+        const audio = audioRef.current;
 
-          if (!audio) return;
-
+        if (repeatMode === "one" && audio) {
           audio.currentTime = 0;
-          audio.play();
-
+          audio.play().catch(console.error);
           return;
         }
 

@@ -1,8 +1,47 @@
-import { useState, useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDebounce } from "./useDebounce";
 import { mediaApi } from "../api/mediaApi";
 import { mediaStore } from "../store/mediaStore";
-import type { Media } from "../types/media";
+import type { Media, MediaItemDto } from "../types/media";
+import { mapMediaItemDtoToMedia } from "../types/media";
+
+type MediaListResponse = {
+  success?: boolean;
+  data?: MediaItemDto[];
+};
+
+const normalize = (value: string) => {
+  return value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+};
+
+const getMediaListFromResponse = (responseData: unknown): Media[] => {
+  const body = responseData as MediaListResponse | MediaItemDto[];
+
+  const rawData = Array.isArray(body)
+    ? body
+    : Array.isArray(body.data)
+      ? body.data
+      : [];
+
+  return rawData.map(mapMediaItemDtoToMedia);
+};
+
+const filterMedia = (items: Media[], query: string) => {
+  const key = normalize(query.trim());
+
+  if (!key) return [];
+
+  return items.filter((item) => {
+    const title = normalize(item.title ?? "");
+    const artist = normalize(item.artist?.name ?? "");
+    const genre = normalize(item.genre ?? "");
+
+    return title.includes(key) || artist.includes(key) || genre.includes(key);
+  });
+};
 
 export const useSearch = () => {
   const [query, setQuery] = useState("");
@@ -12,27 +51,21 @@ export const useSearch = () => {
   const isLoading = mediaStore((state) => state.isLoading);
   const error = mediaStore((state) => state.error);
 
-  // Auto-search khi debouncedQuery thay đổi
-  useEffect(() => {
-    if (!debouncedQuery.trim()) {
+  const runSearch = useCallback(async (searchQuery: string) => {
+    if (!searchQuery.trim()) {
       mediaStore.getState().setSearchResults([], "");
       return;
     }
-    runSearch(debouncedQuery);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedQuery]);
-
-  const runSearch = useCallback(async (searchQuery: string) => {
-    if (!searchQuery.trim()) return;
 
     mediaStore.getState().setLoading(true);
     mediaStore.getState().setError(null);
 
     try {
-      const res = await mediaApi.getSearch(searchQuery);
-      const results: Media[] = Array.isArray(res.data)
-        ? res.data
-        : res.data?.items ?? [];
+      const res = await mediaApi.getAll();
+
+      const allMedia = getMediaListFromResponse(res.data);
+      const results = filterMedia(allMedia, searchQuery);
+
       mediaStore.getState().setSearchResults(results, searchQuery);
     } catch (err) {
       mediaStore
@@ -43,6 +76,15 @@ export const useSearch = () => {
       mediaStore.getState().setLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    if (!debouncedQuery.trim()) {
+      mediaStore.getState().setSearchResults([], "");
+      return;
+    }
+
+    runSearch(debouncedQuery);
+  }, [debouncedQuery, runSearch]);
 
   const search = useCallback(
     (searchQuery: string) => {

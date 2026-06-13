@@ -8,6 +8,7 @@ using TuneVault.Application.DTOs;
 using TuneVault.Domain.Interfaces;
 using TuneVault.Domain.Entities;
 
+
 namespace TuneVault.Application.UseCases;
 
 public class GetRecommendationsQueryHandler : IRequestHandler<GetRecommendationsQuery, List<MediaItemRecommendationDto>>

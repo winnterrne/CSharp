@@ -3306,19 +3306,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\NHAN\\.nuget\\packages\\": {}
+    "C:\\Users\\ADMIN\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\DockerFile\\TuneVault.Infrastructure\\TuneVault.Infrastructure.csproj",
+      "projectUniqueName": "C:\\DoAnMonHoc\\CSharp\\Backend\\DockerFile\\TuneVault.Infrastructure\\TuneVault.Infrastructure.csproj",
       "projectName": "TuneVault.Infrastructure",
-      "projectPath": "C:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\DockerFile\\TuneVault.Infrastructure\\TuneVault.Infrastructure.csproj",
-      "packagesPath": "C:\\Users\\NHAN\\.nuget\\packages\\",
-      "outputPath": "C:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\DockerFile\\TuneVault.Infrastructure\\obj\\",
+      "projectPath": "C:\\DoAnMonHoc\\CSharp\\Backend\\DockerFile\\TuneVault.Infrastructure\\TuneVault.Infrastructure.csproj",
+      "packagesPath": "C:\\Users\\ADMIN\\.nuget\\packages\\",
+      "outputPath": "C:\\DoAnMonHoc\\CSharp\\Backend\\DockerFile\\TuneVault.Infrastructure\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\NHAN\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\ADMIN\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net10.0"
@@ -3330,11 +3330,11 @@
         "net10.0": {
           "targetAlias": "net10.0",
           "projectReferences": {
-            "C:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\DockerFile\\TuneVault.Application\\TuneVault.Application.csproj": {
-              "projectPath": "C:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\DockerFile\\TuneVault.Application\\TuneVault.Application.csproj"
+            "C:\\DoAnMonHoc\\CSharp\\Backend\\DockerFile\\TuneVault.Application\\TuneVault.Application.csproj": {
+              "projectPath": "C:\\DoAnMonHoc\\CSharp\\Backend\\DockerFile\\TuneVault.Application\\TuneVault.Application.csproj"
             },
-            "C:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\DockerFile\\TuneVault.Domain\\TuneVault.Domain.csproj": {
-              "projectPath": "C:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\DockerFile\\TuneVault.Domain\\TuneVault.Domain.csproj"
+            "C:\\DoAnMonHoc\\CSharp\\Backend\\DockerFile\\TuneVault.Domain\\TuneVault.Domain.csproj": {
+              "projectPath": "C:\\DoAnMonHoc\\CSharp\\Backend\\DockerFile\\TuneVault.Domain\\TuneVault.Domain.csproj"
             }
           }
         }
@@ -3396,7 +3396,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.201/PortableRuntimeIdentifierGraph.json",
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.204/PortableRuntimeIdentifierGraph.json",
         "packagesToPrune": {
           "Microsoft.CSharp": "(,4.7.32767]",
           "Microsoft.VisualBasic": "(,10.4.32767]",
@@ -3673,5 +3673,13 @@
         }
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "Undefined",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Problem reading the cache file C:\\DoAnMonHoc\\CSharp\\Backend\\DockerFile\\TuneVault.Infrastructure\\obj\\project.nuget.cache : '<' is an invalid start of a property name. Expected a '\"'. Path: $ | LineNumber: 2 | BytePositionInLine: 0."
+    }
+  ]
 }

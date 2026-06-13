@@ -13,11 +13,10 @@ export const authApi = {
     password: string;
     phone?: string;
   }) =>
-    api.post("/auth/register", data),
-
-  refreshToken: () =>
-    api.post("/auth/refresh-token"),
-
-  logout: () =>
-    api.post("/auth/logout"),
+    api.post("/Auth/register", {
+      userName: data.username,
+      email: data.email,
+      password: data.password,
+      phone: data.phone,
+    }),
 };

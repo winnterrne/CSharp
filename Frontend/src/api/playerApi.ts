@@ -1,23 +1,12 @@
-import api from "./axios";
+import { interactionApi } from "./interactionApi";
+import { mediaApi } from "./mediaApi";
 
 export const playerApi = {
-  getCurrentTrack: () => api.get("/player/current"),
+  getStreamUrl: mediaApi.getStreamUrl,
 
-  getQueue: () => api.get("/player/queue"),
+  saveHistory: (mediaItemId: number) =>
+    interactionApi.recordPlayHistory(mediaItemId),
 
-  getHistory: () => api.get("/player/history"),
-
-  getRecentlyPlayed: () => api.get("/player/recent"),
-
-  saveHistory: (trackId: string) =>
-    api.post("/player/history", {
-      trackId,
-    }),
-
-  addToQueue: (trackId: string) =>
-    api.post("/player/queue", {
-      trackId,
-    }),
-
-  removeFromQueue: (trackId: string) => api.delete(`/player/queue/${trackId}`),
+  getRecentlyPlayed: (limit = 10) =>
+    interactionApi.getPlayHistory(limit),
 };

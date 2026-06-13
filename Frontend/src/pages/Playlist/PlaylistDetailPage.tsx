@@ -1,10 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { playlistApi } from "../../api/playlistApi";
-import type { Playlist, PlaylistTrack, PlaylistDetailDto } from "../../types/playlist";
+import type {
+  Playlist,
+  PlaylistTrack,
+  PlaylistDetailDto,
+} from "../../types/playlist";
 import { mapPlaylistDetailDtoToPlaylist } from "../../types/playlist";
 import type { Media } from "../../types/media";
 import { usePlayer } from "../../hooks/usePlayer";
+import { useFavorite } from "../../hooks/useFavorite";
+import TrackActionMenu from "../../components/common/TrackActionMenu";
 
 const formatDuration = (seconds?: number) => {
   if (!seconds || Number.isNaN(seconds)) return "0:00";
@@ -40,19 +46,17 @@ const PlaylistDetailPage = () => {
   const mediaTracks = useMemo<Media[]>(() => {
     return playlistTracks.map((item) => item.media).filter(Boolean);
   }, [playlistTracks]);
-  // NEW: tổng thời lượng playlist
+
   const totalDuration = useMemo(() => {
     const totalSeconds = mediaTracks.reduce(
       (sum, track) => sum + (track.duration ?? 0),
-      0,
+      0
     );
 
     const hours = Math.floor(totalSeconds / 3600);
     const mins = Math.floor((totalSeconds % 3600) / 60);
 
-    if (hours > 0) {
-      return `${hours} giờ ${mins} phút`;
-    }
+    if (hours > 0) return `${hours} giờ ${mins} phút`;
 
     return `${mins} phút`;
   }, [mediaTracks]);
@@ -87,58 +91,21 @@ const PlaylistDetailPage = () => {
     playTrack(mediaTracks[0]);
   };
 
-  const handlePlayTrack = (playlistTrack: PlaylistTrack) => {
-    if (!playlistTrack.media) return;
-
+  const handlePlayTrack = (track: Media) => {
     setQueue(mediaTracks);
-    playTrack(playlistTrack.media);
+    playTrack(track);
   };
 
   if (!id) {
-    return (
-      <div
-        style={{
-          height: "100%",
-          background: "#121212",
-          color: "#ff4d4f",
-          padding: "24px",
-          boxSizing: "border-box",
-        }}
-      >
-        Thiếu id playlist
-      </div>
-    );
+    return <StatusPage text="Thiếu id playlist" danger />;
   }
+
   if (loading) {
-    return (
-      <div
-        style={{
-          height: "100%",
-          background: "#121212",
-          color: "#fff",
-          padding: "24px",
-          boxSizing: "border-box",
-        }}
-      >
-        Đang tải playlist...
-      </div>
-    );
+    return <StatusPage text="Đang tải playlist..." />;
   }
 
   if (error || !playlist) {
-    return (
-      <div
-        style={{
-          height: "100%",
-          background: "#121212",
-          color: "#ff4d4f",
-          padding: "24px",
-          boxSizing: "border-box",
-        }}
-      >
-        {error || "Không tìm thấy playlist"}
-      </div>
-    );
+    return <StatusPage text={error || "Không tìm thấy playlist"} danger />;
   }
 
   return (
@@ -152,30 +119,16 @@ const PlaylistDetailPage = () => {
         boxSizing: "border-box",
       }}
     >
-      {/* HEADER PLAYLIST */}
       <section
         style={{
           display: "flex",
           gap: "24px",
           padding: "32px",
           alignItems: "flex-end",
-          background: "linear-gradient(180deg, #333 0%, #121212 100%)",
+          background:
+            "linear-gradient(180deg, rgba(140, 70, 130, .95) 0%, #121212 100%)",
         }}
       >
-        <button
-          style={{
-            border: "1px solid #555",
-            background: "transparent",
-            color: "#fff",
-            borderRadius: "999px",
-            padding: "10px 18px",
-            cursor: "pointer",
-            fontWeight: 600,
-          }}
-        >
-          + Thêm bài hát
-        </button>
-        {/* COVER */}
         <div
           style={{
             width: "220px",
@@ -187,11 +140,12 @@ const PlaylistDetailPage = () => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: "64px",
+            color: "#b3b3b3",
+            fontSize: "72px",
             boxShadow: "0 16px 40px rgba(0,0,0,.45)",
           }}
         >
-          {playlist.coverUrl ?
+          {playlist.coverUrl ? (
             <img
               src={playlist.coverUrl}
               alt={playlist.name || playlist.playlistName}
@@ -201,10 +155,11 @@ const PlaylistDetailPage = () => {
                 objectFit: "cover",
               }}
             />
-          : "🎵"}
+          ) : (
+            "♪"
+          )}
         </div>
 
-        {/* INFO */}
         <div style={{ minWidth: 0 }}>
           <div
             style={{
@@ -214,7 +169,7 @@ const PlaylistDetailPage = () => {
               marginBottom: "8px",
             }}
           >
-            Playlist
+            Danh sách phát công khai
           </div>
 
           <h1
@@ -232,7 +187,7 @@ const PlaylistDetailPage = () => {
           {playlist.description && (
             <p
               style={{
-                color: "#b3b3b3",
+                color: "#d7d7d7",
                 marginBottom: "10px",
                 maxWidth: "680px",
               }}
@@ -243,26 +198,23 @@ const PlaylistDetailPage = () => {
 
           <div
             style={{
-              color: "#b3b3b3",
+              color: "#d7d7d7",
               fontSize: "14px",
             }}
           >
-            <strong style={{ color: "#fff" }}>
-              {playlist.owner?.username ?? "Người dùng"}
-            </strong>{" "}
-            • {playlist.trackCount ?? playlistTracks.length} bài hát •{" "}
+            <strong style={{ color: "#fff" }}>TuneVault</strong> •{" "}
+            {playlist.trackCount ?? playlistTracks.length} bài hát •{" "}
             {totalDuration}
           </div>
         </div>
       </section>
 
-      {/* ACTION BAR */}
       <section
         style={{
           padding: "24px 32px",
           display: "flex",
           alignItems: "center",
-          gap: "16px",
+          gap: "18px",
         }}
       >
         <button
@@ -270,69 +222,87 @@ const PlaylistDetailPage = () => {
           disabled={mediaTracks.length === 0}
           title="Phát playlist"
           style={{
-            width: "56px",
-            height: "56px",
+            width: "60px",
+            height: "60px",
             borderRadius: "50%",
             border: "none",
             background: mediaTracks.length === 0 ? "#3a3a3a" : "#1DB954",
             color: "#000",
             cursor: mediaTracks.length === 0 ? "not-allowed" : "pointer",
             fontSize: "22px",
-            fontWeight: 800,
+            fontWeight: 900,
             boxShadow: "0 8px 24px rgba(0,0,0,.35)",
           }}
         >
           ▶
         </button>
 
-        <span
+        <button
+          title="Phát ngẫu nhiên"
           style={{
+            border: "none",
+            background: "transparent",
             color: "#b3b3b3",
-            fontSize: "14px",
+            cursor: "pointer",
+            fontSize: "30px",
           }}
         >
-          Double click vào bài hát để phát
-        </span>
+          ⇄
+        </button>
+
+        <button
+          title="Thêm vào thư viện"
+          style={{
+            width: "34px",
+            height: "34px",
+            borderRadius: "50%",
+            border: "2px solid #b3b3b3",
+            background: "transparent",
+            color: "#b3b3b3",
+            cursor: "pointer",
+            fontSize: "24px",
+          }}
+        >
+          +
+        </button>
+
+        <button
+          title="Tải xuống"
+          style={{
+            border: "none",
+            background: "transparent",
+            color: "#b3b3b3",
+            cursor: "pointer",
+            fontSize: "30px",
+          }}
+        >
+          ↓
+        </button>
+
+        <button
+          title="Tùy chọn playlist"
+          style={{
+            border: "none",
+            background: "transparent",
+            color: "#b3b3b3",
+            cursor: "pointer",
+            fontSize: "30px",
+          }}
+        >
+          ⋯
+        </button>
       </section>
 
-      {/* TRACK LIST */}
       <section style={{ padding: "0 32px 32px" }}>
-        {playlistTracks.length === 0 ?
-          <div
-            style={{
-              color: "#b3b3b3",
-              padding: "24px 0",
-            }}
-          >
-            <div
-              style={{
-                textAlign: "center",
-                padding: "80px 20px",
-              }}
-            >
-              <div
-                style={{
-                  fontSize: "72px",
-                  marginBottom: "20px",
-                }}
-              >
-                🎵
-              </div>
-
-              <h2 style={{ color: "#fff" }}>Playlist trống</h2>
-
-              <p style={{ color: "#b3b3b3" }}>
-                Hãy thêm bài hát vào playlist của bạn.
-              </p>
-            </div>{" "}
-          </div>
-        : <div>
-            {/* TABLE HEADER */}
+        {playlistTracks.length === 0 ? (
+          <EmptyPlaylist />
+        ) : (
+          <>
             <div
               style={{
                 display: "grid",
                 gridTemplateColumns:
-                  "40px minmax(0, 1.6fr) minmax(120px, 1fr) 90px",
+                  "40px minmax(0, 1.6fr) 48px minmax(120px, 1fr) 110px",
                 gap: "12px",
                 color: "#b3b3b3",
                 fontSize: "13px",
@@ -343,21 +313,22 @@ const PlaylistDetailPage = () => {
             >
               <div>#</div>
               <div>Tiêu đề</div>
+              <div></div>
               <div>Nghệ sĩ</div>
               <div style={{ textAlign: "right" }}>Thời lượng</div>
             </div>
 
-            {/* TABLE BODY */}
             {playlistTracks.map((item, index) => (
               <PlaylistTrackRow
                 key={item.id}
                 item={item}
                 index={index}
-                onPlay={() => handlePlayTrack(item)}
+                tracks={mediaTracks}
+                onPlay={() => handlePlayTrack(item.media)}
               />
             ))}
-          </div>
-        }
+          </>
+        )}
       </section>
     </main>
   );
@@ -366,15 +337,23 @@ const PlaylistDetailPage = () => {
 const PlaylistTrackRow = ({
   item,
   index,
+  tracks,
   onPlay,
 }: {
   item: PlaylistTrack;
   index: number;
+  tracks: Media[];
   onPlay: () => void;
 }) => {
   const [hovered, setHovered] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const { playTrack, setQueue } = usePlayer();
+  const { isFavorite, toggleFavorite } = useFavorite();
 
   const media = item.media;
+  const liked = isFavorite(media.id);
+  const artistName = media.artist?.name ?? "Unknown Artist";
 
   return (
     <div
@@ -383,20 +362,39 @@ const PlaylistTrackRow = ({
       onMouseLeave={() => setHovered(false)}
       style={{
         display: "grid",
-        gridTemplateColumns: "40px minmax(0, 1.6fr) minmax(120px, 1fr) 90px",
+        gridTemplateColumns:
+          "40px minmax(0, 1.6fr) 48px minmax(120px, 1fr) 110px",
         gap: "12px",
         alignItems: "center",
         height: "64px",
         padding: "0 8px",
         borderRadius: "8px",
-        background: hovered ? "#1a1a1a" : "transparent",
+        background: hovered ? "#555" : "transparent",
         cursor: "pointer",
+        position: "relative",
       }}
     >
       <div style={{ color: "#b3b3b3", fontSize: "14px" }}>
-        {hovered ?
-          <span style={{ color: "#fff" }}>▶</span>
-        : index + 1}{" "}
+        {hovered ? (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setQueue(tracks);
+              playTrack(media);
+            }}
+            style={{
+              border: "none",
+              background: "transparent",
+              color: "#fff",
+              cursor: "pointer",
+              fontSize: "16px",
+            }}
+          >
+            ▶
+          </button>
+        ) : (
+          index + 1
+        )}
       </div>
 
       <div
@@ -415,12 +413,13 @@ const PlaylistTrackRow = ({
             background: "#282828",
             overflow: "hidden",
             flexShrink: 0,
+            color: "#b3b3b3",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
           }}
         >
-          {media.thumbnailUrl ?
+          {media.thumbnailUrl ? (
             <img
               src={media.thumbnailUrl}
               alt={media.title}
@@ -430,7 +429,9 @@ const PlaylistTrackRow = ({
                 objectFit: "cover",
               }}
             />
-          : "🎵"}
+          ) : (
+            "♪"
+          )}
         </div>
 
         <div style={{ minWidth: 0 }}>
@@ -438,7 +439,7 @@ const PlaylistTrackRow = ({
             style={{
               color: "#fff",
               fontSize: "14px",
-              fontWeight: 600,
+              fontWeight: 700,
               whiteSpace: "nowrap",
               overflow: "hidden",
               textOverflow: "ellipsis",
@@ -449,14 +450,34 @@ const PlaylistTrackRow = ({
 
           <div
             style={{
-              color: "#b3b3b3",
+              color: "#d0d0d0",
               fontSize: "12px",
               marginTop: "3px",
             }}
           >
-            {media.type}
+            {artistName}
           </div>
         </div>
+      </div>
+
+      <div>
+        {hovered && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleFavorite(media.id);
+            }}
+            style={{
+              border: "none",
+              background: "transparent",
+              color: liked ? "#1DB954" : "#fff",
+              cursor: "pointer",
+              fontSize: "20px",
+            }}
+          >
+            {liked ? "♥" : "+"}
+          </button>
+        )}
       </div>
 
       <div
@@ -468,7 +489,7 @@ const PlaylistTrackRow = ({
           textOverflow: "ellipsis",
         }}
       >
-        {media.artist?.name ?? "Unknown Artist"}
+        {artistName}
       </div>
 
       <div
@@ -476,12 +497,69 @@ const PlaylistTrackRow = ({
           color: "#b3b3b3",
           fontSize: "14px",
           textAlign: "right",
+          display: "flex",
+          justifyContent: "flex-end",
+          alignItems: "center",
+          gap: "12px",
+          position: "relative",
         }}
       >
-        {formatDuration(media.duration)}
+        <span>{formatDuration(media.duration)}</span>
+
+        {hovered && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setMenuOpen((prev) => !prev);
+            }}
+            style={{
+              border: "none",
+              background: "transparent",
+              color: "#fff",
+              cursor: "pointer",
+              fontSize: "24px",
+            }}
+          >
+            ⋯
+          </button>
+        )}
+
+        <TrackActionMenu
+          track={media}
+          open={menuOpen}
+          onClose={() => setMenuOpen(false)}
+        />
       </div>
     </div>
   );
 };
+
+const StatusPage = ({ text, danger }: { text: string; danger?: boolean }) => (
+  <div
+    style={{
+      height: "100%",
+      background: "#121212",
+      color: danger ? "#ff4d4f" : "#fff",
+      padding: "24px",
+      boxSizing: "border-box",
+    }}
+  >
+    {text}
+  </div>
+);
+
+const EmptyPlaylist = () => (
+  <div
+    style={{
+      textAlign: "center",
+      padding: "80px 20px",
+      color: "#b3b3b3",
+    }}
+  >
+    <div style={{ fontSize: "72px", marginBottom: "20px" }}>♪</div>
+    <h2 style={{ color: "#fff" }}>Playlist trống</h2>
+    <p>Hãy thêm bài hát vào playlist của bạn.</p>
+  </div>
+);
 
 export default PlaylistDetailPage;

@@ -13,7 +13,11 @@ public class MediaItemRepository : IMediaItemRepository
     // Query trả về 1 dòng dữ liệu 
     public async Task<MediaItem> GetMediaByIdAsync(int mediaId)
     {
-        string sql = @"SELECT * FROM MediaItem WHERE MediaItemID = @MediaItemID AND IsDeleted = 0";
+        string sql = @"SELECT m.*, a.ArtistName, al.AlbumName
+                     FROM MediaItem m
+                     LEFT JOIN Artist a ON m.ArtistID = a.ArtistID
+                     LEFT JOIN Album al ON m.AlbumID = al.AlbumID
+                     WHERE MediaItemID = @MediaItemID AND IsDeleted = 0";
         return await _db.LoadDataSingleAsync<MediaItem>(sql, new { MediaItemID = mediaId});
     }
     public async Task<MediaItem> GetMediaByNameAsync(string mediaitemname)
@@ -24,14 +28,30 @@ public class MediaItemRepository : IMediaItemRepository
     // Query trả về 1 list dữ liệu 
     public async Task<IEnumerable<MediaItem>> GetAllMediaAsync()
     {
-        string sql = @"SELECT * FROM MediaItem WHERE IsDeleted = 0";
+         var sql = @"
+                    SELECT 
+                        m.*,
+                        a.ArtistName,
+                        al.AlbumName
+                    FROM MediaItem m
+                    LEFT JOIN Artist a ON m.ArtistID = a.ArtistID
+                    LEFT JOIN Album al ON m.AlbumID = al.AlbumID
+                    WHERE m.IsDeleted = 0";
         return await _db.LoadAllDataSingleAsync<MediaItem>(sql);
     }
 
     public async Task<IEnumerable<MediaItem>> GetMediaByUserIdAsync(string userID) {
-        string sql = @"SELECT * FROM MediaItem 
-                    WHERE UserID = @UserID AND IsDeleted = 0
-                    ORDER BY UploadAt DESC";
+         var sql = @"
+                    SELECT 
+                        m.*,
+                        a.ArtistName,
+                        al.AlbumName
+                    FROM MediaItem m
+                    LEFT JOIN Artist a ON m.ArtistID = a.ArtistID
+                    LEFT JOIN Album al ON m.AlbumID = al.AlbumID
+                    WHERE m.UserID = @UserID 
+                    AND m.IsDeleted = 0
+                    ORDER BY m.UploadAT DESC";
         return await _db.LoadAllDataSingleAsync<MediaItem> (sql, new {UserID = userID});
     }
     // Query tra ve 1 list ten bai hat 

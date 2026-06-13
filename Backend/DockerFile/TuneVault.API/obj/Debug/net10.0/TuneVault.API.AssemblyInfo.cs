@@ -10,11 +10,11 @@
 using System;
 using System.Reflection;
 
-[assembly: Microsoft.Extensions.Configuration.UserSecrets.UserSecretsIdAttribute("b9a54c7a-fd72-446f-bb9c-0171574aa254")]
+[assembly: Microsoft.Extensions.Configuration.UserSecrets.UserSecretsIdAttribute("480293b7-b345-4b20-8aff-e22d9735030e")]
 [assembly: System.Reflection.AssemblyCompanyAttribute("TuneVault.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+86f2ab125897d0493d1495a4a3a5559db5d3f895")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9275c0adfd31a5623b45dba084e35d9ed6f2f958")]
 [assembly: System.Reflection.AssemblyProductAttribute("TuneVault.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TuneVault.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

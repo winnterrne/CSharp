@@ -1,19 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using TuneVault.Application.DTOs;
-using TuneVault.Application.UseCases.MediaItem;
 using TuneVault.Application.UseCases.MediaItem.MediaUploading;
 using TuneVault.Application.UseCases.MediaItem.MediaStreaming;
 using TuneVault.Application.UseCases.Interaction;
-using System.IO;
 using TuneVault.Application.UseCases;
+
 
 namespace TuneVault.API.Controllers
 {
@@ -51,6 +45,14 @@ namespace TuneVault.API.Controllers
             );
 
             var result = await _mediator.Send(command);
+            return Ok(new { success = true, data = result});
+        }
+
+        [HttpGet("get-all")]
+        public async Task<IActionResult> GetAll()
+        {
+            var query = new GetAllMediaQuery();
+            var result = await _mediator.Send(query);
             return Ok(new { success = true, data = result});
         }
 
@@ -143,7 +145,7 @@ namespace TuneVault.API.Controllers
             }
 
             return PhysicalFile(physicalPath, contentType, enableRangeProcessing: true);
-            
+
         }
 
         [HttpGet]
@@ -151,6 +153,18 @@ namespace TuneVault.API.Controllers
         {
             var result = await _mediator.Send(query);
             return Ok(new { success = true, data = result });
+        }
+        // GET: /api/media/all
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllMedia()
+        {
+            var result = await _mediator.Send(new GetAllMediaQuery());
+
+            return Ok(new
+            {
+                success = true,
+                data = result
+            });
         }
     }
 }
