@@ -19,6 +19,7 @@ CREATE TABLE AspNetUsers(
     Password NVARCHAR(MAX),
     Role NVARCHAR(50), 
     Phone NVARCHAR(20),
+    Bio NVARCHAR(MAX),
     IsDeleted BIT NOT NULL CONSTRAINT DF_AspNetUsers_IsDeleted DEFAULT(0)
 );
 

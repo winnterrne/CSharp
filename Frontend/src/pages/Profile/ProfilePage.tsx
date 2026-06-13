@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { userApi } from "../../api/userApi";
 import { authStore } from "../../store/authStore";
-
 interface UserProfileDto {
   userID: string;
   userName: string;
@@ -9,6 +8,7 @@ interface UserProfileDto {
   email: string;
   role: string;
   phone?: string;
+  bio?: string;
 }
 
 const ProfilePage = () => {
@@ -26,6 +26,23 @@ const ProfilePage = () => {
   const [error, setError] = useState("");
   const [isEditing, setIsEditing] = useState(false);
 
+  const resolveAvatarUrl = (img?: string) => {
+    if (!img) return undefined;
+    // absolute URL
+    if (img.startsWith("http")) return img;
+    const addExtIfMissing = (path: string) => {
+      const last = path.split("/").pop() ?? "";
+      return last.includes(".") ? path : `${path}.jpg`;
+    };
+
+    // already rooted path e.g. /media/...
+    if (img.startsWith("/")) return `http://localhost:5081${addExtIfMissing(img)}`;
+    // contains folder segments (images or media) — prefix host
+    if (img.includes("/")) return `http://localhost:5081/${addExtIfMissing(img)}`;
+    // bare filename from seed or user upload — user images live under /media/images/users/
+    return `http://localhost:5081/media/images/users/${addExtIfMissing(img)}`;
+  };
+
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -41,6 +58,15 @@ const ProfilePage = () => {
         const data = res.data?.data as UserProfileDto;
 
         setProfile(data);
+        // Update global auth user so header and other parts use resolved avatar URL
+        setUser({
+          id: data.userID,
+          username: data.userName,
+          email: data.email,
+          role: data.role,
+          avatarUrl: resolveAvatarUrl(data.userImage) || data.userImage,
+          phone: data.phone,
+        });
         setDisplayName(data.userName ?? "");
         setAvatarUrl(data.userImage ?? "");
         setPhone(data.phone ?? "");
@@ -79,7 +105,7 @@ const ProfilePage = () => {
         username: data.userName,
         email: data.email,
         role: data.role,
-        avatarUrl: data.userImage,
+        avatarUrl: resolveAvatarUrl(data.userImage) || data.userImage,
         phone: data.phone,
       });
 
@@ -117,7 +143,11 @@ const ProfilePage = () => {
       <section style={heroStyle}>
         <div style={avatarBoxStyle}>
           {avatarUrl ? (
-            <img src={avatarUrl} alt={displayName} style={avatarImgStyle} />
+            <img
+              src={resolveAvatarUrl(avatarUrl) ?? avatarUrl}
+              alt={displayName}
+              style={avatarImgStyle}
+            />
           ) : (
             <span style={{ fontSize: "64px", color: "#b3b3b3" }}>👤</span>
           )}
@@ -142,7 +172,11 @@ const ProfilePage = () => {
         </div>
       </section>
 
-      <section style={{ padding: "28px 32px 60px" }}>
+      <section style={{
+          padding: "28px 32px 60px",
+          maxWidth: "900px",
+          margin: "0 auto",
+        }}>
         <div style={{ display: "flex", gap: "12px", marginBottom: "28px" }}>
           {isEditing ? (
             <>
@@ -211,6 +245,12 @@ const ProfilePage = () => {
           <InfoRow label="Email" value={profile.email} />
           <InfoRow label="Vai trò" value={profile.role} />
           <InfoRow label="Số điện thoại" value={profile.phone ?? "Chưa cập nhật"} />
+        </div>
+        <div style={cardStyle}>
+          <h3>Giới thiệu</h3>
+          <p>
+            {profile.bio ?? "No bio yet!"}
+          </p>
         </div>
       </section>
     </main>
