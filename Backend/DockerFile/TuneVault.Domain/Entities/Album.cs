@@ -7,7 +7,7 @@ namespace TuneVault.Domain.Entities
 {
     public class Album
     {
-         public required string AlbumID{get; set;} //Primary Key
+        public required int AlbumID{get; set;} //Primary Key
         public string? AlbumName{get; set;}
         public string? Title{get; set;}
         public string? AlbumItemImage{get; set;}

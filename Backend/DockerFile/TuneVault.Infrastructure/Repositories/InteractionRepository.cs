@@ -35,9 +35,14 @@ namespace TuneVault.Infrastructure.Repositories
         // Lấy danh sách yêu thích của người dùng
         public async Task<IEnumerable<MediaItem>> GetUserFavoritesAsync(string userId)
         {
-            string sql = @"SELECT m.* FROM MediaItem m
-                            INNER JOIN Favorite f ON m.MediaItemID = f.MediaItemID
-                            WHERE f.UserID = @UserID";
+            string sql = @"SELECT 
+                            m.*, 
+                            a.ArtistName
+                        FROM MediaItem m
+                        INNER JOIN Favorite f ON m.MediaItemID = f.MediaItemID
+                        LEFT JOIN Artist a ON m.ArtistID = a.ArtistID 
+                        WHERE f.UserID = @UserID";
+
             return await _db.LoadAllDataSingleAsync<MediaItem>(sql, new {UserID = userId});
         }
 
