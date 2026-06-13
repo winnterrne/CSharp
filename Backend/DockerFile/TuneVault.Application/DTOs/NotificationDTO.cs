@@ -1,6 +1,6 @@
 namespace TuneVault.Application.DTOs;
 
-public record NotificationDto(
+public record NotificationDTO(
     int NotificationID,
     string? Title,
     string? Type,

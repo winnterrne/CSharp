@@ -1,5 +1,4 @@
 using MediatR;
-using TuneVault.Application.Dtos;
 using TuneVault.Application.DTOs;
 using TuneVault.Application.Interfaces;
 using TuneVault.Domain.Entities;
@@ -12,7 +11,7 @@ namespace TuneVault.Application.UseCases.Auth;
 // Sử dụng IJwtService để tạo JWT token nếu đăng ký thành công
 // Trả về AuthResponseDTO chứa token và thông tin người dùng nếu đăng ký thành công
 //</summary>
-public class RegisterHandler : IRequestHandler<RegisterCommand, AuthResponseDto>
+public class RegisterHandler : IRequestHandler<RegisterCommand, AuthResponseDTO>
 {
     private readonly IUserRepository _userRepo;
     private readonly IJwtService _jwtService;
@@ -23,7 +22,7 @@ public class RegisterHandler : IRequestHandler<RegisterCommand, AuthResponseDto>
         _jwtService = jwtService;
     }
 
-    public async Task<AuthResponseDto> Handle(
+    public async Task<AuthResponseDTO> Handle(
         RegisterCommand request,
         CancellationToken cancellationToken)
     {
@@ -43,7 +42,7 @@ public class RegisterHandler : IRequestHandler<RegisterCommand, AuthResponseDto>
         await _userRepo.CreateUserAsync(user);
 
         var token = _jwtService.GenerateToken(user);
-        return new AuthResponseDto(
+        return new AuthResponseDTO(
             user.UserID, user.UserName!, user.Email!, user.Role!, token
         );
     }

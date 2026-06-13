@@ -1,5 +1,5 @@
 using MediatR;
-using TuneVault.Application.Dtos;
+using TuneVault.Application.DTOs;
 
 namespace TuneVault.Application.UseCases.User;
 
@@ -8,4 +8,4 @@ public record UpdateProfileCommand (
     string? UserName,
     string? UserImage,
     string? Phone
-) : IRequest<UserProfileDto>;
+) : IRequest<UserProfileDTO>;

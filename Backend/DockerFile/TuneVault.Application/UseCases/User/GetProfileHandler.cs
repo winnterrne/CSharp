@@ -1,10 +1,10 @@
 using MediatR;
-using TuneVault.Application.Dtos;
+using TuneVault.Application.DTOs;
 using TuneVault.Domain.Interfaces;
 
 namespace TuneVault.Application.UseCases.User;
 
-public class GetProfileHandler : IRequestHandler<GetProfileQuery, UserProfileDto>
+public class GetProfileHandler : IRequestHandler<GetProfileQuery, UserProfileDTO>
 {
     private readonly IUserRepository _userRepo;
 
@@ -13,20 +13,19 @@ public class GetProfileHandler : IRequestHandler<GetProfileQuery, UserProfileDto
         _userRepo = userRepo;
     }
 
-    public async Task<UserProfileDto> Handle(
+    public async Task<UserProfileDTO> Handle(
         GetProfileQuery request,
         CancellationToken cancellationToken)
     {
         var user = await _userRepo.GetProfileAsync(request.UserID);
         if(user == null) throw new Exception("Người dùng không tồn tại");
-        return new UserProfileDto(
+        return new UserProfileDTO(
             user.UserID,
             user.UserName,
             user.UserImage,
             user.Email,
             user.Role,
-            user.Phone,
-            user.Bio
+            user.Phone
         );
     }
 }

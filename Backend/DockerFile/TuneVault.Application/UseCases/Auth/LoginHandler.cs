@@ -1,5 +1,4 @@
 using MediatR;
-using TuneVault.Application.Dtos;
 using TuneVault.Application.DTOs;
 using TuneVault.Application.Interfaces;
 using TuneVault.Domain.Interfaces;
@@ -12,7 +11,7 @@ namespace TuneVault.Application.UseCases.Auth;
 // Sử dụng IJwtService để tạo JWT token nếu đăng nhập thành công
 // Trả về AuthResponseDTO chứa token và thông tin người dùng nếu đăng nhập thành công
 //</summary>
-public class LoginHandler : IRequestHandler<LoginCommand, AuthResponseDto>
+public class LoginHandler : IRequestHandler<LoginCommand, AuthResponseDTO>
 {
     private readonly IUserRepository _userRepo;
     private readonly IJwtService _jwtService;
@@ -23,7 +22,7 @@ public class LoginHandler : IRequestHandler<LoginCommand, AuthResponseDto>
         _jwtService = jwtService;
     }
 
-    public async Task<AuthResponseDto> Handle(
+    public async Task<AuthResponseDTO> Handle(
         LoginCommand request,
         CancellationToken cancellationToken)
     {
@@ -36,7 +35,7 @@ public class LoginHandler : IRequestHandler<LoginCommand, AuthResponseDto>
             throw new Exception("Email hoặc mật khẩu không đúng");
 
         var token = _jwtService.GenerateToken(user);
-        return new AuthResponseDto(
+        return new AuthResponseDTO(
             user.UserID, user.UserName!, user.Email!, user.Role!, token
         );
     }

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using TuneVault.Domain.Interfaces;
 using TuneVault.Domain.Entities;
 using TuneVault.Infrastructure.Dapper;
+using Dapper;
 namespace TuneVault.Infrastructure.Repositories
 {
     public class AlbumRepository : IAlbumRepository
@@ -55,6 +56,29 @@ namespace TuneVault.Infrastructure.Repositories
                            WHERE AlbumID = @AlbumID";
                            
             return await _db.ExecuteDataAsync(sql, new { AlbumID = albumId });
+        }
+
+        public async Task<IEnumerable<(Album Album, string ArtistName)>> GetAllAlbumsAsync()
+        {
+            string sql = @"
+                SELECT 
+                    al.AlbumID, al.AlbumName, al.Title, al.AlbumItemImage, 
+                    al.ReleaseDate, al.UploadAT, al.ArtistID, al.UserID, al.IsDeleted,
+                    a.ArtistName 
+                FROM Album al
+                LEFT JOIN Artist a ON al.ArtistID = a.ArtistID
+                WHERE al.IsDeleted = 0";
+
+            
+            using var connection = _db.CreateConnection(); 
+            
+            var result = await connection.QueryAsync<Album, string, (Album, string)>(
+                sql,
+                (album, artistName) => (album, artistName), 
+                splitOn: "ArtistName" 
+            );
+
+            return result;
         }
     }
 }
