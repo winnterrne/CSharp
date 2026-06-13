@@ -2,10 +2,18 @@ import api from "./axios";
 
 const API_BASE_URL = "http://localhost:5081/api";
 
+
 export const mediaApi = {
   getMyMedia: () => api.get("/media/my-media"),
 
   getAll: () => api.get("/media/get-all"),
+
+  // Tạm thời 3 hàm này đều gọi get-all
+  // Sau này có thể tách endpoint riêng
+  getRecommended: () => api.get("/media/get-all"),
+  getForYou: () => api.get("/media/get-all"),
+  getUpcoming: () => api.get("/media/get-all"),
+  
 
   getById: (id: number | string) => api.get(`/media/${id}`),
 
@@ -20,3 +28,4 @@ export const mediaApi = {
 
  getStreamUrl: (id: number | string) =>
   `http://localhost:5081/api/media/${id}/stream?t=${Date.now()}`,};
+

@@ -44,7 +44,9 @@ export interface MediaItemDto {
   duration?: number;
   description?: string;
   artistID?: number;
+  artistName?: string;
   albumID?: number;
+  albumName?: string;
   userID?: string;
   uploadAT?: string;
 }
@@ -76,7 +78,7 @@ export const mapMediaItemDtoToMedia = (item: MediaItemDto): Media => {
     duration: item.duration ?? 0,
     artist: {
       id: item.artistID ?? 0,
-      name: item.artistID ? `Artist ${item.artistID}` : "Unknown Artist",
+      name: item.artistName ?? "Unknown Artist",
     },
     genre: item.mediaItemTag ?? undefined,
     createdAt: item.uploadAT ?? new Date().toISOString(),

@@ -30,7 +30,9 @@ public class GetAllMediaHandler
             media.Duration,
             media.Description,
             media.ArtistID,
+            media.ArtistName,
             media.AlbumID,
+            media.AlbumName,
             media.UserID,
             media.UploadAt
         ));

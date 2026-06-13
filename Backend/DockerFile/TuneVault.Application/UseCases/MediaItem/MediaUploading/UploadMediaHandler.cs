@@ -52,7 +52,9 @@ public class UploadMediaHandler : IRequestHandler<UploadMediaCommand, MediaItemD
             media.Duration,
             media.Description,
             media.ArtistID,
+            media.ArtistName,
             media.AlbumID,
+            media.AlbumName,
             media.UserID,
             media.UploadAt
         );

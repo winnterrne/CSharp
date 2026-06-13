@@ -26,7 +26,9 @@ public record MediaItemDto(
     int? Duration,
     string? Description,
     int? ArtistID,
+    string? ArtistName,
     int? AlbumID,
+    string? AlbumName,
     string? UserID,
     DateTime UploadAT
 );
