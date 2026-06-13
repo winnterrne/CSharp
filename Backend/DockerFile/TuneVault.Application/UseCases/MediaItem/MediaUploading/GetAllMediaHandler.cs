@@ -4,8 +4,7 @@ using TuneVault.Domain.Interfaces;
 
 namespace TuneVault.Application.UseCases.MediaItem.MediaUploading;
 
-public class GetAllMediaHandler 
-    : IRequestHandler<GetAllMediaQuery, IEnumerable<MediaItemDto>>
+public class GetAllMediaHandler : IRequestHandler<GetAllMediaQuery, IEnumerable<MediaItemDto>>
 {
     private readonly IMediaItemRepository _mediaRepo;
 
@@ -30,7 +29,9 @@ public class GetAllMediaHandler
             media.Duration,
             media.Description,
             media.ArtistID,
+            media.ArtistName,
             media.AlbumID,
+            media.AlbumName,
             media.UserID,
             media.UploadAt
         ));

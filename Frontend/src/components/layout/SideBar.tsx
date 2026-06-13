@@ -3,6 +3,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { playlistApi } from "../../api/playlistApi";
+
 import type { Playlist } from "../../types/playlist";
 import type { Media } from "../../types/media";
 import { ROUTES } from "../../constant/routes";
@@ -12,8 +13,10 @@ import { usePlayer } from "../../hooks/usePlayer";
 import { useHistoryStore } from "../../store/historyStore";
 import { useFavorite } from "../../hooks/useFavorite";
 import { authStore } from "../../store/authStore";
+import { mediaApi } from "../../api/mediaApi";
+import { mapMediaItemDtoToMedia, type MediaItemDto } from "../../types/media";
 
-type FilterTab = "playlist" | "favorite" | "following";
+type FilterTab = "playlist" | "favorite" | "album" | "following";
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -51,6 +54,7 @@ const Sidebar = ({
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchVal, setSearchVal] = useState("");
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
+  const [albums, setAlbums] = useState<Media[]>([]);
   const [loading, setLoading] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showRecent, setShowRecent] = useState(false);
@@ -86,11 +90,46 @@ const Sidebar = ({
   }, [canUseAuthApi]);
 
   useEffect(() => {
-    fetchPlaylists();
+    const fetchAlbums = async () => {
+      try {
+        const res = await mediaApi.getAll();
 
-    if (canUseAuthApi) {
-      loadFavorites();
-    }
+        const rawData: MediaItemDto[] =
+          Array.isArray(res.data?.data) ? res.data.data
+          : Array.isArray(res.data) ? res.data
+          : [];
+
+        const mediaList = rawData.map(mapMediaItemDtoToMedia);
+
+        const albumMap = new Map<string, Media>();
+
+        mediaList.forEach((track) => {
+          const key = String(track.albumId ?? track.id);
+
+          if (!albumMap.has(key)) {
+            albumMap.set(key, {
+              ...track,
+              title: track.albumName ?? track.title,
+            });
+          }
+        });
+
+        setAlbums(Array.from(albumMap.values()));
+
+        setAlbums(data);
+      } catch (error) {
+        console.error("LOAD ALBUM ERROR:", error);
+      }
+    };
+    // Avoid calling setState synchronously inside effect body by running
+    // the async work in an immediately-invoked async function.
+    (async () => {
+      await fetchPlaylists();
+      await fetchAlbums();
+      if (canUseAuthApi) {
+        await loadFavorites();
+      }
+    })();
   }, [fetchPlaylists, loadFavorites, canUseAuthApi]);
 
   const filteredPlaylists = playlists.filter((playlist) =>
@@ -99,6 +138,9 @@ const Sidebar = ({
 
   const filteredFavorites = favoriteTracks.filter((track) =>
     track.title.toLowerCase().includes(searchVal.toLowerCase()),
+  );
+  const filteredAlbums = albums.filter((album) =>
+    album.title.toLowerCase().includes(searchVal.toLowerCase()),
   );
 
   const handleOpenPlaylist = (playlist: Playlist) => {
@@ -143,7 +185,18 @@ const Sidebar = ({
         <IconBtn title="Phóng to thư viện" onClick={onToggleExpand}>
           <ExpandIcon />
         </IconBtn>
+        <SmallTile
+          title="Album"
+          active={activeTab === "album"}
+          onClick={() => {
+            if (isCollapsed) onToggleCollapse();
 
+            setActiveTab("album");
+            setShowRecent(false);
+          }}
+        >
+          💿
+        </SmallTile>
         <div style={collapsedListStyle}>
           <SmallTile
             title="Bài hát yêu thích"
@@ -237,6 +290,15 @@ const Sidebar = ({
             Yêu thích
           </TabButton>
           <TabButton
+            active={activeTab === "album"}
+            onClick={() => {
+              setActiveTab("album");
+              setShowRecent(false);
+            }}
+          >
+            Album
+          </TabButton>
+          <TabButton
             active={activeTab === "following"}
             onClick={() => {
               setActiveTab("following");
@@ -312,8 +374,22 @@ const Sidebar = ({
               />
             ))
 
+        : activeTab === "album" ?
+          filteredAlbums.length === 0 ?
+            <EmptyText text="Chưa có album" />
+          : filteredAlbums.map((album) => (
+              <TrackRow
+                key={`album-${album.id}`}
+                track={album}
+                isWide={isWide}
+                onClick={() => {
+                  navigate(`/album/${album.id}`);
+                }}
+              />
+            ))
+
         : activeTab === "following" ?
-          <EmptyText text="Chưa có API lấy danh sách đang follow" />
+          <EmptyText text="Chưa có BE Artist. Tạm thời lấy nghệ sĩ từ danh sách bài hát." />
         : activeTab === "favorite" ?
           filteredFavorites.length === 0 ?
             <EmptyText text="Chưa có bài hát yêu thích" />

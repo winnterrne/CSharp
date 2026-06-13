@@ -55,6 +55,7 @@ const QuickPlayCard = ({ track, tracks, onOpenTrack }: Props) => {
         }}
       >
         {track.thumbnailUrl ?
+        
           <img
             src={track.thumbnailUrl}
             alt={track.title}

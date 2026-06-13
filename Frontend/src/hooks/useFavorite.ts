@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { favoriteApi } from "../api/favoriteApi";
 import type { Media } from "../types/media";
+import { buildImageUrl } from "../types/media";
 import { emitFavoriteUpdated } from "../utils/appEvents";
 import { authStore } from "../store/authStore";
 
@@ -10,6 +11,7 @@ type FavoriteMediaShape = {
   id?: number;
   titleName?: string;
   mediaItemImage?: string;
+  artistName?: string;
 };
 
 type FavoriteResponse = {
@@ -36,13 +38,11 @@ const toMedia = (item: FavoriteMediaShape): Media => {
     type: "audio",
     status: "published",
     url: `http://localhost:5081/api/media/${id}/stream`,
-    thumbnailUrl: item.mediaItemImage
-      ? `http://localhost:5081/images/${item.mediaItemImage}`
-      : undefined,
+    thumbnailUrl: buildImageUrl(item.mediaItemImage),
     duration: 0,
     artist: {
       id: 0,
-      name: "Unknown Artist",
+      name: item.artistName ?? "Unknown Artist",
     },
     createdAt: new Date().toISOString(),
   };
@@ -150,7 +150,7 @@ export const useFavorite = () => {
     };
 
     listeners.add(listener);
-    loadFavorites();
+    void Promise.resolve().then(loadFavorites);
 
     return () => {
       listeners.delete(listener);

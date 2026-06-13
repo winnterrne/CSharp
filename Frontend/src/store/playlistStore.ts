@@ -49,7 +49,6 @@ export const playlistStore = create<PlaylistStore>((set) => ({
           ? { ...state.selectedPlaylist, ...updates }
           : state.selectedPlaylist,
     })),
-
   deletePlaylist: (id) =>
     set((state) => ({
       myPlaylists: state.myPlaylists.filter((p) => p.id !== id),

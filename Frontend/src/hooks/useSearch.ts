@@ -71,7 +71,6 @@ export const useSearch = () => {
       mediaStore
         .getState()
         .setError(err instanceof Error ? err.message : "Tìm kiếm thất bại");
-
       mediaStore.getState().setSearchResults([], searchQuery);
     } finally {
       mediaStore.getState().setLoading(false);

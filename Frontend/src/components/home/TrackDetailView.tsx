@@ -6,27 +6,27 @@ import AddToPlaylistButton from "../playlist/AddToPlaylistButton";
 import TrackActionMenu from "../common/TrackActionMenu";
 
 
-type TrackDetailViewProps = {
-  track: Media;
-  onOpenArtist: (artistName: string) => void;
-};
+  type TrackDetailViewProps = {
+    track: Media;
+    onOpenArtist: (artistName: string) => void; 
+  };
 
-const formatDuration = (seconds?: number) => {
-  if (!seconds) return "0:00";
+  const formatDuration = (seconds?: number) => {
+    if (!seconds) return "0:00";
 
-  const min = Math.floor(seconds / 60);
-  const sec = Math.floor(seconds % 60);
+    const min = Math.floor(seconds / 60);
+    const sec = Math.floor(seconds % 60);
 
-  return `${min}:${String(sec).padStart(2, "0")}`;
-};
+    return `${min}:${String(sec).padStart(2, "0")}`;
+  };
 
-const TrackDetailView = ({ track, onOpenArtist }: TrackDetailViewProps) => {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const TrackDetailView = ({ track, onOpenArtist }: TrackDetailViewProps) => {
+    const [menuOpen, setMenuOpen] = useState(false);
 
-  const { playTrack, setQueue } = usePlayer();
-  const { isFavorite, toggleFavorite } = useFavorite();
+    const { playTrack, setQueue } = usePlayer();
+    const { isFavorite, toggleFavorite } = useFavorite();
 
-  const artistName = track.artist?.name ?? "Unknown Artist";
+    const artistName = track.artist?.name ?? "Unknown Artist";
   const liked = isFavorite(track.id);
 
   return (

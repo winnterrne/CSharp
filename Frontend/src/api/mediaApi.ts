@@ -1,16 +1,18 @@
 import api from "./axios";
 
-const API_BASE_URL = "http://localhost:5081/api";
-
 export const mediaApi = {
   getMyMedia: () => api.get("/media/my-media"),
 
-  getAll: () => api.get("/media/all"),
+  getAll: () => api.get("/media/get-all"),
+
+  getRecommended: () => api.get("/media/get-all"),
+  getForYou: () => api.get("/media/get-all"),
+  getUpcoming: () => api.get("/media/get-all"),
 
   getById: (id: number | string) => api.get(`/media/${id}`),
 
   search: (keyword: string) =>
-    api.get("/media", {
+    api.get("/media/get-all", {
       params: {
         keyWord: keyword,
         pageNumber: 1,
@@ -18,5 +20,6 @@ export const mediaApi = {
       },
     }),
 
- getStreamUrl: (id: number | string) =>
-  `http://localhost:5081/api/media/${id}/stream?t=${Date.now()}`,};
+  getStreamUrl: (id: number | string) =>
+    `http://localhost:5081/api/media/${id}/stream?t=${Date.now()}`,
+};

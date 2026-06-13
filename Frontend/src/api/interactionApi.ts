@@ -2,9 +2,7 @@ import api from "./axios";
 
 export const interactionApi = {
   recordPlayHistory: (mediaItemId: number) =>
-    api.post("/Interaction/playhistory", {
-      mediaItemID: mediaItemId,
-    }),
+  api.post(`/Interaction/playhistory/${mediaItemId}`),
 
   getPlayHistory: (limit = 10) =>
     api.get(`/Interaction/playhistory?limit=${limit}`),

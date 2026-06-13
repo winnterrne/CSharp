@@ -2,7 +2,7 @@ import api from "./axios";
 
 export const authApi = {
   login: (email: string, password: string) =>
-    api.post("/Auth/login", {
+    api.post("/auth/login", {
       email,
       password,
     }),

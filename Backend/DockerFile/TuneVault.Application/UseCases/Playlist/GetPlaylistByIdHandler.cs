@@ -1,24 +1,63 @@
 using MediatR;
 using TuneVault.Application.DTOs;
-using TuneVault.Application.UseCases.MediaItem.MediaUploading;
+using TuneVault.Domain.Entities;
 using TuneVault.Domain.Interfaces;
 
 namespace TuneVault.Application.UseCases.Playlist;
-public class GetPlaylistByIdHandler : IRequestHandler<GetPlaylistByIdQuery, PlaylistDto>
+
+public class GetPlaylistByIdHandler
+    : IRequestHandler<
+        GetPlaylistByIdQuery,
+        PlaylistDetailSongDto?>
 {
-    public readonly IPlaylistRepository _Playlistrepo;
-    public GetPlaylistByIdHandler(IPlaylistRepository Playlistrepo)
+    private readonly IPlaylistRepository _playlistRepo;
+
+    public GetPlaylistByIdHandler(
+        IPlaylistRepository playlistRepo)
     {
-        _Playlistrepo = Playlistrepo;
+        _playlistRepo = playlistRepo;
     }
-    public async Task<PlaylistDto?> Handle(GetPlaylistByIdQuery request, CancellationToken cancellationToken)
+
+    public async Task<PlaylistDetailSongDto?>
+        Handle(
+            GetPlaylistByIdQuery request,
+            CancellationToken cancellationToken)
     {
-        var result = await _Playlistrepo.GetPlaylistByIdAsync(request.PlaylistID);
-        if(result == null) return null; 
-        return new PlaylistDto (
-            result.PlaylistID,
-            result.PlaylistName,
-            result.UserID
+        var playlist =
+            await _playlistRepo.GetPlaylistByIdAsync(
+                request.PlaylistID);
+
+        if (playlist == null)
+            return null;
+
+        var tracks =
+            await _playlistRepo.GetTracksByPlaylistIdAsync(
+                request.PlaylistID);
+
+        var songs =
+            tracks.Select(
+                track =>
+                    new PlaylistSongDto(
+                        track.MediaItemID,
+                        track.TitleName ?? "",
+                        track.ArtistID?.ToString() ?? "",
+                        track.AlbumID?.ToString(),
+                        track.Duration ?? 0,
+                        track.filePath ?? ""
+                    )
+            ).ToList();
+
+        return new PlaylistDetailSongDto(
+            playlist.PlaylistID,
+            playlist.PlaylistName ?? "",
+            playlist.IsPublic??true,
+            playlist.Description ?? "",
+            int.TryParse(
+                playlist.UserID,
+                out var userId)
+                ? userId
+                : 0,
+            songs
         );
-    } 
+    }
 }

@@ -1,19 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using TuneVault.Application.DTOs;
-using TuneVault.Application.UseCases.MediaItem;
 using TuneVault.Application.UseCases.MediaItem.MediaUploading;
 using TuneVault.Application.UseCases.MediaItem.MediaStreaming;
 using TuneVault.Application.UseCases.Interaction;
-using System.IO;
 using TuneVault.Application.UseCases;
+
+
 namespace TuneVault.API.Controllers
 {
     [ApiController]
@@ -32,7 +27,7 @@ namespace TuneVault.API.Controllers
         public async Task<IActionResult> Upload([FromForm] UploadMediaFormDto form)
         {
             var userID = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userID == null)
+            if(userID == null)
             {
                 return Unauthorized();
             }
@@ -50,7 +45,15 @@ namespace TuneVault.API.Controllers
             );
 
             var result = await _mediator.Send(command);
-            return Ok(new { success = true, data = result });
+            return Ok(new { success = true, data = result});
+        }
+
+        [HttpGet("get-all")]
+        public async Task<IActionResult> GetAll()
+        {
+            var query = new GetAllMediaQuery();
+            var result = await _mediator.Send(query);
+            return Ok(new { success = true, data = result});
         }
 
         [HttpGet("{id}")]
@@ -58,11 +61,11 @@ namespace TuneVault.API.Controllers
         {
             var query = new GetMediaByIdQuery(id);
             var result = await _mediator.Send(query);
-            if (result == null)
+            if(result == null)
             {
-                return NotFound(new { success = false, message = "Không tìm thấy" });
+                return NotFound(new { success = false, message = "Không tìm thấy"});
             }
-            return Ok(new { success = true, data = result });
+            return Ok(new { success = true, data = result});
         }
         [Authorize]
         [HttpPut("{id}")]
@@ -82,7 +85,7 @@ namespace TuneVault.API.Controllers
                 dto.AlbumID
             );
             var result = await _mediator.Send(command);
-            return Ok(new { success = true, data = result });
+             return Ok(new { success = true, data = result });
         }
 
         [Authorize]
@@ -92,7 +95,7 @@ namespace TuneVault.API.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null) return Unauthorized();
 
-            var command = new DeleteMediaCommand(id, userId);
+            var command = new DeleteMediaCommand(id, userId);   
             var result = await _mediator.Send(command);
             return Ok(new { success = true, data = result });
         }
@@ -104,10 +107,10 @@ namespace TuneVault.API.Controllers
             var userID = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var query = new GetMediaByUserQuery(userID!);
             var result = await _mediator.Send(query);
-            return Ok(new { success = true, data = result });
+            return Ok(new { success = true, data = result});
         }
 
-        // [Authorize]
+        [Authorize]
         [HttpGet("{id}/stream")]
         public async Task<IActionResult> Streaming(int id)
         {
@@ -116,7 +119,7 @@ namespace TuneVault.API.Controllers
             {
                 return NotFound(new { success = false, message = "File media không tồn tại" });
             }
-            var fileName = mediaItem.filePath.Trim().TrimStart('/', '\\');
+            var fileName = mediaItem.filePath.Trim().TrimStart('/','\\');
             var type = mediaItem.MediaItemType?.ToLower();
             bool isVideo = type == "video";
             string subFolder = isVideo ? "video" : "audio";

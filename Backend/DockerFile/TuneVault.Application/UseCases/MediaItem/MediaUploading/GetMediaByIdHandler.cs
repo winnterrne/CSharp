@@ -27,7 +27,9 @@ public class GetMediaByIdHandler : IRequestHandler<GetMediaByIdQuery, MediaItemD
             media.Duration,
             media.Description,
             media.ArtistID,
+            media.ArtistName,
             media.AlbumID,
+            media.AlbumName,
             media.UserID,
             media.UploadAt
         );
