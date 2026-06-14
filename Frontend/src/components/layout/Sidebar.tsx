@@ -13,7 +13,7 @@ import { useHistoryStore } from "../../store/historyStore";
 import { useFavorite } from "../../hooks/useFavorite";
 import { authStore } from "../../store/authStore";
 
-type FilterTab = "playlist" | "favorite" | "album" | "following";
+type FilterTab = "playlist" | "favorite" | "following";
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -51,7 +51,6 @@ const Sidebar = ({
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchVal, setSearchVal] = useState("");
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
-  const [albums, setAlbums] = useState<Media[]>([]);
   const [loading, setLoading] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showRecent, setShowRecent] = useState(false);
@@ -87,25 +86,11 @@ const Sidebar = ({
   }, [canUseAuthApi]);
 
   useEffect(() => {
-    const fetchAlbums = async () => {
-      try {
-        const res = await mediaApi.getAll();
-
-        const data: Media[] =
-          Array.isArray(res.data?.data) ? res.data.data
-          : Array.isArray(res.data) ? res.data
-          : [];
-
-        setAlbums(data);
-      } catch (error) {
-        console.error("LOAD ALBUM ERROR:", error);
-      }
-    };
     // Avoid calling setState synchronously inside effect body by running
     // the async work in an immediately-invoked async function.
     (async () => {
       await fetchPlaylists();
-      await fetchAlbums();
+
       if (canUseAuthApi) {
         await loadFavorites();
       }
@@ -118,9 +103,6 @@ const Sidebar = ({
 
   const filteredFavorites = favoriteTracks.filter((track) =>
     track.title.toLowerCase().includes(searchVal.toLowerCase()),
-  );
-  const filteredAlbums = albums.filter((album) =>
-    album.title.toLowerCase().includes(searchVal.toLowerCase()),
   );
 
   const handleOpenPlaylist = (playlist: Playlist) => {
@@ -165,18 +147,7 @@ const Sidebar = ({
         <IconBtn title="Phóng to thư viện" onClick={onToggleExpand}>
           <ExpandIcon />
         </IconBtn>
-        <SmallTile
-          title="Album"
-          active={activeTab === "album"}
-          onClick={() => {
-            if (isCollapsed) onToggleCollapse();
 
-            setActiveTab("album");
-            setShowRecent(false);
-          }}
-        >
-          💿
-        </SmallTile>
         <div style={collapsedListStyle}>
           <SmallTile
             title="Bài hát yêu thích"
@@ -270,15 +241,6 @@ const Sidebar = ({
             Yêu thích
           </TabButton>
           <TabButton
-            active={activeTab === "album"}
-            onClick={() => {
-              setActiveTab("album");
-              setShowRecent(false);
-            }}
-          >
-            Album
-          </TabButton>
-          <TabButton
             active={activeTab === "following"}
             onClick={() => {
               setActiveTab("following");
@@ -351,20 +313,6 @@ const Sidebar = ({
                 track={track}
                 isWide={isWide}
                 onClick={() => handlePlayTrackList(track, recentTracks)}
-              />
-            ))
-
-        : activeTab === "album" ?
-          filteredAlbums.length === 0 ?
-            <EmptyText text="Chưa có album" />
-          : filteredAlbums.map((album) => (
-              <TrackRow
-                key={`album-${album.id}`}
-                track={album}
-                isWide={isWide}
-                onClick={() => {
-                  navigate(`/album/${album.id}`);
-                }}
               />
             ))
 

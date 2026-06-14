@@ -12,7 +12,6 @@ export const playlistApi = {
       description: data.Description ?? "",
       isPublic: data.IsPublic,
     }),
-
   update: (
     id: number,
     data: {
