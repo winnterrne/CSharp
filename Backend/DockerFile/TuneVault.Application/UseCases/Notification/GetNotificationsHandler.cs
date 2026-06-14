@@ -16,7 +16,7 @@ public class GetNotificationsHandler
         _notifRepo = notifRepo;
     }
 
-    public async Task<IEnumerable<NotificationDto>> Handle(
+    public async Task<IEnumerable<NotificationDTO>> Handle(
         GetNotificationsQuery request,
         CancellationToken cancellationToken)
     {

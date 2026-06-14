@@ -1,10 +1,11 @@
 using MediatR;
+using TuneVault.Application.DTos;
 using TuneVault.Application.DTOs;
 using TuneVault.Domain.Interfaces;
 
 namespace TuneVault.Application.UseCases.User;
 
-public class SearchUsersHandler : IRequestHandler<SearchUserQuery, IEnumerable<UserProfileDto>>
+public class SearchUsersHandler : IRequestHandler<SearchUserQuery, IEnumerable<UserProfileDTO>>
 {
     // Tiêm Dependency Injection cho User Repository
     private readonly IUserRepository _userRepo;

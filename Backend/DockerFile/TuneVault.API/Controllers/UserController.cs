@@ -31,7 +31,7 @@ public class UserController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateProfile(
         string id,
-        [FromBody] UpdateProfileDto dto)
+        [FromBody] UpdateProfileDTO dto)
     {
         var command = new UpdateProfileCommand(
             id, 

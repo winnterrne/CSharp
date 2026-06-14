@@ -1,4 +1,5 @@
 using MediatR;
+using TuneVault.Application.DTos;
 using TuneVault.Application.DTOs;
 namespace TuneVault.Application.UseCases.Auth;
 

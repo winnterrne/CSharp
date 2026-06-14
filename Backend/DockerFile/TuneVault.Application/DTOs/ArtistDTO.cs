@@ -7,10 +7,3 @@ public record ArtistDto(
     string? ArtistName,
     string? ArtistImage
 );
-public record ArtistProfileDto(
-    int ArtistID,
-    string? ArtistName,
-    string? ArtistImage,
-    string? Bio,
-    int Followers
-);

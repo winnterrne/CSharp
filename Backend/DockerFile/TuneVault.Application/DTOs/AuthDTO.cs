@@ -1,4 +1,4 @@
-namespace TuneVault.Application.DTOs;
+namespace TuneVault.Application.DTos;
 public record RegisterRequestDto (
     string UserName,
     string Email,
