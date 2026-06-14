@@ -11,6 +11,10 @@ import AlbumDetailView from "../home/AlbumDetailView";
 import TrackDetailView from "../home/TrackDetailView";
 import ArtistDetailView from "../home/ArtistDetailView";
 import AlbumCardLarge from "../home/AlbumCardLarge";
+import type { Album } from "../../types/album";
+import { albumApi } from "../../api/albumApi";
+import { useAlbumStore } from "../../store/albumStore";
+import { mapAlbumTrackToMedia, buildImageUrl } from "../../types/media";
 
 type ViewMode =
   | "home"
@@ -50,9 +54,13 @@ const MainContent = () => {
   const [recommended, setRecommended] = useState<Media[]>([]);
   const [forYou, setForYou] = useState<Media[]>([]);
   const [upcoming, setUpcoming] = useState<Media[]>([]);
+  const [albums, setAlbums] = useState<Album[]>([]);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const selectedAlbumId = useAlbumStore((s) => s.selectedAlbumId);
+  const setSelectedAlbumId = useAlbumStore((s) => s.setSelectedAlbumId);
 
   useEffect(() => {
     const fetchHomeData = async () => {
@@ -60,17 +68,21 @@ const MainContent = () => {
         setLoading(true);
         setError("");
 
-        const res = await mediaApi.getAll();
+        const [mediaRes, albumRes] = await Promise.all([
+          mediaApi.getAll(),
+          albumApi.getAll(),
+        ]);
 
-        const mediaDtos: MediaItemDto[] = Array.isArray(res.data?.data)
-          ? res.data.data
-          : [];
+        const mediaDtos: MediaItemDto[] = Array.isArray(mediaRes.data?.data)
+        ? mediaRes.data.data
+        : [];
 
         const mediaList = uniqueTracks(mediaDtos.map(mapMediaItemDtoToMedia));
 
         setRecommended(mediaList.slice(0, 12));
         setForYou(mediaList.slice(4, 16));
         setUpcoming(mediaList.slice(8, 20));
+        setAlbums(albumRes.data?.data ?? []);
 
         if (mediaList.length === 0) {
           setError("Chưa có dữ liệu bài hát từ server.");
@@ -89,6 +101,8 @@ const MainContent = () => {
 
     fetchHomeData();
   }, []);
+
+  
 
   const allTracks = useMemo(() => {
     return uniqueTracks([...recommended, ...forYou, ...upcoming]);
@@ -114,6 +128,48 @@ const MainContent = () => {
     setSelectedArtist(null);
     setViewMode("album");
   };
+
+  useEffect(() => {
+  if (!selectedAlbumId) return;
+
+  const album = albums.find((a) => a.albumID === selectedAlbumId);
+  if (!album) return;
+
+  const openAlbum = async () => {
+    try {
+      const res = await albumApi.getTracks(selectedAlbumId);
+      const rawTracks = res.data?.data ?? [];
+
+      const tracks = rawTracks.map((item) =>
+        mapAlbumTrackToMedia(item, album.albumID, album.albumName, album.artistName)
+      );
+
+      const cover = {
+        id: String(album.albumID),
+        title: album.albumName,
+        type: "audio" as const,
+        status: "published" as const,
+        url: "",
+        thumbnailUrl: album.albumItemImage
+          ? `http://localhost:5081/media/images/album/${album.albumItemImage}`
+          : undefined,
+        duration: 0,
+        artist: { id: album.artistID, name: album.artistName },
+        albumId: album.albumID,
+        albumName: album.albumName,
+        createdAt: album.uploadAt,
+      };
+
+      handleOpenAlbum(cover, tracks, album.albumName);
+    } catch (err) {
+      console.error("Không tải được album từ sidebar:", err);
+    } finally {
+      setSelectedAlbumId(null); // reset sau khi mở
+    }
+  };
+
+  openAlbum();
+}, [selectedAlbumId, albums]);
 
   const handleOpenArtist = (artistName: string, tracks: Media[] = allTracks) => {
     const artistTracks = tracks.filter(
@@ -226,6 +282,7 @@ const MainContent = () => {
           recommended={recommended}
           forYou={forYou}
           upcoming={upcoming}
+          albums={albums}
           onOpenTrack={handleOpenTrack}
           onOpenAlbum={handleOpenAlbum}
           onShowAll={(mode) => {
@@ -295,6 +352,7 @@ const MainContent = () => {
         />
       )}
 
+
       {viewMode === "artist" && selectedArtist && (
         <ArtistDetailView
           artistName={selectedArtist.name}
@@ -308,3 +366,4 @@ const MainContent = () => {
 };
 
 export default MainContent;
+

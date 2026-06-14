@@ -13,7 +13,11 @@ import { useHistoryStore } from "../../store/historyStore";
 import { useFavorite } from "../../hooks/useFavorite";
 import { authStore } from "../../store/authStore";
 
-type FilterTab = "playlist" | "favorite" | "following";
+import { albumApi } from "../../api/albumApi";
+import type { Album } from "../../types/album";
+import { useAlbumStore } from "../../store/albumStore";
+
+type FilterTab = "playlist" | "favorite" | "following" | "album";
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -59,6 +63,9 @@ const Sidebar = ({
   const { favoriteTracks, loadFavorites } = useFavorite();
   const { playTrack, setQueue } = usePlayer();
 
+  const [albums, setAlbums] = useState<Album[]>([]);
+  const setSelectedAlbumId = useAlbumStore((s) => s.setSelectedAlbumId);
+
   const fetchPlaylists = useCallback(async () => {
     if (!canUseAuthApi) {
       setPlaylists([]);
@@ -96,6 +103,16 @@ const Sidebar = ({
       }
     })();
   }, [fetchPlaylists, loadFavorites, canUseAuthApi]);
+
+  useEffect(() => {
+    albumApi.getAll().then((res) => {
+      setAlbums(res.data?.data ?? []);
+    });
+  }, []);
+
+  const handleOpenAlbum = (album: Album) => {
+  setSelectedAlbumId(album.albumID);
+};
 
   const filteredPlaylists = playlists.filter((playlist) =>
     getPlaylistName(playlist).toLowerCase().includes(searchVal.toLowerCase()),
@@ -249,6 +266,13 @@ const Sidebar = ({
           >
             Đang follow
           </TabButton>
+
+          <TabButton
+            active={activeTab === "album"}
+            onClick={() => setActiveTab("album")}
+          >
+            Album
+          </TabButton>
         </div>
       </div>
 
@@ -329,7 +353,17 @@ const Sidebar = ({
                 onClick={() => handlePlayTrackList(track, favoriteTracks)}
               />
             ))
-
+        : activeTab === "album" ?
+          albums.length === 0 ?
+            <EmptyText text="Chưa có album" />
+          : albums.map((album) => (
+              <AlbumRow
+                key={album.albumID}
+                album={album}
+                isWide={isWide}
+                onClick={() => handleOpenAlbum(album)}
+              />
+            ))
         : loading ?
           <LoadingText />
         : filteredPlaylists.length === 0 ?
@@ -345,6 +379,8 @@ const Sidebar = ({
                 isWide={isWide}
                 onClick={() => handleOpenPlaylist(playlist)}
               />
+
+
             );
           })
         }
@@ -445,6 +481,71 @@ const PlaylistRow = ({
           }}
         >
           Danh sách phát • {trackCount} bài
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const AlbumRow = ({
+  album,
+  isWide,
+  onClick,
+}: {
+  album: Album;
+  isWide: boolean;
+  onClick: () => void;
+}) => {
+  const [hovered, setHovered] = useState(false);
+  const selectedId = useAlbumStore((s) => s.selectedAlbumId);
+  const active = selectedId === album.albumID;
+
+  return (
+    <div
+      onClick={onClick}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: isWide ? "16px" : "12px",
+        padding: isWide ? "12px" : "8px",
+        borderRadius: "8px",
+        background:
+          active ? "#2a2a2a"
+          : hovered ? "#1a1a1a"
+          : "transparent",
+        cursor: "pointer",
+      }}
+    >
+      <CoverBox size={isWide ? 56 : 48}>
+        {album.albumItemImage ? (
+          <img
+            src={`http://localhost:5081/media/images/album/${album.albumItemImage}`}
+            alt={album.albumName}
+            style={imgFullStyle}
+          />
+        ) : "🎵"}
+      </CoverBox>
+
+      <div style={{ minWidth: 0, flex: 1 }}>
+        <div style={{
+          color: active ? "#1DB954" : "#fff",
+          fontSize: isWide ? "15px" : "14px",
+          fontWeight: 700,
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+        }}>
+          {album.albumName}
+        </div>
+
+        <div style={{
+          color: "#b3b3b3",
+          fontSize: isWide ? "13px" : "12px",
+          marginTop: "4px",
+        }}>
+          Album • {album.artistName}
         </div>
       </div>
     </div>

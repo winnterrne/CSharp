@@ -22,6 +22,7 @@ public class GetAlbumTracksHandler : IRequestHandler<GetAlbumTracksQuery, IEnume
             track.TitleName,
             track.filePath,
             track.MediaItemImage,
+            track.MediaItemTag,
             track.Duration
         ));
     }

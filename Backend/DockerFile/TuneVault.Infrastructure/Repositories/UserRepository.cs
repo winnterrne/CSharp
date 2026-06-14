@@ -115,19 +115,40 @@ namespace TuneVault.Infrastructure.Repositories
             return await _db.ExecuteDataAsync(sql, user);
         }
 
-        public async Task<(IEnumerable<AspNetUsers> Users, int TotalCount)> SearchAsync(string keyword, int skip, int take)
+        public async Task<(IEnumerable<AspNetUsers> Users, int TotalCount)> SearchAsync(string keyword,int skip,int take)
         {
+            keyword = keyword?.Trim() ?? "";
+
+            if (string.IsNullOrWhiteSpace(keyword))
+            {
+                return (Enumerable.Empty<AspNetUsers>(), 0);
+            }
+
+            if (skip < 0) skip = 0;
+            if (take <= 0) take = 10;
+
             string sql = @"
-                SELECT * FROM AspNetUsers 
-                WHERE UserName LIKE @keyword AND IsDeleted = 0
+                SELECT *
+                FROM AspNetUsers
+                WHERE UserName LIKE @Keyword
+                OR Email LIKE @Keyword
                 ORDER BY UserName ASC
-                OFFSET @skip ROWS FETCH NEXT @take ROWS ONLY";
+                OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+            ";
 
             string countSql = @"
-            SELECT COUNT(*) FROM AspNetUsers 
-            WHERE UserName LIKE @keyword AND IsDeleted = 0";
+                SELECT COUNT(*)
+                FROM AspNetUsers
+                WHERE UserName LIKE @Keyword
+                OR Email LIKE @Keyword;
+            ";
 
-            var parameters = new { Keyword = $"%{keyword}%", skip, take };
+            var parameters = new
+            {
+                Keyword = $"%{keyword}%",
+                Skip = skip,
+                Take = take
+            };
 
             var users = await _db.LoadAllDataSingleAsync<AspNetUsers>(sql, parameters);
             var totalCount = await _db.ExecuteScalarAsync<int>(countSql, parameters);

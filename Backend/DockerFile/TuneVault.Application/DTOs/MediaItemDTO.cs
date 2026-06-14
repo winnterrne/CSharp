@@ -83,5 +83,6 @@ public record MediaItemAlbumDto(
     string? TitleName,
     string? filePath,
     string? MediaItemImage,
+    string? MediaItemTag,
     int? Duration
 );

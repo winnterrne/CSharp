@@ -4,10 +4,18 @@ import { usePlayer } from "../../hooks/usePlayer";
 import { useFavorite } from "../../hooks/useFavorite";
 import AddToPlaylistButton from "../playlist/AddToPlaylistButton";
 import TrackActionMenu from "../common/TrackActionMenu";
+import ShareMediaModal from "../share/ShareModal";
+
 
 type AlbumDetailViewProps = {
-  cover: Media;
+  cover?: Media;
+
+  albumTitle?: string;
+  albumImage?: string;
+  artistName?: string;
+
   tracks: Media[];
+
   onOpenTrack: (track: Media) => void;
   onOpenArtist: (artistName: string) => void;
 };
@@ -39,6 +47,9 @@ const formatTotalDuration = (tracks: Media[]) => {
 
 const AlbumDetailView = ({
   cover,
+   albumTitle,
+  albumImage,
+  artistName,
   tracks,
   onOpenTrack,
   onOpenArtist,
@@ -46,7 +57,21 @@ const AlbumDetailView = ({
   const { playTrack, setQueue } = usePlayer();
   const [shuffle, setShuffle] = useState(false);
 
-  const artistName = cover.artist?.name ?? "Unknown Artist";
+  const displayTitle =
+    albumTitle ??
+    cover?.albumName ??
+    cover?.title ??
+    "Album";
+
+  const displayArtist =
+    artistName ??
+    cover?.artist?.name ??
+    "Unknown Artist";
+
+  const displayImage =
+    albumImage ??
+    cover?.thumbnailUrl ??
+    "";
 
   const handlePlayAll = () => {
     if (tracks.length === 0) return;
@@ -84,10 +109,10 @@ const AlbumDetailView = ({
             fontSize: "72px",
           }}
         >
-          {cover.thumbnailUrl ? (
+          {displayImage ? (
             <img
-              src={cover.thumbnailUrl}
-              alt={cover.title}
+              src={displayImage}
+              alt={displayTitle}
               style={{
                 width: "100%",
                 height: "100%",
@@ -119,7 +144,7 @@ const AlbumDetailView = ({
               wordBreak: "break-word",
             }}
           >
-            {cover.title}
+            {displayTitle}
           </h1>
 
           <p
@@ -130,13 +155,13 @@ const AlbumDetailView = ({
             }}
           >
             <span
-              onClick={() => onOpenArtist(artistName)}
+              onClick={() => onOpenArtist(displayArtist)}
               style={{
                 cursor: "pointer",
                 color: "#fff",
               }}
             >
-              {artistName}
+              {displayArtist}
             </span>{" "}
             • {tracks.length} bài hát • {formatTotalDuration(tracks)}
           </p>
@@ -186,7 +211,9 @@ const AlbumDetailView = ({
           ⇄
         </button>
 
-        <AddToPlaylistButton mediaId={cover.id} />
+        {cover && (
+          <AddToPlaylistButton mediaId={cover.id} />
+        )}
 
         <button
           title="Tải xuống"

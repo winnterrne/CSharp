@@ -7,6 +7,8 @@ import HomeView from "./HomeView";
 import ArtistDetailView from "./ArtistDetailView";
 import AlbumCardLarge from "./AlbumCardLarge";
 import { mediaApi } from "../../api/mediaApi";
+import { albumApi } from "../../api/albumApi";
+import type { Album } from "../../types/album";
 
 type ViewMode =
   | "home"
@@ -39,22 +41,26 @@ const MainContent = () => {
     tracks: Media[];
   } | null>(null);
 
+  const [albums, setAlbums] = useState<Album[]>([]);
+
 useEffect(() => {
   const fetchHomeData = async () => {
     try {
       setLoading(true);
 
       // NEW: gọi dữ liệu thật từ backend
-      const [recommendedRes, forYouRes, upcomingRes] = await Promise.all([
-        mediaApi.getRecommended(),
-        mediaApi.getForYou(),
-        mediaApi.getUpcoming(),
-      ]);
+      const [recommendedRes, forYouRes, upcomingRes, albumRes,] = await Promise.all([
+      mediaApi.getRecommended(),
+      mediaApi.getForYou(),
+      mediaApi.getUpcoming(),
+      albumApi.getAll(),
+    ]);
 
       // FIX: backend có thể trả res.data hoặc res.data.data
       setRecommended(recommendedRes.data?.data ?? recommendedRes.data ?? []);
       setForYou(forYouRes.data?.data ?? forYouRes.data ?? []);
       setUpcoming(upcomingRes.data?.data ?? upcomingRes.data ?? []);
+      setAlbums(albumRes.data?.data ?? []);
     } catch (err) {
       console.error("FETCH HOME DATA ERROR:", err);
 
@@ -175,6 +181,7 @@ useEffect(() => {
           recommended={recommended}
           forYou={forYou}
           upcoming={upcoming}
+          albums={albums}
           onOpenTrack={handleOpenTrack}
           onOpenAlbum={handleOpenAlbum}
           onShowAll={(mode) => setViewMode(mode)}

@@ -34,6 +34,12 @@ public class ShareMediaHandler : IRequestHandler<ShareMediaCommand, ShareMediaRe
         var receiver = await _userRepo.GetUserByIdAsync(request.ReceiverID);
         if(receiver == null) throw new Exception("Người nhận không tồn tại");
 
+        if (request.MediaItemID == null && request.PlaylistID == null)
+            throw new Exception("Phải chọn bài hát/video hoặc playlist để chia sẻ");
+
+        if (request.MediaItemID != null && request.PlaylistID != null)
+            throw new Exception("Chỉ được chia sẻ một loại nội dung");
+
         var alreadyShared = await _shareRepo.AlreadySharedAsync(
             request.SenderID, request.ReceiverID,
             request.MediaItemID, request.PlaylistID);
@@ -63,7 +69,7 @@ public class ShareMediaHandler : IRequestHandler<ShareMediaCommand, ShareMediaRe
                 shareID = shareID,
                 senderName = sender?.UserName,
                 mediaItemID = request.MediaItemID,
-                plalistID = request.PlaylistID  
+                playlistID = request.PlaylistID  
             }),
             IsRead = false,
             UserID = request.ReceiverID

@@ -15,21 +15,24 @@ public class SearchUsersHandler : IRequestHandler<SearchUserQuery, IEnumerable<U
         _userRepo = userRepo;
     }
 
-    public async Task<IEnumerable<UserProfileDto>> Handle( SearchUserQuery request, CancellationToken cancellationToken)
+    public async Task<IEnumerable<UserProfileDto>> Handle(SearchUserQuery request,CancellationToken cancellationToken)
     {
-        int skip = (request.PageNumber - 1) * request.PageSize;
+        var pageNumber = request.PageNumber <= 0 ? 1 : request.PageNumber;
+        var pageSize = request.PageSize <= 0 ? 10 : request.PageSize;
 
-        var users = await _userRepo.SearchAsync(request.Keyword, skip, request.PageSize);
+        var skip = (pageNumber - 1) * pageSize;
+        var take = pageSize;
 
-        var userDtos = users.Users.Select(user => new UserProfileDto(
-            user.UserID,
-            user.UserName,
-            user.UserImage,
-            user.Email,
-            user.Role,
-            user.Phone
+        var result = await _userRepo.SearchAsync(request.Keyword, skip, take);
+
+        return result.Users.Select(u => new UserProfileDto
+        (
+            u.UserID,
+            u.UserName,
+            u.UserImage,
+            u.Email,
+            u.Role,
+            u.Phone
         ));
-
-        return userDtos;
     }
 }
