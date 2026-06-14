@@ -5,6 +5,7 @@ export interface User {
   role?: string;
   avatarUrl?: string;
   phone?: string;
+  bio?: string;
   createdAt?: string;
   updatedAt?: string;
 }

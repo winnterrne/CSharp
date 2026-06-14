@@ -5,7 +5,7 @@ using TuneVault.Domain.Interfaces;
 
 namespace TuneVault.Application.UseCases.User;
 
-public class SearchUsersHandler : IRequestHandler<SearchUserQuery, IEnumerable<UserProfileDTO>>
+public class SearchUsersHandler : IRequestHandler<SearchUserQuery, IEnumerable<UserProfileDto>>
 {
     // Tiêm Dependency Injection cho User Repository
     private readonly IUserRepository _userRepo;

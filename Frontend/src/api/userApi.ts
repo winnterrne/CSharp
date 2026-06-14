@@ -4,6 +4,7 @@ export interface UpdateProfilePayload {
   userName?: string;
   userImage?: string;
   phone?: string;
+  bio?: string;
 }
 
 export const userApi = {
