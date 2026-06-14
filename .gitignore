@@ -1,6 +1,11 @@
 # Ignore build outputs
 **/bin/
 **/obj/
+*.dll
+*.pdb
+*.cache
+*.log
+*.json
 
 # Ignore local settings and temporary files
 .vs/
