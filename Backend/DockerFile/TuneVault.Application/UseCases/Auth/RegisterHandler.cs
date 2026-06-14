@@ -44,7 +44,7 @@ public class RegisterHandler : IRequestHandler<RegisterCommand, AuthResponseDto>
 
         var token = _jwtService.GenerateToken(user);
         return new AuthResponseDto(
-            user.UserID, user.UserName!, user.Email!, user.Role!, token
+            user.UserID, user.UserName!, user.Email!, user.Role!, token, user.UserImage
         );
     }
 }

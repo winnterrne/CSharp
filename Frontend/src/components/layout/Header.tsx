@@ -4,7 +4,8 @@ import { authStore } from "../../store/authStore";
 import { userApi } from "../../api/userApi";
 import type { UserProfile } from "../../types/profile";
 import { useEffect } from "react";
-
+import { useHistoryStore } from "../../store/historyStore";
+import { PlayIcon } from "../common/icons";
 export interface HeaderUser {
   displayName: string;
   avatarUrl?: string;
@@ -27,6 +28,24 @@ export interface HeaderProps {
   onPlayTrack?: (track: Media) => void;
   onSelectTrack?: (track: Media) => void;
 }
+
+// Thêm helper format ngày
+const formatPlayedAt = (playedAt?: string) => {
+  if (!playedAt) return "";
+  const date = new Date(playedAt);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMins / 60);
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffMins < 1) return "Vừa xong";
+  if (diffMins < 60) return `${diffMins} phút trước`;
+  if (diffHours < 24) return `${diffHours} giờ trước`;
+  if (diffDays < 7) return `${diffDays} ngày trước`;
+  return date.toLocaleDateString("vi-VN");
+};
+
 
 const Header = ({
   searchValue,
@@ -56,6 +75,9 @@ const Header = ({
   const [profile, setProfile] = useState<UserProfile | null>(null);
 
   const [showProfileModal, setShowProfileModal] = useState(false);
+
+  const [showRecentModal, setShowRecentModal] = useState(false);
+  const recentTracks = useHistoryStore((state) => state.recentTracks);
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -411,21 +433,19 @@ const Header = ({
               }}
             >
               <MenuItem
-                label="Tài khoản"
-                onClick={() => {
-                  setShowAccountMenu(false);
-                  onAvatarClick?.();
-                }}
-              />
-              <MenuItem
                 label="Hồ sơ"
                 onClick={() => {
                   setShowAccountMenu(false);
                   onAvatarClick?.();
                 }}
               />
-              <MenuItem label="Gần đây" />
-              <MenuItem label="Cài đặt" />
+              <MenuItem
+                label="Gần đây"
+                onClick={() => {
+                  setShowAccountMenu(false);
+                  setShowRecentModal(true);
+                }}
+              />
               <div
                 style={{
                   height: "1px",
@@ -504,89 +524,221 @@ const Header = ({
           </div>
         </div>
       )}
-    </header>
-  );
-};
 
-// ─── Sub-components ────────────────────────────────────────────────────────────
-const IconActionBtn = ({
-  children,
-  title,
-  onClick,
-}: {
-  children: React.ReactNode;
-  title?: string;
-  onClick?: () => void;
-}) => (
-  <button
-    title={title}
-    onClick={onClick}
-    style={{
-      background: "transparent",
-      border: "none",
-      borderRadius: "50%",
-      width: "36px",
-      height: "36px",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      cursor: "pointer",
-      color: "#b3b3b3",
-      transition: "color 0.2s",
-    }}
-    onMouseEnter={(e) => (e.currentTarget.style.color = "#fff")}
-    onMouseLeave={(e) => (e.currentTarget.style.color = "#b3b3b3")}
-  >
-    {children}
-  </button>
-);
+      {showRecentModal && (
+        <div
+          onClick={() => setShowRecentModal(false)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,.65)",
+            zIndex: 99999,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              width: "480px",
+              maxWidth: "100%",
+              background: "#181818",
+              borderRadius: "14px",
+              padding: "24px",
+              color: "#fff",
+              maxHeight: "70vh",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <h2 style={{ margin: "0 0 16px", fontSize: "22px" }}>Gần đây</h2>
 
-const MenuItem = ({
-  label,
-  onClick,
-}: {
-  label: string;
-  onClick?: () => void;
-}) => (
-  <button
-    onClick={onClick}
-    style={{
-      width: "100%",
-      background: "transparent",
-      border: "none",
-      color: "#fff",
-      padding: "12px",
-      textAlign: "left",
-      borderRadius: "4px",
-      cursor: "pointer",
-      fontSize: "14px",
-      fontWeight: 600,
-    }}
-    onMouseEnter={(e) => (e.currentTarget.style.background = "#3e3e3e")}
-    onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-  >
-    {label}
-  </button>
-);
-const ProfileRow = ({ label, value }: { label: string; value: string }) => (
-  <div
-    style={{
-      display: "flex",
-      justifyContent: "space-between",
-      padding: "12px 0",
-      borderBottom: "1px solid #2f2f2f",
-    }}
-  >
-    <span
+            {recentTracks.length === 0 ? (
+              <p style={{ color: "#b3b3b3" }}>Chưa có bài hát nào gần đây.</p>
+            ) : (
+              <div style={{ overflowY: "auto", flex: 1 }}>
+                {recentTracks.map((track) => (
+                  <RecentTrackRow
+                    key={track.id}
+                    track={track}
+                    onPlay={(t) => {
+                      onPlayTrack?.(t);
+                      setShowRecentModal(false);
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+
+            <button
+              onClick={() => setShowRecentModal(false)}
+              style={{
+                marginTop: "16px",
+                width: "100%",
+                height: "40px",
+                border: "none",
+                borderRadius: "999px",
+                background: "#333",
+                color: "#fff",
+                cursor: "pointer",
+                fontWeight: 700,
+              }}
+            >
+              Đóng
+            </button>
+          </div>
+        </div>
+        )}
+      </header>
+    );
+  };
+
+  // ─── Sub-components ────────────────────────────────────────────────────────────
+  const IconActionBtn = ({
+    children,
+    title,
+    onClick,
+  }: {
+    children: React.ReactNode;
+    title?: string;
+    onClick?: () => void;
+  }) => (
+    <button
+      title={title}
+      onClick={onClick}
       style={{
+        background: "transparent",
+        border: "none",
+        borderRadius: "50%",
+        width: "36px",
+        height: "36px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        cursor: "pointer",
         color: "#b3b3b3",
+        transition: "color 0.2s",
       }}
+      onMouseEnter={(e) => (e.currentTarget.style.color = "#fff")}
+      onMouseLeave={(e) => (e.currentTarget.style.color = "#b3b3b3")}
+    >
+      {children}
+    </button>
+  );
+
+  const MenuItem = ({
+    label,
+    onClick,
+  }: {
+    label: string;
+    onClick?: () => void;
+  }) => (
+    <button
+      onClick={onClick}
+      style={{
+        width: "100%",
+        background: "transparent",
+        border: "none",
+        color: "#fff",
+        padding: "12px",
+        textAlign: "left",
+        borderRadius: "4px",
+        cursor: "pointer",
+        fontSize: "14px",
+        fontWeight: 600,
+      }}
+      onMouseEnter={(e) => (e.currentTarget.style.background = "#3e3e3e")}
+      onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
     >
       {label}
-    </span>
+    </button>
+  );
+  const ProfileRow = ({ label, value }: { label: string; value: string }) => (
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        padding: "12px 0",
+        borderBottom: "1px solid #2f2f2f",
+      }}
+    >
+      <span
+        style={{
+          color: "#b3b3b3",
+        }}
+      >
+        {label}
+      </span>
 
-    <span>{value}</span>
-  </div>
-);
+      <span>{value}</span>
+    </div>
+  );
 
+  const RecentTrackRow = ({
+      track,
+      onPlay,
+    }: {
+      track: Media;
+    onPlay: (track: Media) => void;
+  }) => {
+    const [hovered, setHovered] = useState(false);
+
+    return (
+      <div
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+          padding: "10px 8px",
+          borderRadius: "8px",
+          background: hovered ? "#2a2a2a" : "transparent",
+          cursor: "pointer",
+        }}
+      >
+        <div style={{
+          width: "44px", height: "44px", borderRadius: "6px",
+          overflow: "hidden", flexShrink: 0, background: "#282828",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          color: "#b3b3b3",
+        }}>
+          {track.thumbnailUrl ? (
+            <img src={track.thumbnailUrl} alt={track.title}
+              style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          ) : "🎵"}
+        </div>
+
+        <div style={{ minWidth: 0, flex: 1 }}>
+          <div style={{
+            color: "#fff", fontWeight: 700, fontSize: "14px",
+            whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
+          }}>
+            {track.title}
+          </div>
+          <div style={{ color: "#b3b3b3", fontSize: "13px", marginTop: "3px", display: "flex", gap: "8px" }}>
+            <span>{track.artist?.name ?? "Unknown Artist"}</span>
+            {track.playedAt && <><span>•</span><span>{formatPlayedAt(track.playedAt)}</span></>}
+          </div>
+        </div>
+
+        {/* Nút play hiện khi hover row */}
+        <button
+          onClick={() => onPlay(track)}
+          title="Phát"
+          style={{
+            width: "36px", height: "36px", borderRadius: "50%",
+            border: "none", background: "#1DB954", color: "#000",
+            cursor: "pointer", display: "flex", alignItems: "center",
+            justifyContent: "center", flexShrink: 0,
+            opacity: hovered ? 1 : 0,
+            transition: "opacity .15s",
+          }}
+        >
+          <PlayIcon />
+        </button>
+      </div>
+    );
+  };
 export default Header;

@@ -19,10 +19,17 @@ export const authStore = create<AuthStore>((set, get) => ({
   isLoading: false,
 
   setUser: (user) =>
-    set({
-      user,
-      isAuthenticated: !!user && !!get().token,
-    }),
+  set({
+    user: user
+      ? {
+          ...user,
+          avatarUrl: user.userImage
+            ? `http://localhost:5081/media/images/users/${user.userImage}`
+            : undefined,
+        }
+      : null,
+    isAuthenticated: !!user && !!get().token,
+  }),
 
   setToken: (token) =>
     set({
@@ -33,12 +40,17 @@ export const authStore = create<AuthStore>((set, get) => ({
   setLoading: (isLoading) => set({ isLoading }),
 
   login: (user, token) =>
-    set({
-      user,
-      token,
-      isAuthenticated: true,
-      isLoading: false,
-    }),
+  set({
+    user: {
+      ...user,
+      avatarUrl: user.userImage
+        ? `http://localhost:5081/media/images/users/${user.userImage}`
+        : undefined,
+    },
+    token,
+    isAuthenticated: true,
+    isLoading: false,
+  }),
 
   logout: () =>
     set({

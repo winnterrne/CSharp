@@ -8,6 +8,7 @@ export interface User {
   bio?: string;
   createdAt?: string;
   updatedAt?: string;
+  userImage?: string;
 }
 
 export interface AuthTokens {

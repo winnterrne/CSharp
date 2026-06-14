@@ -156,7 +156,7 @@ const MainLayout = ({ children }: { children: ReactNode }) => {
             user
               ? {
                   displayName: user.username,
-                  avatarUrl: user.avatarUrl,
+                   avatarUrl: user.avatarUrl,
                 }
               : null
           }

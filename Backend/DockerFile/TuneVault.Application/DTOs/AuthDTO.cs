@@ -16,7 +16,8 @@ public record AuthResponseDto (
     string UserName,
     string Email,
     string Role,
-    string Token
+    string Token,
+    string? UserImage
 );
 
 public record UserProfileDto (
