@@ -4,6 +4,7 @@ import { usePlayer } from "../../hooks/usePlayer";
 import { useFavorite } from "../../hooks/useFavorite";
 import AddToPlaylistButton from "../playlist/AddToPlaylistButton";
 import TrackActionMenu from "../common/TrackActionMenu";
+import ShareMediaModal from "../share/ShareModal";
 
 
   type TrackDetailViewProps = {
@@ -22,7 +23,7 @@ import TrackActionMenu from "../common/TrackActionMenu";
 
   const TrackDetailView = ({ track, onOpenArtist }: TrackDetailViewProps) => {
     const [menuOpen, setMenuOpen] = useState(false);
-
+    const [shareOpen, setShareOpen] = useState(false);
     const { playTrack, setQueue } = usePlayer();
     const { isFavorite, toggleFavorite } = useFavorite();
 
@@ -168,7 +169,7 @@ import TrackActionMenu from "../common/TrackActionMenu";
 
        <AddToPlaylistButton mediaId={track.id} />
         <button
-          onClick={() => navigator.clipboard.writeText(window.location.href)}
+          onClick={() => setShareOpen(true)}
           title="Chia sẻ"
           style={{
             border: "none",
@@ -248,6 +249,13 @@ import TrackActionMenu from "../common/TrackActionMenu";
           </p>
         </div>
       </section>
+      <ShareMediaModal
+        open={shareOpen}
+        onClose={() => setShareOpen(false)}
+        mediaItemID={Number(track.id)}
+        playlistID={null}
+        title={`Chia sẻ ${track.type === "video" ? "video" : "bài hát"}`}
+      />
     </>
   );
 };

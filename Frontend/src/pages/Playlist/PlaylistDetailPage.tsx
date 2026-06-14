@@ -12,6 +12,7 @@ import type { Media } from "../../types/media";
 import { usePlayer } from "../../hooks/usePlayer";
 import { useSearch } from "../../hooks/useSearch";
 import TrackActionMenu from "../../components/common/TrackActionMenu";
+import ShareMediaModal from "../../components/share/ShareModal";
 
 const formatDuration = (seconds?: number) => {
   if (!seconds || Number.isNaN(seconds)) return "0:00";
@@ -34,7 +35,7 @@ const getPlaylistFromResponse = (responseData: unknown): Playlist => {
 
 const PlaylistDetailPage = () => {
   const { id } = useParams<{ id: string }>();
-  const { playTrack } = usePlayer();
+  const { playTrack, setQueue} = usePlayer();
 
   const {
     search,
@@ -50,6 +51,7 @@ const PlaylistDetailPage = () => {
   const [searchKeyword, setSearchKeyword] = useState("");
   const [addingTrack, setAddingTrack] = useState(false);
   const [addTrackMessage, setAddTrackMessage] = useState("");
+  const [sharePlaylistOpen, setSharePlaylistOpen] = useState(false);
 
   const playlistTracks = useMemo<PlaylistTrack[]>(() => {
     return playlist?.tracks ?? [];
@@ -322,16 +324,17 @@ const PlaylistDetailPage = () => {
           +
         </button>
         <button
-          title="Tải xuống"
+          title="Chia sẻ playlist"
+          onClick={() => setSharePlaylistOpen(true)}
           style={{
             border: "none",
             background: "transparent",
             color: "#b3b3b3",
             cursor: "pointer",
-            fontSize: "30px",
+            fontSize: "28px",
           }}
         >
-          ↓
+          ↗
         </button>
 
         <button
@@ -489,7 +492,7 @@ const PlaylistDetailPage = () => {
               </div>
 
               <button
-                onClick={() => handleAddTrackToCurrentPlaylist(track.id)}
+                onClick={() => handleAddTrackToCurrentPlaylist(Number(track.id))}
                 disabled={addingTrack}
                 style={{
                   height: "36px",
@@ -547,6 +550,13 @@ const PlaylistDetailPage = () => {
           </>
         )}
       </section>
+      <ShareMediaModal
+        open={sharePlaylistOpen}
+        onClose={() => setSharePlaylistOpen(false)}
+        playlistID={Number(id)}
+        mediaItemID={null}
+        title="Chia sẻ playlist"
+      />
     </main>
   );
 };
