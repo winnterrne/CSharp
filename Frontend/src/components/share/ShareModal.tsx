@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { shareApi } from "../../api/shareApi";
 import { userApi, type UserSearchResult } from "../../api/userApi";
+import { ShareIcon } from "../common/icons";
 
 type ShareMediaModalProps = {
   open: boolean;
@@ -163,8 +164,12 @@ const ShareMediaModal = ({
           style={{
             margin: "0 0 16px",
             fontSize: "22px",
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
           }}
         >
+          <ShareIcon />
           {title}
         </h2>
 

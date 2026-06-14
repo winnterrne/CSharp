@@ -334,7 +334,8 @@ const PlaylistDetailPage = () => {
             fontSize: "28px",
           }}
         >
-          ↗
+          <img src="/src/assets/icons/share-solid-full.svg" alt="share-media"/>
+
         </button>
 
         <button

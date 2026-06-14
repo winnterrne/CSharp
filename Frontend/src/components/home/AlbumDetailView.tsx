@@ -5,6 +5,8 @@ import { useFavorite } from "../../hooks/useFavorite";
 import AddToPlaylistButton from "../playlist/AddToPlaylistButton";
 import TrackActionMenu from "../common/TrackActionMenu";
 import ShareMediaModal from "../share/ShareModal";
+import { ShareIcon, AddToPlaylistIcon, PlayIcon, ShuffleIcon, DownloadIcon, MoreHorizIcon, HeartIcon } from "../common/icons";
+
 
 
 type AlbumDetailViewProps = {
@@ -194,7 +196,7 @@ const AlbumDetailView = ({
             boxShadow: "0 8px 24px rgba(0,0,0,.35)",
           }}
         >
-          ▶
+          <PlayIcon/>
         </button>
 
         <button
@@ -208,7 +210,7 @@ const AlbumDetailView = ({
             cursor: "pointer",
           }}
         >
-          ⇄
+          <ShuffleIcon/>
         </button>
 
         {cover && (
@@ -225,7 +227,7 @@ const AlbumDetailView = ({
             cursor: "pointer",
           }}
         >
-          ↓
+          <DownloadIcon/>
         </button>
 
         <button
@@ -238,7 +240,7 @@ const AlbumDetailView = ({
             cursor: "pointer",
           }}
         >
-          ⋯
+          <MoreHorizIcon/>
         </button>
 
         <button
@@ -369,7 +371,7 @@ const TrackRow = ({
               fontSize: "16px",
             }}
           >
-            ▶
+            <PlayIcon/>
           </button>
         ) : (
           index + 1
@@ -491,7 +493,8 @@ const TrackRow = ({
                 fontSize: "20px",
               }}
             >
-              {liked ? "♥" : "♡"}
+              {/* {liked ? "♥" : "♡"} */}
+              <HeartIcon/>
             </button>
 
             <button
@@ -508,7 +511,7 @@ const TrackRow = ({
                 fontSize: "22px",
               }}
             >
-              ⋯
+              <MoreHorizIcon/>
             </button>
           </>
         )}
