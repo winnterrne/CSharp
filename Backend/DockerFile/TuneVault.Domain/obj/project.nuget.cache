@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "zfDNfYbugTQ=",
+  "dgSpecHash": "7cVhNAufc6c=",
   "success": true,
-  "projectFilePath": "D:\\TuneVault\\CSharp\\Backend\\DockerFile\\TuneVault.Domain\\TuneVault.Domain.csproj",
+  "projectFilePath": "d:\\TuneVault\\CSharp\\Backend\\DockerFile\\TuneVault.Domain\\TuneVault.Domain.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }
