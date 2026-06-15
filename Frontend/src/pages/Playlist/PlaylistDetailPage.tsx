@@ -642,6 +642,8 @@ const PlaylistTrackRow = ({
     currentTrack &&
     Number(getMediaId(currentTrack)) === Number(getMediaId(media));
 
+  const showNowPlaying = Boolean(isThisTrackPlaying && isPlaying);
+
   const handlePlayThisTrack = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
 
@@ -659,6 +661,7 @@ const PlaylistTrackRow = ({
 
     playTrack(media);
   };
+
   return (
     <div
       onDoubleClick={onPlay}
@@ -673,24 +676,43 @@ const PlaylistTrackRow = ({
         height: "64px",
         padding: "0 8px",
         borderRadius: "8px",
-        background: hovered ? "#555" : "transparent",
+        background: showNowPlaying
+          ? "rgba(29,185,84,.18)"
+          : hovered
+            ? "#2a2a2a"
+            : "transparent",
         cursor: "pointer",
         position: "relative",
+        transition: "background 0.15s ease, transform 0.12s ease",
+        transform: hovered ? "translateY(-1px)" : "translateY(0)",
       }}
     >
-      <div style={{ color: "#b3b3b3", fontSize: "14px" }}>
-        {hovered ? (
+      <div
+        style={{
+          color: showNowPlaying ? "#1DB954" : "#b3b3b3",
+          fontSize: "14px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        {hovered || isThisTrackPlaying ? (
           <button
             onClick={handlePlayThisTrack}
             style={{
+              width: "28px",
+              height: "28px",
               border: "none",
               background: "transparent",
-              color: "#fff",
+              color: showNowPlaying ? "#1DB954" : "#fff",
               cursor: "pointer",
               fontSize: "16px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
-            <PlayIcon/>
+            {showNowPlaying ? <NowPlayingIcon /> : <PlayIcon />}
           </button>
         ) : (
           index + 1
@@ -698,6 +720,7 @@ const PlaylistTrackRow = ({
       </div>
 
       <div
+        onClick={onPlay}
         style={{
           display: "flex",
           alignItems: "center",
@@ -717,6 +740,9 @@ const PlaylistTrackRow = ({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            boxShadow: showNowPlaying
+              ? "0 0 0 2px rgba(29,185,84,.7)"
+              : "none",
           }}
         >
           {media.thumbnailUrl ? (
@@ -737,7 +763,7 @@ const PlaylistTrackRow = ({
         <div style={{ minWidth: 0 }}>
           <div
             style={{
-              color: "#fff",
+              color: showNowPlaying ? "#1DB954" : "#fff",
               fontSize: "14px",
               fontWeight: 700,
               whiteSpace: "nowrap",
@@ -753,6 +779,9 @@ const PlaylistTrackRow = ({
               color: "#d0d0d0",
               fontSize: "12px",
               marginTop: "3px",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
             }}
           >
             {artistName}
@@ -790,7 +819,7 @@ const PlaylistTrackRow = ({
 
       <div
         style={{
-          color: "#b3b3b3",
+          color: hovered || showNowPlaying ? "#fff" : "#b3b3b3",
           fontSize: "14px",
           whiteSpace: "nowrap",
           overflow: "hidden",
@@ -802,7 +831,7 @@ const PlaylistTrackRow = ({
 
       <div
         style={{
-          color: "#b3b3b3",
+          color: hovered || showNowPlaying ? "#fff" : "#b3b3b3",
           fontSize: "14px",
           textAlign: "right",
           display: "flex",
