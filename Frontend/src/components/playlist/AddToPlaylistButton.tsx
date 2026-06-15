@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { playlistApi } from "../../api/playlistApi";
 import type { Playlist } from "../../types/playlist";
-
+import { AddToPlaylistIcon } from "../common/icons";
 type Props = {
   mediaId: string | number;
 };
@@ -121,7 +121,7 @@ const AddToPlaylistButton = ({ mediaId }: Props) => {
           justifyContent: "center",
         }}
       >
-        +
+        <AddToPlaylistIcon/>
       </button>
 
       {open && (

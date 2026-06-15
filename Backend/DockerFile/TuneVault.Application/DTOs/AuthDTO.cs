@@ -1,25 +1,26 @@
-namespace TuneVault.Application.DTOs;
-public record RegisterRequestDTO (
+namespace TuneVault.Application.DTos;
+public record RegisterRequestDto (
     string UserName,
     string Email,
     string Password,
     string? Phone
 );
 
-public record LoginRequestDTO (
+public record LoginRequestDto (
     string Email,
     string Password
 );
 
-public record AuthResponseDTO (
+public record AuthResponseDto (
     string UserID,
     string UserName,
     string Email,
     string Role,
-    string Token
+    string Token,
+    string? UserImage
 );
 
-public record UserProfileDTO (
+public record UserProfileDto (
     string UserID, 
     string? UserName, 
     string? UserImage,
@@ -28,7 +29,7 @@ public record UserProfileDTO (
     string? Phone
 );
 
-public record UpdateProfileDTO (
+public record UpdateProfileDto (
     string? UserName,
     string? UserImage,
     string? Phone

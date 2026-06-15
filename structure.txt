@@ -1,0 +1,522 @@
+Folder PATH listing for volume Acer
+Volume serial number is 000002DB 26E0:617E
+C:\DOANMONHOC\CSHARP\BACKEND
+¦   docker-compose.yml
+¦   ERD.png
+¦   
++---DockerFile
+    ¦   TuneVault.slnx
+    ¦   
+    +---TuneVault.API
+    ¦   ¦   appsettings.Development.json
+    ¦   ¦   appsettings.json
+    ¦   ¦   Program.cs
+    ¦   ¦   TuneVault.API.csproj
+    ¦   ¦   TuneVault.API.http
+    ¦   ¦   
+    ¦   +---bin
+    ¦   ¦   +---Debug
+    ¦   ¦       +---net10.0
+    ¦   ¦           ¦   appsettings.Development.json
+    ¦   ¦           ¦   appsettings.json
+    ¦   ¦           ¦   BCrypt-Net-Next.dll
+    ¦   ¦           ¦   Dapper.dll
+    ¦   ¦           ¦   FluentValidation.DependencyInjectionExtensions.dll
+    ¦   ¦           ¦   FluentValidation.dll
+    ¦   ¦           ¦   MediatR.Contracts.dll
+    ¦   ¦           ¦   MediatR.dll
+    ¦   ¦           ¦   Microsoft.AspNetCore.Authentication.JwtBearer.dll
+    ¦   ¦           ¦   Microsoft.AspNetCore.OpenApi.dll
+    ¦   ¦           ¦   Microsoft.Bcl.Cryptography.dll
+    ¦   ¦           ¦   Microsoft.Data.SqlClient.dll
+    ¦   ¦           ¦   Microsoft.Data.SqlClient.Extensions.Abstractions.dll
+    ¦   ¦           ¦   Microsoft.Data.SqlClient.Internal.Logging.dll
+    ¦   ¦           ¦   Microsoft.EntityFrameworkCore.Abstractions.dll
+    ¦   ¦           ¦   Microsoft.EntityFrameworkCore.dll
+    ¦   ¦           ¦   Microsoft.EntityFrameworkCore.Relational.dll
+    ¦   ¦           ¦   Microsoft.EntityFrameworkCore.SqlServer.dll
+    ¦   ¦           ¦   Microsoft.IdentityModel.Abstractions.dll
+    ¦   ¦           ¦   Microsoft.IdentityModel.JsonWebTokens.dll
+    ¦   ¦           ¦   Microsoft.IdentityModel.Logging.dll
+    ¦   ¦           ¦   Microsoft.IdentityModel.Protocols.dll
+    ¦   ¦           ¦   Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+    ¦   ¦           ¦   Microsoft.IdentityModel.Tokens.dll
+    ¦   ¦           ¦   Microsoft.OpenApi.dll
+    ¦   ¦           ¦   Microsoft.SqlServer.Server.dll
+    ¦   ¦           ¦   Swashbuckle.AspNetCore.Swagger.dll
+    ¦   ¦           ¦   Swashbuckle.AspNetCore.SwaggerGen.dll
+    ¦   ¦           ¦   Swashbuckle.AspNetCore.SwaggerUI.dll
+    ¦   ¦           ¦   System.Configuration.ConfigurationManager.dll
+    ¦   ¦           ¦   System.IdentityModel.Tokens.Jwt.dll
+    ¦   ¦           ¦   System.Security.Cryptography.ProtectedData.dll
+    ¦   ¦           ¦   TuneVault.API.deps.json
+    ¦   ¦           ¦   TuneVault.API.dll
+    ¦   ¦           ¦   TuneVault.API.exe
+    ¦   ¦           ¦   TuneVault.API.pdb
+    ¦   ¦           ¦   TuneVault.API.runtimeconfig.json
+    ¦   ¦           ¦   TuneVault.API.staticwebassets.endpoints.json
+    ¦   ¦           ¦   TuneVault.API.staticwebassets.runtime.json
+    ¦   ¦           ¦   TuneVault.Application.dll
+    ¦   ¦           ¦   TuneVault.Application.pdb
+    ¦   ¦           ¦   TuneVault.Domain.dll
+    ¦   ¦           ¦   TuneVault.Domain.pdb
+    ¦   ¦           ¦   TuneVault.Infrastructure.dll
+    ¦   ¦           ¦   TuneVault.Infrastructure.pdb
+    ¦   ¦           ¦   
+    ¦   ¦           +---cs
+    ¦   ¦           ¦       Microsoft.Data.SqlClient.resources.dll
+    ¦   ¦           ¦       
+    ¦   ¦           +---de
+    ¦   ¦           ¦       Microsoft.Data.SqlClient.resources.dll
+    ¦   ¦           ¦       
+    ¦   ¦           +---es
+    ¦   ¦           ¦       Microsoft.Data.SqlClient.resources.dll
+    ¦   ¦           ¦       
+    ¦   ¦           +---fr
+    ¦   ¦           ¦       Microsoft.Data.SqlClient.resources.dll
+    ¦   ¦           ¦       
+    ¦   ¦           +---it
+    ¦   ¦           ¦       Microsoft.Data.SqlClient.resources.dll
+    ¦   ¦           ¦       
+    ¦   ¦           +---ja
+    ¦   ¦           ¦       Microsoft.Data.SqlClient.resources.dll
+    ¦   ¦           ¦       
+    ¦   ¦           +---ko
+    ¦   ¦           ¦       Microsoft.Data.SqlClient.resources.dll
+    ¦   ¦           ¦       
+    ¦   ¦           +---pl
+    ¦   ¦           ¦       Microsoft.Data.SqlClient.resources.dll
+    ¦   ¦           ¦       
+    ¦   ¦           +---pt-BR
+    ¦   ¦           ¦       Microsoft.Data.SqlClient.resources.dll
+    ¦   ¦           ¦       
+    ¦   ¦           +---ru
+    ¦   ¦           ¦       Microsoft.Data.SqlClient.resources.dll
+    ¦   ¦           ¦       
+    ¦   ¦           +---runtimes
+    ¦   ¦           ¦   +---unix
+    ¦   ¦           ¦   ¦   +---lib
+    ¦   ¦           ¦   ¦       +---net9.0
+    ¦   ¦           ¦   ¦               Microsoft.Data.SqlClient.dll
+    ¦   ¦           ¦   ¦               
+    ¦   ¦           ¦   +---win
+    ¦   ¦           ¦   ¦   +---lib
+    ¦   ¦           ¦   ¦       +---net9.0
+    ¦   ¦           ¦   ¦               Microsoft.Data.SqlClient.dll
+    ¦   ¦           ¦   ¦               
+    ¦   ¦           ¦   +---win-arm64
+    ¦   ¦           ¦   ¦   +---native
+    ¦   ¦           ¦   ¦           Microsoft.Data.SqlClient.SNI.dll
+    ¦   ¦           ¦   ¦           
+    ¦   ¦           ¦   +---win-x64
+    ¦   ¦           ¦   ¦   +---native
+    ¦   ¦           ¦   ¦           Microsoft.Data.SqlClient.SNI.dll
+    ¦   ¦           ¦   ¦           
+    ¦   ¦           ¦   +---win-x86
+    ¦   ¦           ¦       +---native
+    ¦   ¦           ¦               Microsoft.Data.SqlClient.SNI.dll
+    ¦   ¦           ¦               
+    ¦   ¦           +---tr
+    ¦   ¦           ¦       Microsoft.Data.SqlClient.resources.dll
+    ¦   ¦           ¦       
+    ¦   ¦           +---zh-Hans
+    ¦   ¦           ¦       Microsoft.Data.SqlClient.resources.dll
+    ¦   ¦           ¦       
+    ¦   ¦           +---zh-Hant
+    ¦   ¦                   Microsoft.Data.SqlClient.resources.dll
+    ¦   ¦                   
+    ¦   +---Controllers
+    ¦   ¦       .gitkeep
+    ¦   ¦       AIController.cs
+    ¦   ¦       AuthController.cs
+    ¦   ¦       InteractionController.cs
+    ¦   ¦       MediaItemController.cs
+    ¦   ¦       NotificationController.cs
+    ¦   ¦       PlaylistController.cs
+    ¦   ¦       ShareController.cs
+    ¦   ¦       UserController.cs
+    ¦   ¦       
+    ¦   +---Middleware
+    ¦   ¦       .gitkeep
+    ¦   ¦       
+    ¦   +---obj
+    ¦   ¦   ¦   project.assets.json
+    ¦   ¦   ¦   project.nuget.cache
+    ¦   ¦   ¦   TuneVault.API.csproj.nuget.dgspec.json
+    ¦   ¦   ¦   TuneVault.API.csproj.nuget.g.props
+    ¦   ¦   ¦   TuneVault.API.csproj.nuget.g.targets
+    ¦   ¦   ¦   
+    ¦   ¦   +---Debug
+    ¦   ¦       +---net10.0
+    ¦   ¦           ¦   .NETCoreApp,Version=v10.0.AssemblyAttributes.cs
+    ¦   ¦           ¦   apphost.exe
+    ¦   ¦           ¦   rjimswa.dswa.cache.json
+    ¦   ¦           ¦   rjsmcshtml.dswa.cache.json
+    ¦   ¦           ¦   rjsmrazor.dswa.cache.json
+    ¦   ¦           ¦   rpswa.dswa.cache.json
+    ¦   ¦           ¦   staticwebassets.build.endpoints.json
+    ¦   ¦           ¦   staticwebassets.build.json
+    ¦   ¦           ¦   staticwebassets.build.json.cache
+    ¦   ¦           ¦   staticwebassets.development.json
+    ¦   ¦           ¦   swae.build.ex.cache
+    ¦   ¦           ¦   TuneVaul.BE12D78A.Up2Date
+    ¦   ¦           ¦   TuneVault.API.AssemblyInfo.cs
+    ¦   ¦           ¦   TuneVault.API.AssemblyInfoInputs.cache
+    ¦   ¦           ¦   TuneVault.API.assets.cache
+    ¦   ¦           ¦   TuneVault.API.csproj.AssemblyReference.cache
+    ¦   ¦           ¦   TuneVault.API.csproj.CoreCompileInputs.cache
+    ¦   ¦           ¦   TuneVault.API.csproj.FileListAbsolute.txt
+    ¦   ¦           ¦   TuneVault.API.dll
+    ¦   ¦           ¦   TuneVault.API.GeneratedMSBuildEditorConfig.editorconfig
+    ¦   ¦           ¦   TuneVault.API.genruntimeconfig.cache
+    ¦   ¦           ¦   TuneVault.API.GlobalUsings.g.cs
+    ¦   ¦           ¦   TuneVault.API.MvcApplicationPartsAssemblyInfo.cache
+    ¦   ¦           ¦   TuneVault.API.MvcApplicationPartsAssemblyInfo.cs
+    ¦   ¦           ¦   TuneVault.API.pdb
+    ¦   ¦           ¦   TuneVault.API.sourcelink.json
+    ¦   ¦           ¦   
+    ¦   ¦           +---ref
+    ¦   ¦           ¦       TuneVault.API.dll
+    ¦   ¦           ¦       
+    ¦   ¦           +---refint
+    ¦   ¦           ¦       TuneVault.API.dll
+    ¦   ¦           ¦       
+    ¦   ¦           +---staticwebassets
+    ¦   +---Properties
+    ¦   ¦       launchSettings.json
+    ¦   ¦       
+    ¦   +---wwwroot
+    ¦       ¦   .gitkeep
+    ¦       ¦   
+    ¦       +---media
+    ¦           ¦   .gitkeep
+    ¦           ¦   
+    ¦           +---audio
+    ¦           ¦       (3) SON TUNG M-TP x TYGA - COME MY WAY - OFFICIAL MUSIC VIDEO - YouTube.mp3
+    ¦           ¦       .gitkeep
+    ¦           ¦       1f66c770-d0bb-40c0-8b7d-cd598c21ccbe_(3) SON TUNG M-TP x TYGA - COME MY WAY - OFFICIAL MUSIC VIDEO - YouTube.mp3
+    ¦           ¦       1f66c770-d0bb-40c0-8b7d-cd598c21ccbe_3_SON_TUNG_M-TP_x_TYGA_-_COME_MY_WAY_-_OFFICIAL_MUSIC_VIDEO_-_YouTube.mp3
+    ¦           ¦       377dbdf1-f7f3-4934-aaa9-bcdf024eede7_song2.mp3
+    ¦           ¦       3a0d57d4-cd14-4fc8-b2b4-a71e2716dbdf_song2.mp3
+    ¦           ¦       4d5545c5-d8ab-481f-a376-de0e2fb6a01c_(3) SON TUNG M-TP x TYGA - COME MY WAY - OFFICIAL MUSIC VIDEO - YouTube.mp3
+    ¦           ¦       4d5545c5-d8ab-481f-a376-de0e2fb6a01c_3_SON_TUNG_M-TP_x_TYGA_-_COME_MY_WAY_-_OFFICIAL_MUSIC_VIDEO_-_YouTube.mp3
+    ¦           ¦       527aa291-303d-452a-897f-32bbce854f45_song2.mp3
+    ¦           ¦       795b8cde-1214-4b27-9197-5e3de28ba7d7_song2.mp3
+    ¦           ¦       82474599-14b6-4535-8e3a-7fdf94108b18_(3) SON TUNG M-TP x TYGA - COME MY WAY - OFFICIAL MUSIC VIDEO - YouTube.mp3
+    ¦           ¦       82474599-14b6-4535-8e3a-7fdf94108b18_3_SON_TUNG_M-TP_x_TYGA_-_COME_MY_WAY_-_OFFICIAL_MUSIC_VIDEO_-_YouTube.mp3
+    ¦           ¦       934b8b09-01a3-478b-9c62-f6d017f780c0_(3) SON TUNG M-TP x TYGA - COME MY WAY - OFFICIAL MUSIC VIDEO - YouTube.mp3
+    ¦           ¦       934b8b09-01a3-478b-9c62-f6d017f780c0_3_SON_TUNG_M-TP_x_TYGA_-_COME_MY_WAY_-_OFFICIAL_MUSIC_VIDEO_-_YouTube.mp3
+    ¦           ¦       9a841121-5570-4d6d-bc08-4149f613645d_(3) SON TUNG M-TP x TYGA - COME MY WAY - OFFICIAL MUSIC VIDEO - YouTube.mp3
+    ¦           ¦       9a841121-5570-4d6d-bc08-4149f613645d_3_SON_TUNG_M-TP_x_TYGA_-_COME_MY_WAY_-_OFFICIAL_MUSIC_VIDEO_-_YouTube.mp3
+    ¦           ¦       ac0ffc92-96dd-4027-b44a-b53d00331e49_song2.mp3
+    ¦           ¦       afedf32b-4a83-470d-9fa5-edbb833fcfb7_song2.mp3
+    ¦           ¦       ba4a5eea-4a29-4b82-a90c-e1bdb655fd2b_song36.mp3
+    ¦           ¦       ce263922-4d82-4774-b24d-86cff30ffea0_song2.mp3
+    ¦           ¦       d7179a7c-ba64-4626-b092-d553f9ffbd33_song36.mp3
+    ¦           ¦       f2bb7043-7de3-4b2e-90e6-dc6ecb13d9ee_song36.mp3
+    ¦           ¦       haychoconchiudangkhothayem.mp3
+    ¦           ¦       song1.mp3
+    ¦           ¦       song2.mp3
+    ¦           ¦       song36.mp3
+    ¦           ¦       
+    ¦           +---video
+    ¦                   .gitkeep
+    ¦                   
+    +---TuneVault.Application
+    ¦   ¦   TuneVault.Application.csproj
+    ¦   ¦   
+    ¦   +---bin
+    ¦   ¦   +---Debug
+    ¦   ¦       +---net10.0
+    ¦   ¦               TuneVault.Application.deps.json
+    ¦   ¦               TuneVault.Application.dll
+    ¦   ¦               TuneVault.Application.pdb
+    ¦   ¦               TuneVault.Domain.dll
+    ¦   ¦               TuneVault.Domain.pdb
+    ¦   ¦               
+    ¦   +---DTOs
+    ¦   ¦       .gitkeep
+    ¦   ¦       AuthDTO.cs
+    ¦   ¦       FavoriteDTO.cs
+    ¦   ¦       MediaItemDTO.cs
+    ¦   ¦       NotificationDTO.cs
+    ¦   ¦       PlayHistoryDTO.cs
+    ¦   ¦       PlaylistDTO.cs
+    ¦   ¦       ShareDTO.cs
+    ¦   ¦       
+    ¦   +---Interfaces
+    ¦   ¦       IFileStorageService.cs
+    ¦   ¦       IJwtService.cs
+    ¦   ¦       INotificationPushService.cs
+    ¦   ¦       
+    ¦   +---obj
+    ¦   ¦   ¦   project.assets.json
+    ¦   ¦   ¦   project.nuget.cache
+    ¦   ¦   ¦   TuneVault.Application.csproj.nuget.dgspec.json
+    ¦   ¦   ¦   TuneVault.Application.csproj.nuget.g.props
+    ¦   ¦   ¦   TuneVault.Application.csproj.nuget.g.targets
+    ¦   ¦   ¦   
+    ¦   ¦   +---Debug
+    ¦   ¦       +---net10.0
+    ¦   ¦           ¦   .NETCoreApp,Version=v10.0.AssemblyAttributes.cs
+    ¦   ¦           ¦   TuneVaul.CD6889CD.Up2Date
+    ¦   ¦           ¦   TuneVault.Application.AssemblyInfo.cs
+    ¦   ¦           ¦   TuneVault.Application.AssemblyInfoInputs.cache
+    ¦   ¦           ¦   TuneVault.Application.assets.cache
+    ¦   ¦           ¦   TuneVault.Application.csproj.AssemblyReference.cache
+    ¦   ¦           ¦   TuneVault.Application.csproj.CoreCompileInputs.cache
+    ¦   ¦           ¦   TuneVault.Application.csproj.FileListAbsolute.txt
+    ¦   ¦           ¦   TuneVault.Application.dll
+    ¦   ¦           ¦   TuneVault.Application.GeneratedMSBuildEditorConfig.editorconfig
+    ¦   ¦           ¦   TuneVault.Application.GlobalUsings.g.cs
+    ¦   ¦           ¦   TuneVault.Application.pdb
+    ¦   ¦           ¦   TuneVault.Application.sourcelink.json
+    ¦   ¦           ¦   
+    ¦   ¦           +---ref
+    ¦   ¦           ¦       TuneVault.Application.dll
+    ¦   ¦           ¦       
+    ¦   ¦           +---refint
+    ¦   ¦                   TuneVault.Application.dll
+    ¦   ¦                   
+    ¦   +---PipelineBehaviors
+    ¦   ¦       .gitkeep
+    ¦   ¦       ValidationBehavior.cs
+    ¦   ¦       
+    ¦   +---UseCases
+    ¦   ¦   ¦   .gitkeep
+    ¦   ¦   ¦   
+    ¦   ¦   +---AI
+    ¦   ¦   ¦       GenerateMediaDescriptionCommand.cs
+    ¦   ¦   ¦       GenerateMediaDescriptionHandler.cs
+    ¦   ¦   ¦       
+    ¦   ¦   +---Auth
+    ¦   ¦   ¦       LoginCommand.cs
+    ¦   ¦   ¦       LoginHandler.cs
+    ¦   ¦   ¦       RegisterCommand.cs
+    ¦   ¦   ¦       RegisterHandler.cs
+    ¦   ¦   ¦       
+    ¦   ¦   +---Interaction
+    ¦   ¦   ¦       AddFavoriteCommand.cs
+    ¦   ¦   ¦       AddFavoriteHandler.cs
+    ¦   ¦   ¦       FollowArtistCommand.cs
+    ¦   ¦   ¦       FollowArtistHandler.cs
+    ¦   ¦   ¦       FollowCommand.cs
+    ¦   ¦   ¦       FollowHandler.cs
+    ¦   ¦   ¦       GetRecentPlayHistoryHandler.cs
+    ¦   ¦   ¦       GetRecentPlayHistoryQuery.cs
+    ¦   ¦   ¦       GetUserFavoriteHandler.cs
+    ¦   ¦   ¦       GetUserFavoriteQuery.cs
+    ¦   ¦   ¦       RecordPlayHistoryCommand.cs
+    ¦   ¦   ¦       RecordPlayHistoryHandler.cs
+    ¦   ¦   ¦       RemoveFavoriteCommand.cs
+    ¦   ¦   ¦       RemoveFavoriteHandler.cs
+    ¦   ¦   ¦       
+    ¦   ¦   +---MediaItem
+    ¦   ¦   ¦   +---MediaStreaming
+    ¦   ¦   ¦   ¦       GetMediaInfoQuery.cs
+    ¦   ¦   ¦   ¦       GetMediaInfoQueryHandler.cs
+    ¦   ¦   ¦   ¦       
+    ¦   ¦   ¦   +---MediaUploading
+    ¦   ¦   ¦           DeleteMediaCommand.cs
+    ¦   ¦   ¦           DeleteMediaHandler.cs
+    ¦   ¦   ¦           GetMediaByIdHandler.cs
+    ¦   ¦   ¦           GetMediaByIdQuery.cs
+    ¦   ¦   ¦           GetMediaByUserHandler.cs
+    ¦   ¦   ¦           GetMediaByUserQuery.cs
+    ¦   ¦   ¦           UpdateMediaCommand.cs
+    ¦   ¦   ¦           UpdateMediaHandler.cs
+    ¦   ¦   ¦           UploadMediaCommand.cs
+    ¦   ¦   ¦           UploadMediaHandler.cs
+    ¦   ¦   ¦           
+    ¦   ¦   +---Notification
+    ¦   ¦   ¦       GetNotificationsHandler.cs
+    ¦   ¦   ¦       GetNotificationsQuery.cs
+    ¦   ¦   ¦       MarkAllNotificationsReadCommand.cs
+    ¦   ¦   ¦       MarkAllNotificationsReadHandler.cs
+    ¦   ¦   ¦       MarkNotificationReadCommand.cs
+    ¦   ¦   ¦       MarkNotificationReadHandler.cs
+    ¦   ¦   ¦       
+    ¦   ¦   +---Playhistory
+    ¦   ¦   ¦       RecordPlaylistCommandHandler.cs
+    ¦   ¦   ¦       RecordPlaylistHistoryCommand.cs
+    ¦   ¦   ¦       
+    ¦   ¦   +---Playlist
+    ¦   ¦   ¦       AddTrackToPlaylistCommand.cs
+    ¦   ¦   ¦       AddTrackToPlaylistHandler.cs
+    ¦   ¦   ¦       CreatePlaylistCommand.cs
+    ¦   ¦   ¦       CreatePlaylistHandler.cs
+    ¦   ¦   ¦       DeletePlaylistCommand.cs
+    ¦   ¦   ¦       DeletePlaylistHandler.cs
+    ¦   ¦   ¦       GetPlaylistByIdHandler.cs
+    ¦   ¦   ¦       GetPlaylistByIdQuery.cs
+    ¦   ¦   ¦       GetUserPlaylistHandler.cs
+    ¦   ¦   ¦       GetUserPlaylistQuery.cs
+    ¦   ¦   ¦       RemoveTrackFromPlaylistCommand.cs
+    ¦   ¦   ¦       RemoveTrackFromPlaylistHandler.cs
+    ¦   ¦   ¦       
+    ¦   ¦   +---Share
+    ¦   ¦   ¦       GetReceivedSharesHandler.cs
+    ¦   ¦   ¦       GetReceivedSharesQuery.cs
+    ¦   ¦   ¦       GetSentSharesQuery.cs
+    ¦   ¦   ¦       ShareMediaCommand.cs
+    ¦   ¦   ¦       ShareMediaHandler.cs
+    ¦   ¦   ¦       
+    ¦   ¦   +---User
+    ¦   ¦           GetProfileHandler.cs
+    ¦   ¦           GetProfileQuery.cs
+    ¦   ¦           UpdateProfileCommand.cs
+    ¦   ¦           
+    ¦   +---Validators
+    ¦           .gitkeep
+    ¦           RegisterValidator.cs
+    ¦           ShareMediaValidator.cs
+    ¦           UploadMediaValidator.cs
+    ¦           
+    +---TuneVault.Domain
+    ¦   ¦   TuneVault.Domain.csproj
+    ¦   ¦   
+    ¦   +---bin
+    ¦   ¦   +---Debug
+    ¦   ¦       +---net10.0
+    ¦   ¦               TuneVault.Domain.deps.json
+    ¦   ¦               TuneVault.Domain.dll
+    ¦   ¦               TuneVault.Domain.pdb
+    ¦   ¦               
+    ¦   +---DomainEvents
+    ¦   ¦       .gitkeep
+    ¦   ¦       
+    ¦   +---Entities
+    ¦   ¦       .gitkeep
+    ¦   ¦       Album.cs
+    ¦   ¦       Artist.cs
+    ¦   ¦       AspNetUsers.cs
+    ¦   ¦       Favorite.cs
+    ¦   ¦       Follow.cs
+    ¦   ¦       MediaItem.cs
+    ¦   ¦       MediaShare.cs
+    ¦   ¦       Notification.cs
+    ¦   ¦       PlayHistory.cs
+    ¦   ¦       PlayHistoryDetail.cs
+    ¦   ¦       Playlist.cs
+    ¦   ¦       PlaylistTrack.cs
+    ¦   ¦       
+    ¦   +---Enums
+    ¦   ¦       .gitkeep
+    ¦   ¦       
+    ¦   +---Interfaces
+    ¦   ¦       .gitkeep
+    ¦   ¦       IAIService.cs
+    ¦   ¦       IAlbumRepository.cs
+    ¦   ¦       IArtistRepository.cs
+    ¦   ¦       IInteractionRepository.cs
+    ¦   ¦       IMediaItemRepository.cs
+    ¦   ¦       INotificationRepository.cs
+    ¦   ¦       IPlaylistRepository.cs
+    ¦   ¦       IShareRepository.cs
+    ¦   ¦       IUserRepository.cs
+    ¦   ¦       
+    ¦   +---obj
+    ¦       ¦   project.assets.json
+    ¦       ¦   project.nuget.cache
+    ¦       ¦   TuneVault.Domain.csproj.nuget.dgspec.json
+    ¦       ¦   TuneVault.Domain.csproj.nuget.g.props
+    ¦       ¦   TuneVault.Domain.csproj.nuget.g.targets
+    ¦       ¦   
+    ¦       +---Debug
+    ¦           +---net10.0
+    ¦               ¦   .NETCoreApp,Version=v10.0.AssemblyAttributes.cs
+    ¦               ¦   TuneVault.Domain.AssemblyInfo.cs
+    ¦               ¦   TuneVault.Domain.AssemblyInfoInputs.cache
+    ¦               ¦   TuneVault.Domain.assets.cache
+    ¦               ¦   TuneVault.Domain.csproj.CoreCompileInputs.cache
+    ¦               ¦   TuneVault.Domain.csproj.FileListAbsolute.txt
+    ¦               ¦   TuneVault.Domain.dll
+    ¦               ¦   TuneVault.Domain.GeneratedMSBuildEditorConfig.editorconfig
+    ¦               ¦   TuneVault.Domain.GlobalUsings.g.cs
+    ¦               ¦   TuneVault.Domain.pdb
+    ¦               ¦   TuneVault.Domain.sourcelink.json
+    ¦               ¦   
+    ¦               +---ref
+    ¦               ¦       TuneVault.Domain.dll
+    ¦               ¦       
+    ¦               +---refint
+    ¦                       TuneVault.Domain.dll
+    ¦                       
+    +---TuneVault.Infrastructure
+        ¦   TuneVault.Infrastructure.csproj
+        ¦   
+        +---Auth
+        ¦       JwtService.cs
+        ¦       
+        +---bin
+        ¦   +---Debug
+        ¦       +---net10.0
+        ¦               TuneVault.Application.dll
+        ¦               TuneVault.Application.pdb
+        ¦               TuneVault.Domain.dll
+        ¦               TuneVault.Domain.pdb
+        ¦               TuneVault.Infrastructure.deps.json
+        ¦               TuneVault.Infrastructure.dll
+        ¦               TuneVault.Infrastructure.pdb
+        ¦               
+        +---Dapper
+        ¦       .gitkeep
+        ¦       DataContextDapper.cs
+        ¦       
+        +---Data
+        ¦       .gitkeep
+        ¦       CreateData.sql
+        ¦       CreateTable.sql
+        ¦       
+        +---FileStorage
+        ¦       .gitkeep
+        ¦       LocalFileStorageService.cs
+        ¦       
+        +---obj
+        ¦   ¦   project.assets.json
+        ¦   ¦   project.nuget.cache
+        ¦   ¦   TuneVault.Infrastructure.csproj.nuget.dgspec.json
+        ¦   ¦   TuneVault.Infrastructure.csproj.nuget.g.props
+        ¦   ¦   TuneVault.Infrastructure.csproj.nuget.g.targets
+        ¦   ¦   
+        ¦   +---Debug
+        ¦       +---net10.0
+        ¦           ¦   .NETCoreApp,Version=v10.0.AssemblyAttributes.cs
+        ¦           ¦   TuneVaul.F19165C9.Up2Date
+        ¦           ¦   TuneVault.Infrastructure.AssemblyInfo.cs
+        ¦           ¦   TuneVault.Infrastructure.AssemblyInfoInputs.cache
+        ¦           ¦   TuneVault.Infrastructure.assets.cache
+        ¦           ¦   TuneVault.Infrastructure.csproj.AssemblyReference.cache
+        ¦           ¦   TuneVault.Infrastructure.csproj.CoreCompileInputs.cache
+        ¦           ¦   TuneVault.Infrastructure.csproj.FileListAbsolute.txt
+        ¦           ¦   TuneVault.Infrastructure.dll
+        ¦           ¦   TuneVault.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+        ¦           ¦   TuneVault.Infrastructure.GlobalUsings.g.cs
+        ¦           ¦   TuneVault.Infrastructure.pdb
+        ¦           ¦   TuneVault.Infrastructure.sourcelink.json
+        ¦           ¦   
+        ¦           +---ref
+        ¦           ¦       TuneVault.Infrastructure.dll
+        ¦           ¦       
+        ¦           +---refint
+        ¦                   TuneVault.Infrastructure.dll
+        ¦                   
+        +---Repositories
+        ¦       .gitkeep
+        ¦       AlbumRepository.cs
+        ¦       ArtistRepository.cs
+        ¦       InteractionRepository.cs
+        ¦       MediaItemRepository.cs
+        ¦       NotificationRepository.cs
+        ¦       PlaylistRepository.cs
+        ¦       ShareRepository.cs
+        ¦       UserRepository.cs
+        ¦       
+        +---Services
+        ¦       GeminiService.cs
+        ¦       SignalRNotificationService.cs
+        ¦       
+        +---SignalR
+                .gitkeep
+                NotificationHubs.cs
+                

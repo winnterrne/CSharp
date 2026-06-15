@@ -46,6 +46,7 @@ export interface MediaItemDto {
   title?: string;
 
   filePath?: string;
+
   mediaItemImage?: string;
   image?: string;
   coverUrl?: string;
@@ -111,6 +112,27 @@ const getMediaType = (item: MediaItemDto): MediaType => {
 export const mapMediaItemDtoToMedia = (item: MediaItemDto): Media => {
   const mediaId = getMediaId(item);
   const type = getMediaType(item);
+
+  const artistId =
+    item.artistID ??
+    item.artistId ??
+    item.artist?.artistID ??
+    item.artist?.artistId ??
+    item.artist?.id ??
+    0;
+
+  const artistName =
+    item.artistName ??
+    item.ArtistName ??
+    item.artist?.artistName ??
+    item.artist?.name ??
+    "Không rõ nghệ sĩ";
+
+  const image =
+    item.mediaItemImage ??
+    item.thumbnailUrl ??
+    item.imageUrl ??
+    item.coverUrl;
 
   return {
     id: String(mediaId),

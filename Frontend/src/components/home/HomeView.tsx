@@ -1,14 +1,18 @@
-import type { Media } from "../../types/media";
 import QuickPlayCard from "./QuickPlayCard";
 import AlbumCardLarge from "./AlbumCardLarge";
 import SectionHeader from "./SectionHeader";
 import { useHistoryStore } from "../../store/historyStore";
+import type { Album } from "../../types/album";
+import { albumApi } from "../../api/albumApi";
+import { buildImageUrl, mapAlbumTrackToMedia, type Media } from "../../types/media";
+
 
 type HomeViewProps = {
   loading: boolean;
   recommended: Media[];
   forYou: Media[];
   upcoming: Media[];
+  albums: Album[];
   onOpenTrack: (track: Media) => void;
   onOpenAlbum: (track: Media, tracks: Media[], title?: string) => void;
   onShowAll: (mode: "recommended" | "upcoming" | "forYou") => void;
@@ -19,12 +23,46 @@ const HomeView = ({
   recommended,
   forYou,
   upcoming,
+  albums,
   onOpenTrack,
   onOpenAlbum,
   onShowAll,
 }: HomeViewProps) => {
   const recentTracks = useHistoryStore((state) => state.recentTracks);
   const clearHistory = useHistoryStore((state) => state.clearHistory);
+
+  // Thêm handler này vào trong HomeView component
+  const handleOpenAlbumById = async (album: Album) => {
+    try {
+      const res = await albumApi.getTracks(album.albumID);
+      const rawTracks = res.data?.data ?? [];
+
+      const tracks: Media[] = rawTracks.map((item) =>
+        mapAlbumTrackToMedia(item, album.albumID, album.albumName, album.artistName)
+      );
+
+      // Tạo một Media object "giả" đại diện cho album để truyền vào cover
+      const cover: Media = {
+        id: String(album.albumID),
+        title: album.albumName,
+        type: "audio",
+        status: "published",
+        url: "",
+        thumbnailUrl: album.albumItemImage
+        ? `http://localhost:5081/media/images/album/${album.albumItemImage}`
+        : undefined,
+        duration: 0,
+        artist: { id: album.artistID, name: album.artistName },
+        albumId: album.albumID,
+        albumName: album.albumName,
+        createdAt: album.uploadAt,
+      };
+
+      onOpenAlbum(cover, tracks, album.albumName);
+    } catch (err) {
+      console.error("Không tải được tracks của album:", err);
+    }
+  };
 
   const isEmpty =
     !loading &&
@@ -256,6 +294,66 @@ const HomeView = ({
                 onOpenAlbum(cover, tracks, "Dành cho bạn")
               }
             />
+          ))}
+        </div>
+      </section>
+
+      <section style={{ marginBottom: "36px" }}>
+        <SectionHeader
+          title="Album nổi bật"
+        />
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns:
+              "repeat(auto-fill, minmax(170px, 1fr))",
+            gap: "18px",
+          }}
+        >
+          {albums.slice(0, 6).map((album) => (
+            <div
+              key={album.albumID}
+              onClick={() => handleOpenAlbumById(album)}
+              style={{
+                background: "#181818",
+                borderRadius: "12px",
+                padding: "16px",
+                cursor: "pointer",
+                transition: ".2s",
+              }}
+            >
+              <img
+                src={`http://localhost:5081/media/images/album/${album.albumItemImage}`}
+                alt={album.albumName}
+                style={{
+                  width: "100%",
+                  aspectRatio: "1",
+                  objectFit: "cover",
+                  borderRadius: "8px",
+                  marginBottom: "12px",
+                }}
+              />
+
+              <div
+                style={{
+                  color: "#fff",
+                  fontWeight: 700,
+                  marginBottom: "4px",
+                }}
+              >
+                {album.albumName}
+              </div>
+
+              <div
+                style={{
+                  color: "#b3b3b3",
+                  fontSize: "13px",
+                }}
+              >
+                {album.artistName}
+              </div>
+            </div>
           ))}
         </div>
       </section>

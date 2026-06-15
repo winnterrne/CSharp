@@ -1,9 +1,22 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import type { Media } from "../../types/media";
 import type { Playlist } from "../../types/playlist";
 import { playlistApi } from "../../api/playlistApi";
 import { useFavorite } from "../../hooks/useFavorite";
 import { usePlayer } from "../../hooks/usePlayer";
+import {
+  AddToPlaylistIcon,
+  HeartIcon,
+  AddToQueueIcon,
+  RemoveIcon,
+  RadioIcon,
+  ArtistIcon,
+  AlbumIcon,
+  CreditsIcon,
+  DownloadIcon,
+  ShareIcon,
+  OpenAppIcon,
+} from "../common/icons";
 
 type TrackActionMenuProps = {
   track: Media;
@@ -154,14 +167,14 @@ const TrackActionMenu = ({
         }}
       >
         <MenuItem
-          icon="+"
+          icon= {<AddToPlaylistIcon/>}
           label="Thêm vào danh sách phát"
           arrow
           onMouseEnter={() => setShowPlaylistMenu(true)}
         />
 
         <MenuItem
-          icon="⊕"
+          icon={<HeartIcon filled={liked} />}
           label={
             liked
               ? "Xóa khỏi Bài hát đã thích của bạn"
@@ -174,7 +187,7 @@ const TrackActionMenu = ({
         />
 
         <MenuItem
-          icon="≡"
+          icon={<AddToQueueIcon />}
           label="Thêm vào danh sách chờ"
           onClick={() => {
             addToQueue(track);
@@ -183,14 +196,14 @@ const TrackActionMenu = ({
           }}
         />
 
-        <MenuItem icon="⊗" label="Loại bỏ khỏi hồ sơ sở thích của bạn" />
+        <MenuItem icon={<RemoveIcon />} label="Loại bỏ khỏi hồ sơ sở thích của bạn" />
 
         <Divider />
 
-        <MenuItem icon="◉" label="Chuyển đến radio theo bài hát" />
+        <MenuItem icon={<RadioIcon />} label="Chuyển đến radio theo bài hát" />
 
         <MenuItem
-          icon="♙"
+          icon={<ArtistIcon />}
           label="Chuyển tới nghệ sĩ"
           arrow
           onClick={() => {
@@ -199,17 +212,17 @@ const TrackActionMenu = ({
           }}
         />
 
-        <MenuItem icon="◎" label="Chuyển đến album" />
+        <MenuItem icon={<AlbumIcon />} label="Chuyển đến album" />
 
-        <MenuItem icon="▤" label="Xem thông tin ghi công" />
+        <MenuItem icon={<CreditsIcon />} label="Xem thông tin ghi công" />
 
-        <MenuItem icon="↓" label="Tải xuống" onClick={handleDownload} />
+        <MenuItem icon={<DownloadIcon />} label="Tải xuống" onClick={handleDownload} />
 
-        <MenuItem icon="↗" label="Chia sẻ" arrow onClick={handleShare} />
+        <MenuItem icon={<ShareIcon />} label="Chia sẻ" arrow onClick={handleShare} />
 
         <Divider />
 
-        <MenuItem icon="◉" label="Mở trong ứng dụng dành cho máy tính" />
+        <MenuItem icon={<OpenAppIcon />} label="Mở trong ứng dụng dành cho máy tính" />
 
         {showPlaylistMenu && (
           <div
@@ -277,7 +290,7 @@ const MenuItem = ({
   onClick,
   onMouseEnter,
 }: {
-  icon: string;
+  icon: ReactNode;
   label: string;
   arrow?: boolean;
   onClick?: () => void;

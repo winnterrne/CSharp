@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { playlistApi } from "../../api/playlistApi";
+import AddToPlaylistModal from "../../components/playlist/AddToPlaylistModal";
 import type {
   Playlist,
   PlaylistTrack,
@@ -9,16 +10,38 @@ import type {
 import { mapPlaylistDetailDtoToPlaylist } from "../../types/playlist";
 import type { Media } from "../../types/media";
 import { usePlayer } from "../../hooks/usePlayer";
-import { useFavorite } from "../../hooks/useFavorite";
+import { useSearch } from "../../hooks/useSearch";
 import TrackActionMenu from "../../components/common/TrackActionMenu";
+import ShareMediaModal from "../../components/share/ShareModal";
+import { AddToPlaylistIcon, MoreHorizIcon, NowPlayingIcon, PlayIcon, ShareIcon, ShuffleIcon } from "../../components/common/icons";
+import { playerStore } from "../../store/playerStore";
 
 const formatDuration = (seconds?: number) => {
+  
   if (!seconds || Number.isNaN(seconds)) return "0:00";
 
   const min = Math.floor(seconds / 60);
   const sec = Math.floor(seconds % 60);
 
   return `${min}:${String(sec).padStart(2, "0")}`;
+};
+
+const getArtistName = (media: Media) => {
+  const m = media as any;
+
+  return (
+    m.artist?.name ??
+    m.artist?.artistName ??
+    m.artistName ??
+    m.ArtistName ??
+    "Không rõ nghệ sĩ"
+  );
+};
+
+const getMediaId = (media: Media) => {
+  const m = media as any;
+
+  return m.id ?? m.mediaItemID ?? m.mediaItemId ?? 0;
 };
 
 const getPlaylistFromResponse = (responseData: unknown): Playlist => {
@@ -33,11 +56,25 @@ const getPlaylistFromResponse = (responseData: unknown): Playlist => {
 
 const PlaylistDetailPage = () => {
   const { id } = useParams<{ id: string }>();
-  const { playTrack, setQueue } = usePlayer();
+  const { playTrack, pause, isPlaying, currentTrack, play, setQueue } = usePlayer();
+
+  const {
+    search,
+    searchResults,
+    isLoading: searching,
+    error: searchError,
+  } = useSearch();
 
   const [playlist, setPlaylist] = useState<Playlist | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [showAddTrackBar, setShowAddTrackBar]  = useState(false);
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [addingTrack, setAddingTrack] = useState(false);
+  const [addTrackMessage, setAddTrackMessage] = useState("");
+  const [sharePlaylistOpen, setSharePlaylistOpen] = useState(false);
+
+  const { playingContextId, setPlayingContextId } = playerStore();
 
   const playlistTracks = useMemo<PlaylistTrack[]>(() => {
     return playlist?.tracks ?? [];
@@ -46,6 +83,11 @@ const PlaylistDetailPage = () => {
   const mediaTracks = useMemo<Media[]>(() => {
     return playlistTracks.map((item) => item.media).filter(Boolean);
   }, [playlistTracks]);
+
+  const isCurrentPlaylistPlaying = useMemo(() => {
+    if (!currentTrack) return false;
+    return playingContextId === `playlist-${id}`;
+  }, [currentTrack, playingContextId, id]);
 
   const totalDuration = useMemo(() => {
     const totalSeconds = mediaTracks.reduce(
@@ -61,38 +103,98 @@ const PlaylistDetailPage = () => {
     return `${mins} phút`;
   }, [mediaTracks]);
 
-  useEffect(() => {
+  const loadPlaylist = async () => {
     if (!id) return;
 
-    const loadPlaylist = async () => {
-      try {
-        setLoading(true);
-        setError("");
+    try {
+      setLoading(true);
+      setError("");
 
-        const res = await playlistApi.getById(Number(id));
-        const data = getPlaylistFromResponse(res.data);
+      const res = await playlistApi.getById(Number(id));
 
-        setPlaylist(data);
-      } catch (err) {
-        console.error("LOAD PLAYLIST ERROR:", err);
-        setError("Không tải được playlist");
-      } finally {
-        setLoading(false);
-      }
-    };
+      console.log("PLAYLIST DETAIL RAW:", res.data);
 
+      const data = getPlaylistFromResponse(res.data);
+
+      console.log("PLAYLIST DETAIL MAPPED:", data);
+
+      setPlaylist(data);
+    } catch (err) {
+      console.error("LOAD PLAYLIST ERROR:", err);
+      setError("Không tải được playlist");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     loadPlaylist();
   }, [id]);
 
   const handlePlayPlaylist = () => {
     if (mediaTracks.length === 0) return;
 
-    setQueue(mediaTracks);
-    playTrack(mediaTracks[0]);
+    // Nếu bài đang phát không thuộc playlist hiện tại
+    // thì set queue bằng toàn bộ playlist này và phát bài đầu
+    if (!isCurrentPlaylistPlaying) {
+      setQueue(mediaTracks);
+      setPlayingContextId(`playlist-${id}`);
+      playTrack(mediaTracks[0]);
+      return;
+    }
+
+    // Nếu đang ở đúng playlist này thì nút play chỉ đóng vai trò play/pause
+    if (isPlaying) {
+      pause();
+    } else {
+      play();
+    }
+  };
+
+  useEffect(() => {
+    if (!showAddTrackBar) return;
+
+    const keyword = searchKeyword.trim();
+
+    if (!keyword) {
+      setAddTrackMessage("");
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setAddTrackMessage("");
+      search(keyword);
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [searchKeyword, showAddTrackBar, search]);
+  const handleAddTrackToCurrentPlaylist = async (mediaItemId: number) => {
+    if (!id) return;
+
+    const playlistId = Number(id);
+
+    try {
+      setAddingTrack(true);
+      setAddTrackMessage("");
+
+      await playlistApi.addTrack(playlistId, mediaItemId);
+
+      setAddTrackMessage("Đã thêm bài hát vào playlist");
+
+      const res = await playlistApi.getById(playlistId);
+      const data = getPlaylistFromResponse(res.data);
+      setPlaylist(data);
+    } catch (err) {
+      console.error("ADD TRACK ERROR:", err);
+      setAddTrackMessage("Không thêm được bài hát");
+    } finally {
+      setAddingTrack(false);
+    }
   };
 
   const handlePlayTrack = (track: Media) => {
     setQueue(mediaTracks);
+    setPlayingContextId(`playlist-${id}`);
     playTrack(track);
   };
 
@@ -232,9 +334,12 @@ const PlaylistDetailPage = () => {
             fontSize: "22px",
             fontWeight: 900,
             boxShadow: "0 8px 24px rgba(0,0,0,.35)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
-          ▶
+          {isCurrentPlaylistPlaying && isPlaying ? <NowPlayingIcon /> : <PlayIcon />}
         </button>
 
         <button
@@ -247,36 +352,42 @@ const PlaylistDetailPage = () => {
             fontSize: "30px",
           }}
         >
-          ⇄
+          <ShuffleIcon/>
         </button>
 
         <button
-          title="Thêm vào thư viện"
+          title="Thêm bài hát vào playlist"
+          onClick={() => {
+            setShowAddTrackBar((prev) => !prev);
+            setAddTrackMessage("");
+          }}
           style={{
-            width: "34px",
-            height: "34px",
+            width: "42px",
+            height: "42px",
             borderRadius: "50%",
-            border: "2px solid #b3b3b3",
-            background: "transparent",
-            color: "#b3b3b3",
+            border: `2px solid ${showAddTrackBar ? "#1DB954" : "#b3b3b3"}`,
+            background: showAddTrackBar ? "#1DB954" : "transparent",
+            color: showAddTrackBar ? "#000" : "#b3b3b3",
             cursor: "pointer",
-            fontSize: "24px",
+            fontSize: "26px",
+            fontWeight: 900,
           }}
         >
-          +
+          <AddToPlaylistIcon/>
         </button>
-
         <button
-          title="Tải xuống"
+          title="Chia sẻ playlist"
+          onClick={() => setSharePlaylistOpen(true)}
           style={{
             border: "none",
             background: "transparent",
             color: "#b3b3b3",
             cursor: "pointer",
-            fontSize: "30px",
+            fontSize: "28px",
           }}
         >
-          ↓
+          <ShareIcon/>
+
         </button>
 
         <button
@@ -289,10 +400,173 @@ const PlaylistDetailPage = () => {
             fontSize: "30px",
           }}
         >
-          ⋯
+          <MoreHorizIcon/>
         </button>
-      </section>
+        </section>
+      {showAddTrackBar && (
+  <section
+    style={{
+      padding: "0 32px 24px",
+    }}
+  >
+    <div
+      style={{
+        background: "#181818",
+        border: "1px solid #333",
+        borderRadius: "12px",
+        padding: "18px",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+        }}
+      >
+        <input
+          value={searchKeyword}
+          onChange={(e) => setSearchKeyword(e.target.value)}
+          placeholder="Tìm bài hát để thêm vào playlist..."
+          style={{
+            flex: 1,
+            height: "44px",
+            borderRadius: "999px",
+            border: "none",
+            outline: "none",
+            padding: "0 18px",
+            background: "#242424",
+            color: "#fff",
+            fontSize: "15px",
+            boxSizing: "border-box",
+          }}
+        />
+      </div>
 
+      {searching && (
+        <div
+          style={{
+            marginTop: "10px",
+            color: "#b3b3b3",
+            fontSize: "14px",
+          }}
+        >
+          Đang tìm kiếm...
+        </div>
+      )}
+
+      {(addTrackMessage || searchError) && (
+        <div
+          style={{
+            marginTop: "10px",
+            color:
+              addTrackMessage.includes("Đã") && !searchError
+                ? "#1DB954"
+                : "#ff4d4f",
+            fontSize: "14px",
+          }}
+        >
+          {searchError || addTrackMessage}
+        </div>
+      )}
+
+      {searchKeyword.trim() && searchResults.length > 0 && (
+        <div
+          style={{
+            marginTop: "16px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "8px",
+          }}
+        >
+          {searchResults.map((track) => (
+            <div
+              key={track.id}
+              style={{
+                display: "grid",
+                gridTemplateColumns: "48px minmax(0, 1fr) auto",
+                gap: "12px",
+                alignItems: "center",
+                padding: "10px",
+                borderRadius: "8px",
+                background: "#242424",
+              }}
+            >
+              <div
+                style={{
+                  width: "44px",
+                  height: "44px",
+                  borderRadius: "6px",
+                  background: "#333",
+                  overflow: "hidden",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#b3b3b3",
+                }}
+              >
+                {track.thumbnailUrl ? (
+                  <img
+                    src={track.thumbnailUrl}
+                    alt={track.title}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
+                  />
+                ) : (
+                  "♪"
+                )}
+              </div>
+
+              <div style={{ minWidth: 0 }}>
+                <div
+                  style={{
+                    color: "#fff",
+                    fontWeight: 700,
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {track.title}
+                </div>
+
+                <div
+                  style={{
+                    color: "#b3b3b3",
+                    fontSize: "13px",
+                    marginTop: "4px",
+                  }}
+                >
+                  {getArtistName(track)}
+                </div>
+              </div>
+
+              <button
+                onClick={() => handleAddTrackToCurrentPlaylist(Number(track.id))}
+                disabled={addingTrack}
+                style={{
+                  height: "36px",
+                  padding: "0 16px",
+                  borderRadius: "999px",
+                  border: "none",
+                  background: addingTrack ? "#3a3a3a" : "#fff",
+                  color: "#000",
+                  cursor: addingTrack ? "not-allowed" : "pointer",
+                  fontWeight: 800,
+                }}
+              >
+                Thêm
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
+)}
       <section style={{ padding: "0 32px 32px" }}>
         {playlistTracks.length === 0 ? (
           <EmptyPlaylist />
@@ -319,17 +593,32 @@ const PlaylistDetailPage = () => {
             </div>
 
             {playlistTracks.map((item, index) => (
+              
               <PlaylistTrackRow
                 key={item.id}
                 item={item}
                 index={index}
-                tracks={mediaTracks}
+                currentTrack={currentTrack}
+                isPlaying={isPlaying}
+                playlistQueue={mediaTracks}
+                active={
+                  !!currentTrack &&
+                  Number(getMediaId(item.media)) === Number(getMediaId(currentTrack)) &&
+                  playingContextId === `playlist-${id}`  
+                }
                 onPlay={() => handlePlayTrack(item.media)}
               />
             ))}
           </>
         )}
       </section>
+      <ShareMediaModal
+        open={sharePlaylistOpen}
+        onClose={() => setSharePlaylistOpen(false)}
+        playlistID={Number(id)}
+        mediaItemID={null}
+        title="Chia sẻ playlist"
+      />
     </main>
   );
 };
@@ -337,23 +626,43 @@ const PlaylistDetailPage = () => {
 const PlaylistTrackRow = ({
   item,
   index,
-  tracks,
+  currentTrack,
+  isPlaying,
+  playlistQueue,
+  active,
   onPlay,
 }: {
   item: PlaylistTrack;
   index: number;
-  tracks: Media[];
+  currentTrack: Media | null;
+  isPlaying: boolean;
+  playlistQueue: Media[];
+  active: boolean;
   onPlay: () => void;
 }) => {
   const [hovered, setHovered] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [addModalOpen, setAddModalOpen] = useState(false);
 
-  const { playTrack, setQueue } = usePlayer();
-  const { isFavorite, toggleFavorite } = useFavorite();
+  const { playTrack, pause, play, setQueue } = usePlayer();
 
   const media = item.media;
-  const liked = isFavorite(media.id);
-  const artistName = media.artist?.name ?? "Unknown Artist";
+  const artistName = getArtistName(media);
+
+  const isThisTrackPlaying = active;
+  const showNowPlaying = Boolean(active && isPlaying);
+
+  const handlePlayThisTrack = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+
+    if (active) {  // ✅ thay isThisTrackPlaying
+      if (isPlaying) pause();
+      else play();
+      return;
+    }
+
+    onPlay(); // ✅ dùng onPlay thay vì gọi trực tiếp, để page set context
+  };
 
   return (
     <div
@@ -369,28 +678,43 @@ const PlaylistTrackRow = ({
         height: "64px",
         padding: "0 8px",
         borderRadius: "8px",
-        background: hovered ? "#555" : "transparent",
+        background: showNowPlaying
+          ? "rgba(29,185,84,.18)"
+          : hovered
+            ? "#2a2a2a"
+            : "transparent",
         cursor: "pointer",
         position: "relative",
+        transition: "background 0.15s ease, transform 0.12s ease",
+        transform: hovered ? "translateY(-1px)" : "translateY(0)",
       }}
     >
-      <div style={{ color: "#b3b3b3", fontSize: "14px" }}>
-        {hovered ? (
+      <div
+        style={{
+          color: showNowPlaying ? "#1DB954" : "#b3b3b3",
+          fontSize: "14px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        {hovered || isThisTrackPlaying ? (
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setQueue(tracks);
-              playTrack(media);
-            }}
+            onClick={handlePlayThisTrack}
             style={{
+              width: "28px",
+              height: "28px",
               border: "none",
               background: "transparent",
-              color: "#fff",
+              color: showNowPlaying ? "#1DB954" : "#fff",
               cursor: "pointer",
               fontSize: "16px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
-            ▶
+            {showNowPlaying ? <NowPlayingIcon /> : <PlayIcon />}
           </button>
         ) : (
           index + 1
@@ -398,6 +722,7 @@ const PlaylistTrackRow = ({
       </div>
 
       <div
+        onClick={onPlay}
         style={{
           display: "flex",
           alignItems: "center",
@@ -417,6 +742,9 @@ const PlaylistTrackRow = ({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            boxShadow: showNowPlaying
+              ? "0 0 0 2px rgba(29,185,84,.7)"
+              : "none",
           }}
         >
           {media.thumbnailUrl ? (
@@ -437,7 +765,7 @@ const PlaylistTrackRow = ({
         <div style={{ minWidth: 0 }}>
           <div
             style={{
-              color: "#fff",
+              color: showNowPlaying ? "#1DB954" : "#fff",
               fontSize: "14px",
               fontWeight: 700,
               whiteSpace: "nowrap",
@@ -453,6 +781,9 @@ const PlaylistTrackRow = ({
               color: "#d0d0d0",
               fontSize: "12px",
               marginTop: "3px",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
             }}
           >
             {artistName}
@@ -463,26 +794,34 @@ const PlaylistTrackRow = ({
       <div>
         {hovered && (
           <button
+            title="Thêm vào playlist"
             onClick={(e) => {
               e.stopPropagation();
-              toggleFavorite(media.id);
+              setAddModalOpen(true);
             }}
             style={{
               border: "none",
               background: "transparent",
-              color: liked ? "#1DB954" : "#fff",
+              color: "#fff",
               cursor: "pointer",
-              fontSize: "20px",
+              fontSize: "22px",
+              fontWeight: 700,
             }}
           >
-            {liked ? "♥" : "+"}
+            +
           </button>
         )}
+
+        <AddToPlaylistModal
+          open={addModalOpen}
+          media={media}
+          onClose={() => setAddModalOpen(false)}
+        />
       </div>
 
       <div
         style={{
-          color: "#b3b3b3",
+          color: hovered || showNowPlaying ? "#fff" : "#b3b3b3",
           fontSize: "14px",
           whiteSpace: "nowrap",
           overflow: "hidden",
@@ -494,7 +833,7 @@ const PlaylistTrackRow = ({
 
       <div
         style={{
-          color: "#b3b3b3",
+          color: hovered || showNowPlaying ? "#fff" : "#b3b3b3",
           fontSize: "14px",
           textAlign: "right",
           display: "flex",

@@ -1,6 +1,7 @@
 import type { Media } from "../../types/media";
 import { usePlayer } from "../../hooks/usePlayer";
 import AlbumCardLarge from "./AlbumCardLarge";
+import { PlayIcon } from "../common/icons";
 
 type ArtistDetailViewProps = {
   artistName: string;
@@ -98,7 +99,7 @@ const ArtistDetailView = ({
             fontWeight: 800,
           }}
         >
-          ▶
+          <PlayIcon/>
         </button>
 
         <button

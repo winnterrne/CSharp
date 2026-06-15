@@ -1703,11 +1703,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "d:\\TuneVault\\CSharp\\Backend\\DockerFile\\TuneVault.API\\TuneVault.API.csproj",
+      "projectUniqueName": "D:\\TuneVault\\CSharp\\Backend\\DockerFile\\TuneVault.API\\TuneVault.API.csproj",
       "projectName": "TuneVault.API",
-      "projectPath": "d:\\TuneVault\\CSharp\\Backend\\DockerFile\\TuneVault.API\\TuneVault.API.csproj",
+      "projectPath": "D:\\TuneVault\\CSharp\\Backend\\DockerFile\\TuneVault.API\\TuneVault.API.csproj",
       "packagesPath": "C:\\Users\\Vinh\\.nuget\\packages\\",
-      "outputPath": "d:\\TuneVault\\CSharp\\Backend\\DockerFile\\TuneVault.API\\obj\\",
+      "outputPath": "D:\\TuneVault\\CSharp\\Backend\\DockerFile\\TuneVault.API\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Vinh\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -1722,14 +1722,14 @@
         "net10.0": {
           "targetAlias": "net10.0",
           "projectReferences": {
-            "d:\\TuneVault\\CSharp\\Backend\\DockerFile\\TuneVault.Application\\TuneVault.Application.csproj": {
-              "projectPath": "d:\\TuneVault\\CSharp\\Backend\\DockerFile\\TuneVault.Application\\TuneVault.Application.csproj"
+            "D:\\TuneVault\\CSharp\\Backend\\DockerFile\\TuneVault.Application\\TuneVault.Application.csproj": {
+              "projectPath": "D:\\TuneVault\\CSharp\\Backend\\DockerFile\\TuneVault.Application\\TuneVault.Application.csproj"
             },
-            "d:\\TuneVault\\CSharp\\Backend\\DockerFile\\TuneVault.Domain\\TuneVault.Domain.csproj": {
-              "projectPath": "d:\\TuneVault\\CSharp\\Backend\\DockerFile\\TuneVault.Domain\\TuneVault.Domain.csproj"
+            "D:\\TuneVault\\CSharp\\Backend\\DockerFile\\TuneVault.Domain\\TuneVault.Domain.csproj": {
+              "projectPath": "D:\\TuneVault\\CSharp\\Backend\\DockerFile\\TuneVault.Domain\\TuneVault.Domain.csproj"
             },
-            "d:\\TuneVault\\CSharp\\Backend\\DockerFile\\TuneVault.Infrastructure\\TuneVault.Infrastructure.csproj": {
-              "projectPath": "d:\\TuneVault\\CSharp\\Backend\\DockerFile\\TuneVault.Infrastructure\\TuneVault.Infrastructure.csproj"
+            "D:\\TuneVault\\CSharp\\Backend\\DockerFile\\TuneVault.Infrastructure\\TuneVault.Infrastructure.csproj": {
+              "projectPath": "D:\\TuneVault\\CSharp\\Backend\\DockerFile\\TuneVault.Infrastructure\\TuneVault.Infrastructure.csproj"
             }
           }
         }

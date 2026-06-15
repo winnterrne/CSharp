@@ -1,4 +1,3 @@
-
 import type { Media, MediaItemDto } from "./media";
 import { mapMediaItemDtoToMedia } from "./media";
 
@@ -12,6 +11,14 @@ export interface Playlist {
   tracks: PlaylistTrack[];
   trackCount: number;
   isPublic: boolean;
+
+  // thêm mấy dòng này để Sidebar hiện tên người dùng
+  userName?: string;
+  ownerName?: string;
+  user?: {
+    userName?: string;
+    name?: string;
+  };
 }
 
 export interface PlaylistTrack {
@@ -29,6 +36,14 @@ export interface PlaylistDetailDto {
   isPublic?: boolean;
   songs?: MediaItemDto[];
   tracks?: PlaylistTrack[];
+
+  // thêm mấy dòng này nếu backend có trả tên user
+  userName?: string;
+  ownerName?: string;
+  user?: {
+    userName?: string;
+    name?: string;
+  };
 }
 
 export const mapPlaylistDetailDtoToPlaylist = (
@@ -53,11 +68,16 @@ export const mapPlaylistDetailDtoToPlaylist = (
     tracks,
     trackCount: tracks.length,
     isPublic: item.isPublic ?? true,
+
+    // map tên user ra Playlist
+    userName: item.userName,
+    ownerName: item.ownerName,
+    user: item.user,
   };
 };
+
 export interface CreatePlaylistDto {
   PlaylistName: string;
-    Description?: string;
+  Description?: string;
   IsPublic: boolean;
-
 }

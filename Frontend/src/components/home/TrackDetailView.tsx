@@ -4,6 +4,8 @@ import { usePlayer } from "../../hooks/usePlayer";
 import { useFavorite } from "../../hooks/useFavorite";
 import AddToPlaylistButton from "../playlist/AddToPlaylistButton";
 import TrackActionMenu from "../common/TrackActionMenu";
+import ShareMediaModal from "../share/ShareModal";
+import { PlayIcon, ShareIcon } from "../common/icons";
 
 
   type TrackDetailViewProps = {
@@ -149,7 +151,7 @@ import TrackActionMenu from "../common/TrackActionMenu";
             cursor: "pointer",
           }}
         >
-          ▶
+          <PlayIcon/>
         </button>
 
         <button
@@ -168,7 +170,7 @@ import TrackActionMenu from "../common/TrackActionMenu";
 
        <AddToPlaylistButton mediaId={track.id} />
         <button
-          onClick={() => navigator.clipboard.writeText(window.location.href)}
+          onClick={() => setShareOpen(true)}
           title="Chia sẻ"
           style={{
             border: "none",
@@ -178,7 +180,7 @@ import TrackActionMenu from "../common/TrackActionMenu";
             color: "#b3b3b3",
           }}
         >
-          ↗
+          <ShareIcon/>
         </button>
 
         <div style={{ position: "relative" }}>
@@ -248,6 +250,13 @@ import TrackActionMenu from "../common/TrackActionMenu";
           </p>
         </div>
       </section>
+      <ShareMediaModal
+        open={shareOpen}
+        onClose={() => setShareOpen(false)}
+        mediaItemID={Number(track.id)}
+        playlistID={null}
+        title={`Chia sẻ ${track.type === "video" ? "video" : "bài hát"}`}
+      />
     </>
   );
 };

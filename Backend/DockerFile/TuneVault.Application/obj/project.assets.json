@@ -1033,8 +1033,8 @@
         "net10.0": {
           "targetAlias": "net10.0",
           "projectReferences": {
-            "d:\\TuneVault\\CSharp\\Backend\\DockerFile\\TuneVault.Domain\\TuneVault.Domain.csproj": {
-              "projectPath": "d:\\TuneVault\\CSharp\\Backend\\DockerFile\\TuneVault.Domain\\TuneVault.Domain.csproj"
+            "D:\\TuneVault\\CSharp\\Backend\\DockerFile\\TuneVault.Domain\\TuneVault.Domain.csproj": {
+              "projectPath": "D:\\TuneVault\\CSharp\\Backend\\DockerFile\\TuneVault.Domain\\TuneVault.Domain.csproj"
             }
           }
         }

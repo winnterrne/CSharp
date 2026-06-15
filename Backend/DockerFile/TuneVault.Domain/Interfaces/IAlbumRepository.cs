@@ -7,8 +7,8 @@ namespace TuneVault.Domain.Interfaces
 {
     public interface IAlbumRepository
     {
-        Task<Album> GetAlbumByIdAsync(string albumId);
-        Task<IEnumerable<Album>> GetAlbumsByArtistAsync(string artistId);
+        Task<Album> GetAlbumByIdAsync(int albumId);
+        Task<IEnumerable<Album>> GetAlbumsByArtistAsync(int artistId);
         Task<int> CreateAlbumAsync(Album album);
         Task<int> UpdateAlbumAsync(Album album);
         Task<int> DeleteAlbumAsync(string albumId);

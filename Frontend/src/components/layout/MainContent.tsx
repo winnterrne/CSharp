@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import type { Media } from "../../types/media";
 import {
   mapMediaItemDtoToMedia,
@@ -7,17 +9,20 @@ import {
 import { mediaApi } from "../../api/mediaApi";
 
 import HomeView from "../home/HomeView";
-import AlbumDetailView from "../home/AlbumDetailView";
 import TrackDetailView from "../home/TrackDetailView";
 import ArtistDetailView from "../home/ArtistDetailView";
 import AlbumCardLarge from "../home/AlbumCardLarge";
+import type { Album } from "../../types/album";
+import { albumApi } from "../../api/albumApi";
+import { useAlbumStore } from "../../store/albumStore";
+import { mapAlbumTrackToMedia, buildImageUrl } from "../../types/media";
+
 
 type ViewMode =
   | "home"
   | "recommended"
   | "upcoming"
   | "forYou"
-  | "album"
   | "track"
   | "artist";
 
@@ -31,16 +36,24 @@ const uniqueTracks = (tracks: Media[]) => {
   return Array.from(map.values());
 };
 
+const getAlbumIdFromCover = (cover: Media | Album) => {
+  const item = cover as any;
+
+  return (
+    item.albumID ??
+    item.albumId ??
+    item.albumID ??
+    item.id ??
+    item.mediaItemID ??
+    item.mediaItemId
+  );
+};
+
 const MainContent = () => {
+  const navigate = useNavigate();
+
   const [viewMode, setViewMode] = useState<ViewMode>("home");
-
   const [selectedTrack, setSelectedTrack] = useState<Media | null>(null);
-
-  const [selectedAlbum, setSelectedAlbum] = useState<{
-    cover: Media;
-    tracks: Media[];
-    title?: string;
-  } | null>(null);
 
   const [selectedArtist, setSelectedArtist] = useState<{
     name: string;
@@ -50,9 +63,13 @@ const MainContent = () => {
   const [recommended, setRecommended] = useState<Media[]>([]);
   const [forYou, setForYou] = useState<Media[]>([]);
   const [upcoming, setUpcoming] = useState<Media[]>([]);
+  const [albums, setAlbums] = useState<Album[]>([]);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const selectedAlbumId = useAlbumStore((s) => s.selectedAlbumId);
+  const setSelectedAlbumId = useAlbumStore((s) => s.setSelectedAlbumId);
 
   useEffect(() => {
     const fetchHomeData = async () => {
@@ -60,10 +77,13 @@ const MainContent = () => {
         setLoading(true);
         setError("");
 
-        const res = await mediaApi.getAll();
+        const [mediaRes, albumRes] = await Promise.all([
+          mediaApi.getAll(),
+          albumApi.getAll(),
+        ]);
 
-        const mediaDtos: MediaItemDto[] = Array.isArray(res.data?.data)
-          ? res.data.data
+        const mediaDtos: MediaItemDto[] = Array.isArray(mediaRes.data?.data)
+          ? mediaRes.data.data
           : [];
 
         const mediaList = uniqueTracks(mediaDtos.map(mapMediaItemDtoToMedia));
@@ -71,6 +91,15 @@ const MainContent = () => {
         setRecommended(mediaList.slice(0, 12));
         setForYou(mediaList.slice(4, 16));
         setUpcoming(mediaList.slice(8, 20));
+        setAlbums(albumRes.data?.data ?? []);
+
+        const albumList = Array.isArray(albumRes.data?.data)
+          ? albumRes.data.data
+          : Array.isArray(albumRes.data)
+            ? albumRes.data
+            : [];
+
+        setAlbums(albumList);
 
         if (mediaList.length === 0) {
           setError("Chưa có dữ liệu bài hát từ server.");
@@ -81,6 +110,7 @@ const MainContent = () => {
         setRecommended([]);
         setForYou([]);
         setUpcoming([]);
+        setAlbums([]);
         setError("Không tải được dữ liệu bài hát từ server.");
       } finally {
         setLoading(false);
@@ -90,6 +120,8 @@ const MainContent = () => {
     fetchHomeData();
   }, []);
 
+  
+
   const allTracks = useMemo(() => {
     return uniqueTracks([...recommended, ...forYou, ...upcoming]);
   }, [recommended, forYou, upcoming]);
@@ -98,26 +130,70 @@ const MainContent = () => {
     if (!track?.id) return;
 
     setSelectedTrack(track);
-    setSelectedAlbum(null);
     setSelectedArtist(null);
     setViewMode("track");
   };
 
-  const handleOpenAlbum = (cover: Media, tracks: Media[], title?: string) => {
-    setSelectedAlbum({
-      cover,
-      tracks,
-      title,
-    });
+  const handleOpenAlbum = (
+    cover: Media | Album,
+    _tracks: Media[] = [],
+    _title?: string
+  ) => {
+    const albumId = getAlbumIdFromCover(cover);
 
-    setSelectedTrack(null);
-    setSelectedArtist(null);
-    setViewMode("album");
+    if (!albumId) {
+      console.warn("Không tìm thấy albumId:", cover);
+      return;
+    }
+
+    navigate(`/album/${albumId}`);
   };
+
+  useEffect(() => {
+  if (!selectedAlbumId) return;
+
+  const album = albums.find((a) => a.albumID === selectedAlbumId);
+  if (!album) return;
+
+  const openAlbum = async () => {
+    try {
+      const res = await albumApi.getTracks(selectedAlbumId);
+      const rawTracks = res.data?.data ?? [];
+
+      const tracks = rawTracks.map((item) =>
+        mapAlbumTrackToMedia(item, album.albumID, album.albumName, album.artistName)
+      );
+
+      const cover = {
+        id: String(album.albumID),
+        title: album.albumName,
+        type: "audio" as const,
+        status: "published" as const,
+        url: "",
+        thumbnailUrl: album.albumItemImage
+          ? `http://localhost:5081/media/images/album/${album.albumItemImage}`
+          : undefined,
+        duration: 0,
+        artist: { id: album.artistID, name: album.artistName },
+        albumId: album.albumID,
+        albumName: album.albumName,
+        createdAt: album.uploadAt,
+      };
+
+      handleOpenAlbum(cover, tracks, album.albumName);
+    } catch (err) {
+      console.error("Không tải được album từ sidebar:", err);
+    } finally {
+      setSelectedAlbumId(null); // reset sau khi mở
+    }
+  };
+
+  openAlbum();
+}, [selectedAlbumId, albums]);
 
   const handleOpenArtist = (artistName: string, tracks: Media[] = allTracks) => {
     const artistTracks = tracks.filter(
-      (track) => track.artist?.name === artistName,
+      (track) => track.artist?.name === artistName
     );
 
     setSelectedArtist({
@@ -126,14 +202,12 @@ const MainContent = () => {
     });
 
     setSelectedTrack(null);
-    setSelectedAlbum(null);
     setViewMode("artist");
   };
 
   const handleBackHome = () => {
     setViewMode("home");
     setSelectedTrack(null);
-    setSelectedAlbum(null);
     setSelectedArtist(null);
   };
 
@@ -226,6 +300,7 @@ const MainContent = () => {
           recommended={recommended}
           forYou={forYou}
           upcoming={upcoming}
+          albums={albums}
           onOpenTrack={handleOpenTrack}
           onOpenAlbum={handleOpenAlbum}
           onShowAll={(mode) => {
@@ -285,16 +360,6 @@ const MainContent = () => {
           </div>
         ))}
 
-      {viewMode === "album" && selectedAlbum && (
-        <AlbumDetailView
-          cover={selectedAlbum.cover}
-          tracks={selectedAlbum.tracks}
-          title={selectedAlbum.title}
-          onOpenTrack={handleOpenTrack}
-          onOpenArtist={handleOpenArtist}
-        />
-      )}
-
       {viewMode === "artist" && selectedArtist && (
         <ArtistDetailView
           artistName={selectedArtist.name}
@@ -308,3 +373,4 @@ const MainContent = () => {
 };
 
 export default MainContent;
+
