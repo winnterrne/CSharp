@@ -16,6 +16,9 @@ interface PlayerStore extends PlayerState {
   setLoading: (loading: boolean) => void;
   setDuration: (duration: number) => void;
 
+  playingContextId: string | null;
+  setPlayingContextId: (id: string | null) => void;
+
   playTrack: (track: Media, queue?: Media[]) => void;
   play: () => void;
   pause: () => void;
@@ -45,6 +48,7 @@ export const playerStore = create<PlayerStore>()(
       isShuffle: false,
       repeatMode: "off",
       isLoading: false,
+      playingContextId: null,
 
       setCurrentTrack: (track) =>
         set({
@@ -78,6 +82,8 @@ export const playerStore = create<PlayerStore>()(
         set({
           duration: Math.max(0, duration),
         }),
+
+      setPlayingContextId: (id) => set({ playingContextId: id }),
 
       playTrack: (track, queue) =>
         set((state) => ({
@@ -223,6 +229,7 @@ export const playerStore = create<PlayerStore>()(
           position: 0,
           duration: 0,
           isLoading: false,
+          playingContextId: null,
         }),
     }),
     {
