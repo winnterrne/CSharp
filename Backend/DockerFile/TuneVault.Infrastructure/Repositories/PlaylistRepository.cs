@@ -14,16 +14,42 @@ public class PlaylistRepository : IPlaylistRepository
         _db = db;
     }
 
-    public async Task<(Playlist Playlist, IEnumerable<MediaItem> Songs)> GetPlaylistByIdAsync(int playlistID)
+    public async Task<(Playlist Playlist, IEnumerable<MediaItem> Songs)>
+        GetPlaylistByIdAsync(int playlistID)
     {
-        string sql = "SELECT * FROM PlayList WHERE PlaylistID = @PlaylistID AND IsDeleted = 0";
-        return await _db.LoadDataSingleAsync<Playlist>(sql, new { PlaylistID = playlistID });
+        string sql =
+            "SELECT * FROM PlayList WHERE PlaylistID = @PlaylistID AND IsDeleted = 0";
+
+        var playlist =
+            await _db.LoadDataSingleAsync<Playlist>(
+                sql,
+                new { PlaylistID = playlistID });
+
+        var songs =
+            await GetTracksByPlaylistIdAsync(
+                playlistID);
+
+        return (playlist, songs);
     }
 
-    public async Task<(IEnumerable<Playlist> Playlists, Dictionary<int, int> TrackCounts)> GetUserPlaylistsAsync(string userId)
+    public async Task<(IEnumerable<Playlist> Playlists,
+                       Dictionary<int, int> TrackCounts)>
+        GetUserPlaylistsAsync(string userId)
     {
-        string sql = "SELECT * FROM Playlist WHERE UserID = @userId AND IsDeleted = 0";
-        return await _db.LoadAllDataSingleAsync<Playlist>(sql, new { UserID = userId });
+        string sql =
+            "SELECT * FROM Playlist WHERE UserID = @UserID AND IsDeleted = 0";
+
+        var playlists =
+            await _db.LoadAllDataSingleAsync<Playlist>(
+                sql,
+                new { UserID = userId });
+
+        var trackCounts =
+            playlists.ToDictionary(
+                p => p.PlaylistID,
+                p => 0);
+
+        return (playlists, trackCounts);
     }
 
     public async Task<int> CreatePlaylistAsync(Playlist playlist)

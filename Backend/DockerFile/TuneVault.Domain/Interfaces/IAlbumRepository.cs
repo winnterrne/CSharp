@@ -11,7 +11,7 @@ namespace TuneVault.Domain.Interfaces
         Task<IEnumerable<Album>> GetAlbumsByArtistAsync(int artistId);
         Task<int> CreateAlbumAsync(Album album);
         Task<int> UpdateAlbumAsync(Album album);
-        Task<int> DeleteAlbumAsync(string albumId);
+        Task<int> DeleteAlbumAsync(int albumId);
         Task<IEnumerable<(Album Album, string ArtistName)>> GetAllAlbumsAsync();
     }
 }

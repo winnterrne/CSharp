@@ -50,3 +50,15 @@ public record PlaylistDetailDto(
     bool IsPublic,
     List<MediaItemDto> Songs
 );
+public record SearchPlaylistDto(
+    int PlaylistID,
+    string? PlaylistName,
+    bool? IsPublic,
+    string? Description,
+    string UserID
+);
+
+public record SearchPlaylistResultDto(
+    IEnumerable<PlaylistDto> Playlists,
+    int TotalCount,
+    int TotalPages);
