@@ -8,6 +8,7 @@ import ProfilePage from "../pages/Profile/ProfilePage";
 import SearchPage from "../pages/Search/SearchPage";
 import PlaylistDetailPage from "../pages/Playlist/PlaylistDetailPage";
 import NotificationPage from "../pages/Notification/NotificationPage";
+import AlbumDetailPage from "../pages/Album/AlbumDetailPage";
 
 export default function AppRoutes() {
   return (
@@ -63,6 +64,17 @@ export default function AppRoutes() {
           </MainLayout>
         }
       />
+      <Route
+        path="/album/:id"
+        element={
+          <MainLayout>
+            <AlbumDetailPage />
+          </MainLayout>
+        }
+      />
+
+
     </Routes>
+    
   );
 }

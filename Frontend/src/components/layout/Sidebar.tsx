@@ -126,8 +126,9 @@ const Sidebar = ({
   }, []);
 
   const handleOpenAlbum = (album: Album) => {
-  setSelectedAlbumId(album.albumID);
-};
+    setSelectedAlbumId(album.albumID);
+    navigate(`/album/${album.albumID}`);
+  };
 
   const filteredPlaylists = playlists.filter((playlist) =>
     getPlaylistName(playlist).toLowerCase().includes(searchVal.toLowerCase()),

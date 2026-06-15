@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 
-import Sidebar from "../components/layout/SideBar";
+import Sidebar from "../components/layout/Sidebar";
 import PlayerBar from "../components/layout/PlayerBar";
 import Header from "../components/layout/Header";
 import NowPlaying from "../components/layout/NowPlaying";

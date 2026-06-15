@@ -37,6 +37,12 @@ const getArtistName = (media: Media) => {
   );
 };
 
+const getMediaId = (media: Media) => {
+  const m = media as any;
+
+  return m.id ?? m.mediaItemID ?? m.mediaItemId ?? 0;
+};
+
 const getPlaylistFromResponse = (responseData: unknown): Playlist => {
   const wrapper = responseData as {
     data?: PlaylistDetailDto;
@@ -49,11 +55,7 @@ const getPlaylistFromResponse = (responseData: unknown): Playlist => {
 
 const PlaylistDetailPage = () => {
   const { id } = useParams<{ id: string }>();
-  const { playTrack} = usePlayer();
-  const {pause} = usePlayer();
-  const {isPlaying} = usePlayer();
-  const {currentTrack} = usePlayer();
-  const {play} = usePlayer();
+  const { playTrack, pause, isPlaying, currentTrack, play, setQueue } = usePlayer();
 
   const {
     search,
@@ -79,6 +81,13 @@ const PlaylistDetailPage = () => {
     return playlistTracks.map((item) => item.media).filter(Boolean);
   }, [playlistTracks]);
 
+  const isCurrentPlaylistPlaying = useMemo(() => {
+  if (!currentTrack) return false;
+
+  return mediaTracks.some(
+      (track) => Number(getMediaId(track)) === Number(getMediaId(currentTrack))
+    );
+  }, [currentTrack, mediaTracks]);
   const totalDuration = useMemo(() => {
     const totalSeconds = mediaTracks.reduce(
       (sum, track) => sum + (track.duration ?? 0),
@@ -124,15 +133,19 @@ const PlaylistDetailPage = () => {
   const handlePlayPlaylist = () => {
     if (mediaTracks.length === 0) return;
 
-    if (!currentTrack) {
-      // chưa có bài nào → phát bài đầu
+    // Nếu bài đang phát không thuộc playlist hiện tại
+    // thì set queue bằng toàn bộ playlist này và phát bài đầu
+    if (!isCurrentPlaylistPlaying) {
+      setQueue(mediaTracks);
       playTrack(mediaTracks[0]);
+      return;
+    }
+
+    // Nếu đang ở đúng playlist này thì nút play chỉ đóng vai trò play/pause
+    if (isPlaying) {
+      pause();
     } else {
-      if (isPlaying) {
-        pause(); // dừng tạm thời
-      } else {
-        play()// tiếp tục từ vị trí hiện tại
-      }
+      play();
     }
   };
 
@@ -178,6 +191,7 @@ const PlaylistDetailPage = () => {
   };
 
   const handlePlayTrack = (track: Media) => {
+    setQueue(mediaTracks);
     playTrack(track);
   };
 
@@ -322,7 +336,7 @@ const PlaylistDetailPage = () => {
             justifyContent: "center",
           }}
         >
-          {isPlaying ? <NowPlayingIcon /> : <PlayIcon />}
+          {isCurrentPlaylistPlaying && isPlaying ? <NowPlayingIcon /> : <PlayIcon />}
         </button>
 
         <button
@@ -580,6 +594,9 @@ const PlaylistDetailPage = () => {
                 key={item.id}
                 item={item}
                 index={index}
+                currentTrack={currentTrack}
+                isPlaying={isPlaying}
+                playlistQueue={mediaTracks}
                 onPlay={() => handlePlayTrack(item.media)}
               />
             ))}
@@ -600,20 +617,50 @@ const PlaylistDetailPage = () => {
 const PlaylistTrackRow = ({
   item,
   index,
+  currentTrack,
+  isPlaying,
+  playlistQueue,
   onPlay,
 }: {
   item: PlaylistTrack;
   index: number;
+  currentTrack: Media | null;
+  isPlaying: boolean;
+  playlistQueue: Media[];
   onPlay: () => void;
 }) => {
   const [hovered, setHovered] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [addModalOpen, setAddModalOpen] = useState(false);
 
-  const { playTrack } = usePlayer();
+  const { playTrack, pause, play, setQueue } = usePlayer();
 
   const media = item.media;
   const artistName = getArtistName(media);
+
+  const isThisTrackPlaying =
+    currentTrack &&
+    Number(getMediaId(currentTrack)) === Number(getMediaId(media));
+
+  const showNowPlaying = Boolean(isThisTrackPlaying && isPlaying);
+
+  const handlePlayThisTrack = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+
+    setQueue(playlistQueue);
+
+    if (isThisTrackPlaying) {
+      if (isPlaying) {
+        pause();
+      } else {
+        play();
+      }
+
+      return;
+    }
+
+    playTrack(media);
+  };
 
   return (
     <div
@@ -629,27 +676,43 @@ const PlaylistTrackRow = ({
         height: "64px",
         padding: "0 8px",
         borderRadius: "8px",
-        background: hovered ? "#555" : "transparent",
+        background: showNowPlaying
+          ? "rgba(29,185,84,.18)"
+          : hovered
+            ? "#2a2a2a"
+            : "transparent",
         cursor: "pointer",
         position: "relative",
+        transition: "background 0.15s ease, transform 0.12s ease",
+        transform: hovered ? "translateY(-1px)" : "translateY(0)",
       }}
     >
-      <div style={{ color: "#b3b3b3", fontSize: "14px" }}>
-        {hovered ? (
+      <div
+        style={{
+          color: showNowPlaying ? "#1DB954" : "#b3b3b3",
+          fontSize: "14px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        {hovered || isThisTrackPlaying ? (
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              playTrack(media);
-            }}
+            onClick={handlePlayThisTrack}
             style={{
+              width: "28px",
+              height: "28px",
               border: "none",
               background: "transparent",
-              color: "#fff",
+              color: showNowPlaying ? "#1DB954" : "#fff",
               cursor: "pointer",
               fontSize: "16px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
-            <PlayIcon/>
+            {showNowPlaying ? <NowPlayingIcon /> : <PlayIcon />}
           </button>
         ) : (
           index + 1
@@ -657,6 +720,7 @@ const PlaylistTrackRow = ({
       </div>
 
       <div
+        onClick={onPlay}
         style={{
           display: "flex",
           alignItems: "center",
@@ -676,6 +740,9 @@ const PlaylistTrackRow = ({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            boxShadow: showNowPlaying
+              ? "0 0 0 2px rgba(29,185,84,.7)"
+              : "none",
           }}
         >
           {media.thumbnailUrl ? (
@@ -696,7 +763,7 @@ const PlaylistTrackRow = ({
         <div style={{ minWidth: 0 }}>
           <div
             style={{
-              color: "#fff",
+              color: showNowPlaying ? "#1DB954" : "#fff",
               fontSize: "14px",
               fontWeight: 700,
               whiteSpace: "nowrap",
@@ -712,6 +779,9 @@ const PlaylistTrackRow = ({
               color: "#d0d0d0",
               fontSize: "12px",
               marginTop: "3px",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
             }}
           >
             {artistName}
@@ -749,7 +819,7 @@ const PlaylistTrackRow = ({
 
       <div
         style={{
-          color: "#b3b3b3",
+          color: hovered || showNowPlaying ? "#fff" : "#b3b3b3",
           fontSize: "14px",
           whiteSpace: "nowrap",
           overflow: "hidden",
@@ -761,7 +831,7 @@ const PlaylistTrackRow = ({
 
       <div
         style={{
-          color: "#b3b3b3",
+          color: hovered || showNowPlaying ? "#fff" : "#b3b3b3",
           fontSize: "14px",
           textAlign: "right",
           display: "flex",
