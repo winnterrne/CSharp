@@ -191,9 +191,12 @@ const AlbumDetailView = ({
             background: tracks.length === 0 ? "#3a3a3a" : "#1DB954",
             color: "#000",
             cursor: tracks.length === 0 ? "not-allowed" : "pointer",
-            fontSize: "24px",
+            fontSize: "22px",
             fontWeight: 900,
             boxShadow: "0 8px 24px rgba(0,0,0,.35)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
           <PlayIcon/>

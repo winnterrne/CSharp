@@ -13,7 +13,7 @@ import { usePlayer } from "../../hooks/usePlayer";
 import { useSearch } from "../../hooks/useSearch";
 import TrackActionMenu from "../../components/common/TrackActionMenu";
 import ShareMediaModal from "../../components/share/ShareModal";
-import { PlayIcon, ShareIcon } from "../../components/common/icons";
+import { AddToPlaylistIcon, MoreHorizIcon, NowPlayingIcon, PlayIcon, ShareIcon, ShuffleIcon } from "../../components/common/icons";
 
 const formatDuration = (seconds?: number) => {
   
@@ -50,6 +50,10 @@ const getPlaylistFromResponse = (responseData: unknown): Playlist => {
 const PlaylistDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const { playTrack} = usePlayer();
+  const {pause} = usePlayer();
+  const {isPlaying} = usePlayer();
+  const {currentTrack} = usePlayer();
+  const {play} = usePlayer();
 
   const {
     search,
@@ -120,7 +124,16 @@ const PlaylistDetailPage = () => {
   const handlePlayPlaylist = () => {
     if (mediaTracks.length === 0) return;
 
-    playTrack(mediaTracks[0]);
+    if (!currentTrack) {
+      // chưa có bài nào → phát bài đầu
+      playTrack(mediaTracks[0]);
+    } else {
+      if (isPlaying) {
+        pause(); // dừng tạm thời
+      } else {
+        play()// tiếp tục từ vị trí hiện tại
+      }
+    }
   };
 
   useEffect(() => {
@@ -304,9 +317,12 @@ const PlaylistDetailPage = () => {
             fontSize: "22px",
             fontWeight: 900,
             boxShadow: "0 8px 24px rgba(0,0,0,.35)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
-          ▶
+          {isPlaying ? <NowPlayingIcon /> : <PlayIcon />}
         </button>
 
         <button
@@ -319,7 +335,7 @@ const PlaylistDetailPage = () => {
             fontSize: "30px",
           }}
         >
-          ⇄
+          <ShuffleIcon/>
         </button>
 
         <button
@@ -340,7 +356,7 @@ const PlaylistDetailPage = () => {
             fontWeight: 900,
           }}
         >
-          +
+          <AddToPlaylistIcon/>
         </button>
         <button
           title="Chia sẻ playlist"
@@ -367,7 +383,7 @@ const PlaylistDetailPage = () => {
             fontSize: "30px",
           }}
         >
-          ⋯
+          <MoreHorizIcon/>
         </button>
         </section>
       {showAddTrackBar && (
@@ -633,7 +649,7 @@ const PlaylistTrackRow = ({
               fontSize: "16px",
             }}
           >
-            ▶
+            <PlayIcon/>
           </button>
         ) : (
           index + 1

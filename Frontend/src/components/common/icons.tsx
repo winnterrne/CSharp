@@ -11,10 +11,11 @@ export const AddToPlaylistIcon = () => (
 );
 
 export const PlayIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M8 5v14l11-7z"/>
+  <svg width="32" height="32" viewBox="0 0 32 32" fill="currentColor">
+    <path d="M10 7v18l14-9z" />
   </svg>
 );
+
 
 export const PauseIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
@@ -107,11 +108,14 @@ export const FullscreenIcon = () => (
 );
 
 export const NowPlayingIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <rect x="4" y="5" width="16" height="14" rx="2" />
-    <path d="M8 15l2.5-3 2 2.5L15 11l3 4" />
+  <svg width="28" height="28" viewBox="0 0 28 28" fill="currentColor">
+    {/* Gạch bên trái */}
+    <rect x="7" y="5" width="4" height="18" rx="1" />
+    {/* Gạch bên phải, cách ra một chút */}
+    <rect x="15" y="5" width="4" height="18" rx="1" />
   </svg>
 );
+
 
 export const DownloadIcon = () => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">

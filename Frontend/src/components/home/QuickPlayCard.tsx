@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { Media } from "../../types/media";
 import { usePlayer } from "../../hooks/usePlayer";
 import { useHistoryStore } from "../../store/historyStore";
+import { PlayIcon } from "../common/icons";
 
 type Props = {
   track: Media;
@@ -127,7 +128,7 @@ const QuickPlayCard = ({ track, tracks, onOpenTrack }: Props) => {
             transition: ".18s ease",
           }}
         >
-          ▶
+          <PlayIcon/>
         </button>
       )}
     </div>

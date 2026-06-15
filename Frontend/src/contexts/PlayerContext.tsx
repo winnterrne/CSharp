@@ -21,6 +21,7 @@ export interface PlayerContextType {
   togglePlay: () => void;
   play: () => void;
   pause: () => void;
+  stopTrack: () => void;
   seek: (position: number) => void;
   setDuration: (duration: number) => void;
   setVolume: (volume: number) => void;

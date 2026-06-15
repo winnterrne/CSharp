@@ -55,6 +55,22 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
     togglePlay();
   };
 
+  const handleStop = () => {
+    const audio = audioRef.current;
+
+    if (audio) {
+      audio.pause();
+      audio.currentTime = 0; // đưa về đầu bài
+    }
+
+    // cập nhật state trong store
+    const state = playerStore.getState();
+    state.pause();
+    state.seek(0);
+    state.setCurrentTrack(null); // nếu bạn muốn clear bài hiện tại
+  };
+
+
   const handleSeek = (nextPosition: number) => {
     const safePosition = Math.max(0, nextPosition);
 
@@ -222,6 +238,7 @@ audio.src =
         setQueue,
         togglePlay: handleTogglePlay,
         play,
+        stopTrack: handleStop,
         pause,
         seek: handleSeek,
         setVolume,

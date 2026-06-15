@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { Media } from "../../types/media";
 import { usePlayer } from "../../hooks/usePlayer";
+import { PlayIcon } from "../common/icons";
 
 type Props = {
   track: Media;
@@ -90,7 +91,7 @@ const AlbumCardLarge = ({ track, tracks, onOpenAlbum }: Props) => {
               boxShadow: "0 8px 20px rgba(0,0,0,.35)",
             }}
           >
-            ▶
+            <PlayIcon/>
           </button>
         )}
       </div>

@@ -352,7 +352,7 @@ const Header = ({
                         justifyContent: "center",
                       }}
                     >
-                      ▶
+                      <PlayIcon/>
                     </button>
                   </div>
                 ))}
