@@ -78,6 +78,15 @@ export interface MediaItemDto {
   createdAt?: string;
 }
 
+export interface MediaItemAlbumDto {
+  mediaItemID: number;
+  titleName: string;
+  filePath: string;
+  mediaItemImage: string;
+  duration: number;
+  mediaItemTag?: string;
+}
+
 export const buildImageUrl = (img?: string) => {
   if (!img) return undefined;
 
@@ -134,5 +143,35 @@ export const mapMediaItemDtoToMedia = (item: MediaItemDto): Media => {
     albumId: item.albumID ?? item.albumId,
     albumName: item.albumName,
     createdAt: item.uploadAT ?? item.createdAt ?? new Date().toISOString(),
+  };
+};
+
+export const mapAlbumTrackToMedia = (
+  item: MediaItemAlbumDto,
+  albumId?: number,
+  albumName?: string,
+  artistName?: string,
+): Media => {
+  return {
+    id: String(item.mediaItemID),
+    title: item.titleName,
+    type: "audio",
+    status: "published",
+
+    url: `http://localhost:5081/api/media/${item.mediaItemID}/stream`,
+
+    thumbnailUrl: buildImageUrl(item.mediaItemImage),
+
+    duration: item.duration,
+
+    artist: {
+      id: 0,
+      name: artistName ?? "Unknown Artist",
+    },
+    genre: item.mediaItemTag ?? undefined,
+    albumId,
+    albumName,
+
+    createdAt: new Date().toISOString(),
   };
 };

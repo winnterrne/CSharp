@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using TuneVault.Application.DTos;
 using TuneVault.Application.DTOs;
 using TuneVault.Application.UseCases.Auth;
 namespace TuneVault.API.Controllers;
@@ -16,7 +17,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] RegisterRequestDTO dto)
+    public async Task<IActionResult> Register([FromBody] RegisterRequestDto dto)
     {
         var command = new RegisterCommand(
             dto.UserName, dto.Email, dto.Password, dto.Phone
@@ -26,7 +27,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginRequestDTO dto)
+    public async Task<IActionResult> Login([FromBody] LoginRequestDto dto)
     {
         var command = new LoginCommand(dto.Email, dto.Password);
         var result = await _mediator.Send(command);

@@ -5,4 +5,4 @@ namespace TuneVault.Application.UseCases.Notification;
 
 public record GetNotificationsQuery(
     string UserID
-) : IRequest<IEnumerable<NotificationDTO>>;
+) : IRequest<IEnumerable<NotificationDto>>;

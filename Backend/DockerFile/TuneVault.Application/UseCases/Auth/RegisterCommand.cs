@@ -1,4 +1,5 @@
 using MediatR;
+using TuneVault.Application.DTos;
 using TuneVault.Application.DTOs;
 namespace TuneVault.Application.UseCases.Auth;
 
@@ -11,4 +12,4 @@ public record RegisterCommand(
     string Email,
     string Password,
     string? Phone
-) : IRequest<AuthResponseDTO>;
+) : IRequest<AuthResponseDto>;

@@ -14,7 +14,11 @@ import { useHistoryStore } from "../../store/historyStore";
 import { useFavorite } from "../../hooks/useFavorite";
 import { authStore } from "../../store/authStore";
 
-type FilterTab = "playlist" | "favorite" | "album" | "following";
+import { albumApi } from "../../api/albumApi";
+import type { Album } from "../../types/album";
+import { useAlbumStore } from "../../store/albumStore";
+
+type FilterTab = "playlist" | "favorite" | "following" | "album";
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -52,7 +56,6 @@ const Sidebar = ({
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchVal, setSearchVal] = useState("");
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
-  const [albums, setAlbums] = useState<Media[]>([]);
   const [loading, setLoading] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showRecent, setShowRecent] = useState(false);
@@ -60,6 +63,9 @@ const Sidebar = ({
   const recentTracks = useHistoryStore((state) => state.recentTracks);
   const { favoriteTracks, loadFavorites } = useFavorite();
   const { playTrack, setQueue } = usePlayer();
+
+  const [albums, setAlbums] = useState<Album[]>([]);
+  const setSelectedAlbumId = useAlbumStore((s) => s.setSelectedAlbumId);
 
   const fetchPlaylists = useCallback(async () => {
     if (!canUseAuthApi) {
@@ -102,57 +108,27 @@ const Sidebar = ({
   }, [canUseAuthApi]);
 
   useEffect(() => {
-    fetchPlaylists();
+    // Avoid calling setState synchronously inside effect body by running
+    // the async work in an immediately-invoked async function.
+    (async () => {
+      await fetchPlaylists();
 
-    if (canUseAuthApi) {
-      loadFavorites();
-    }
+      if (canUseAuthApi) {
+        await loadFavorites();
+      }
+    })();
   }, [fetchPlaylists, loadFavorites, canUseAuthApi]);
 
-useEffect(() => {
-    const fetchAlbums = async () => {
-      try {
-        const res = await mediaApi.getAll();
-
-        console.log("ALBUM API DATA:", res.data);
-
-        const rawData =
-          Array.isArray(res.data?.data)
-            ? res.data.data
-            : Array.isArray(res.data)
-              ? res.data
-              : [];
-
-        const mappedAlbums: Media[] = rawData.map((item: any) => ({
-          id: item.id ?? item.mediaItemID ?? item.mediaItemId ?? 0,
-          title: item.title ?? item.titleName ?? item.name ?? "Không có tên",
-          thumbnailUrl:
-            item.thumbnailUrl ??
-            item.mediaItemImage ??
-            item.imageUrl ??
-            item.coverUrl ??
-            "",
-          duration: item.duration ?? 0,
-          type: item.type ?? item.mediaItemType ?? "audio",
-          artist: {
-            id: item.artistID ?? item.artistId ?? item.artist?.id ?? 0,
-            name:
-              item.artistName ??
-              item.artist?.name ??
-              item.artist?.artistName ??
-              "Unknown Artist",
-          },
-        }));
-
-        setAlbums(mappedAlbums);
-      } catch (error) {
-        console.error("LOAD ALBUM ERROR:", error);
-        setAlbums([]);
-      }
-    };
-
-    fetchAlbums();
+  useEffect(() => {
+    albumApi.getAll().then((res) => {
+      setAlbums(res.data?.data ?? []);
+    });
   }, []);
+
+  const handleOpenAlbum = (album: Album) => {
+    setSelectedAlbumId(album.albumID);
+    navigate(`/album/${album.albumID}`);
+  };
 
   const filteredPlaylists = playlists.filter((playlist) =>
     getPlaylistName(playlist).toLowerCase().includes(searchVal.toLowerCase()),
@@ -160,10 +136,6 @@ useEffect(() => {
 
   const filteredFavorites = favoriteTracks.filter((track) =>
     (track.title ?? "").toLowerCase().includes(searchVal.toLowerCase()),
-  );
-
-  const filteredAlbums = albums.filter((album) =>
-    (album.title ?? "").toLowerCase().includes(searchVal.toLowerCase()),
   );
 
   const handleOpenPlaylist = (playlist: Playlist) => {
@@ -208,18 +180,7 @@ useEffect(() => {
         <IconBtn title="Phóng to thư viện" onClick={onToggleExpand}>
           <ExpandIcon />
         </IconBtn>
-        <SmallTile
-          title="Album"
-          active={activeTab === "album"}
-          onClick={() => {
-            if (isCollapsed) onToggleCollapse();
 
-            setActiveTab("album");
-            setShowRecent(false);
-          }}
-        >
-          💿
-        </SmallTile>
         <div style={collapsedListStyle}>
           <SmallTile
             title="Bài hát yêu thích"
@@ -313,15 +274,6 @@ useEffect(() => {
             Yêu thích
           </TabButton>
           <TabButton
-            active={activeTab === "album"}
-            onClick={() => {
-              setActiveTab("album");
-              setShowRecent(false);
-            }}
-          >
-            Album
-          </TabButton>
-          <TabButton
             active={activeTab === "following"}
             onClick={() => {
               setActiveTab("following");
@@ -329,6 +281,13 @@ useEffect(() => {
             }}
           >
             Đang follow
+          </TabButton>
+
+          <TabButton
+            active={activeTab === "album"}
+            onClick={() => setActiveTab("album")}
+          >
+            Album
           </TabButton>
         </div>
       </div>
@@ -397,20 +356,6 @@ useEffect(() => {
               />
             ))
 
-        : activeTab === "album" ?
-          filteredAlbums.length === 0 ?
-            <EmptyText text="Chưa có album" />
-          : filteredAlbums.map((album) => (
-              <TrackRow
-                key={`album-${album.id}`}
-                track={album}
-                isWide={isWide}
-                onClick={() => {
-                  navigate(`/album/${album.id}`);
-                }}
-              />
-            ))
-
         : activeTab === "following" ?
           <EmptyText text="Chưa có API lấy danh sách đang follow" />
         : activeTab === "favorite" ?
@@ -424,7 +369,17 @@ useEffect(() => {
                 onClick={() => handlePlayTrackList(track, favoriteTracks)}
               />
             ))
-
+        : activeTab === "album" ?
+          albums.length === 0 ?
+            <EmptyText text="Chưa có album" />
+          : albums.map((album) => (
+              <AlbumRow
+                key={album.albumID}
+                album={album}
+                isWide={isWide}
+                onClick={() => handleOpenAlbum(album)}
+              />
+            ))
         : loading ?
           <LoadingText />
         : filteredPlaylists.length === 0 ?
@@ -440,6 +395,8 @@ useEffect(() => {
                 isWide={isWide}
                 onClick={() => handleOpenPlaylist(playlist)}
               />
+
+
             );
           })
         }
@@ -540,6 +497,71 @@ const PlaylistRow = ({
           }}
         >
           Danh sách phát • {trackCount} bài
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const AlbumRow = ({
+  album,
+  isWide,
+  onClick,
+}: {
+  album: Album;
+  isWide: boolean;
+  onClick: () => void;
+}) => {
+  const [hovered, setHovered] = useState(false);
+  const selectedId = useAlbumStore((s) => s.selectedAlbumId);
+  const active = selectedId === album.albumID;
+
+  return (
+    <div
+      onClick={onClick}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: isWide ? "16px" : "12px",
+        padding: isWide ? "12px" : "8px",
+        borderRadius: "8px",
+        background:
+          active ? "#2a2a2a"
+          : hovered ? "#1a1a1a"
+          : "transparent",
+        cursor: "pointer",
+      }}
+    >
+      <CoverBox size={isWide ? 56 : 48}>
+        {album.albumItemImage ? (
+          <img
+            src={`http://localhost:5081/media/images/album/${album.albumItemImage}`}
+            alt={album.albumName}
+            style={imgFullStyle}
+          />
+        ) : "🎵"}
+      </CoverBox>
+
+      <div style={{ minWidth: 0, flex: 1 }}>
+        <div style={{
+          color: active ? "#1DB954" : "#fff",
+          fontSize: isWide ? "15px" : "14px",
+          fontWeight: 700,
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+        }}>
+          {album.albumName}
+        </div>
+
+        <div style={{
+          color: "#b3b3b3",
+          fontSize: isWide ? "13px" : "12px",
+          marginTop: "4px",
+        }}>
+          Album • {album.artistName}
         </div>
       </div>
     </div>

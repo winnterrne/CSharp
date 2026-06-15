@@ -5,6 +5,7 @@ import { useAuth } from "../../hooks/useAuth";
 import AuthCard from "./components/AuthCard";
 import AuthInput from "./components/AuthInput";
 import AuthButton from "./components/AuthButton";
+import { userApi } from "../../api/userApi";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -34,7 +35,25 @@ const LoginPage = () => {
         },
         authData.token,
       );
+      // ✅ Fetch profile để lấy userImage
+    try {
+      const profileRes = await userApi.getProfile(authData.userID);
+      const profile = profileRes.data.data;
 
+      // Cập nhật lại user với userImage
+      login(
+        {
+          id: authData.userID,
+          username: authData.userName,
+          email: authData.email,
+          role: authData.role,
+          userImage: profile.userImage ?? undefined,
+        },
+        authData.token,
+      );
+    } catch {
+      // Không lấy được profile thì vẫn login bình thường
+    }
       navigate("/");
     } catch (err) {
       console.error("LOGIN ERROR:", err);

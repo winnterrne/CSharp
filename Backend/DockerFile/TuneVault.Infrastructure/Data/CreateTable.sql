@@ -8,7 +8,7 @@ DROP TABLE IF EXISTS Notification;
 DROP TABLE IF EXISTS Playlist;
 DROP TABLE IF EXISTS Album;
 DROP TABLE IF EXISTS Artist;
-DROP TABLE IF EXISTS AspNetUsers;
+
 
 /* 1. Bảng AspNetUsers */
 CREATE TABLE AspNetUsers(

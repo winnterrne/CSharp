@@ -13,6 +13,7 @@ import { usePlayer } from "../../hooks/usePlayer";
 import { useSearch } from "../../hooks/useSearch";
 import TrackActionMenu from "../../components/common/TrackActionMenu";
 import ShareMediaModal from "../../components/share/ShareModal";
+import { AddToPlaylistIcon, MoreHorizIcon, NowPlayingIcon, PlayIcon, ShareIcon, ShuffleIcon } from "../../components/common/icons";
 
 const formatDuration = (seconds?: number) => {
   
@@ -36,6 +37,12 @@ const getArtistName = (media: Media) => {
   );
 };
 
+const getMediaId = (media: Media) => {
+  const m = media as any;
+
+  return m.id ?? m.mediaItemID ?? m.mediaItemId ?? 0;
+};
+
 const getPlaylistFromResponse = (responseData: unknown): Playlist => {
   const wrapper = responseData as {
     data?: PlaylistDetailDto;
@@ -48,7 +55,7 @@ const getPlaylistFromResponse = (responseData: unknown): Playlist => {
 
 const PlaylistDetailPage = () => {
   const { id } = useParams<{ id: string }>();
-  const { playTrack} = usePlayer();
+  const { playTrack, pause, isPlaying, currentTrack, play, setQueue } = usePlayer();
 
   const {
     search,
@@ -74,6 +81,13 @@ const PlaylistDetailPage = () => {
     return playlistTracks.map((item) => item.media).filter(Boolean);
   }, [playlistTracks]);
 
+  const isCurrentPlaylistPlaying = useMemo(() => {
+  if (!currentTrack) return false;
+
+  return mediaTracks.some(
+      (track) => Number(getMediaId(track)) === Number(getMediaId(currentTrack))
+    );
+  }, [currentTrack, mediaTracks]);
   const totalDuration = useMemo(() => {
     const totalSeconds = mediaTracks.reduce(
       (sum, track) => sum + (track.duration ?? 0),
@@ -119,7 +133,20 @@ const PlaylistDetailPage = () => {
   const handlePlayPlaylist = () => {
     if (mediaTracks.length === 0) return;
 
-    playTrack(mediaTracks[0]);
+    // Nếu bài đang phát không thuộc playlist hiện tại
+    // thì set queue bằng toàn bộ playlist này và phát bài đầu
+    if (!isCurrentPlaylistPlaying) {
+      setQueue(mediaTracks);
+      playTrack(mediaTracks[0]);
+      return;
+    }
+
+    // Nếu đang ở đúng playlist này thì nút play chỉ đóng vai trò play/pause
+    if (isPlaying) {
+      pause();
+    } else {
+      play();
+    }
   };
 
   useEffect(() => {
@@ -164,6 +191,7 @@ const PlaylistDetailPage = () => {
   };
 
   const handlePlayTrack = (track: Media) => {
+    setQueue(mediaTracks);
     playTrack(track);
   };
 
@@ -303,9 +331,12 @@ const PlaylistDetailPage = () => {
             fontSize: "22px",
             fontWeight: 900,
             boxShadow: "0 8px 24px rgba(0,0,0,.35)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
-          ▶
+          {isCurrentPlaylistPlaying && isPlaying ? <NowPlayingIcon /> : <PlayIcon />}
         </button>
 
         <button
@@ -318,7 +349,7 @@ const PlaylistDetailPage = () => {
             fontSize: "30px",
           }}
         >
-          ⇄
+          <ShuffleIcon/>
         </button>
 
         <button
@@ -339,7 +370,7 @@ const PlaylistDetailPage = () => {
             fontWeight: 900,
           }}
         >
-          +
+          <AddToPlaylistIcon/>
         </button>
         <button
           title="Chia sẻ playlist"
@@ -352,7 +383,8 @@ const PlaylistDetailPage = () => {
             fontSize: "28px",
           }}
         >
-          ↗
+          <ShareIcon/>
+
         </button>
 
         <button
@@ -365,7 +397,7 @@ const PlaylistDetailPage = () => {
             fontSize: "30px",
           }}
         >
-          ⋯
+          <MoreHorizIcon/>
         </button>
         </section>
       {showAddTrackBar && (
@@ -562,6 +594,9 @@ const PlaylistDetailPage = () => {
                 key={item.id}
                 item={item}
                 index={index}
+                currentTrack={currentTrack}
+                isPlaying={isPlaying}
+                playlistQueue={mediaTracks}
                 onPlay={() => handlePlayTrack(item.media)}
               />
             ))}
@@ -582,21 +617,48 @@ const PlaylistDetailPage = () => {
 const PlaylistTrackRow = ({
   item,
   index,
+  currentTrack,
+  isPlaying,
+  playlistQueue,
   onPlay,
 }: {
   item: PlaylistTrack;
   index: number;
+  currentTrack: Media | null;
+  isPlaying: boolean;
+  playlistQueue: Media[];
   onPlay: () => void;
 }) => {
   const [hovered, setHovered] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [addModalOpen, setAddModalOpen] = useState(false);
 
-  const { playTrack } = usePlayer();
+  const { playTrack, pause, play, setQueue } = usePlayer();
 
   const media = item.media;
   const artistName = getArtistName(media);
 
+  const isThisTrackPlaying =
+    currentTrack &&
+    Number(getMediaId(currentTrack)) === Number(getMediaId(media));
+
+  const handlePlayThisTrack = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+
+    setQueue(playlistQueue);
+
+    if (isThisTrackPlaying) {
+      if (isPlaying) {
+        pause();
+      } else {
+        play();
+      }
+
+      return;
+    }
+
+    playTrack(media);
+  };
   return (
     <div
       onDoubleClick={onPlay}
@@ -619,10 +681,7 @@ const PlaylistTrackRow = ({
       <div style={{ color: "#b3b3b3", fontSize: "14px" }}>
         {hovered ? (
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              playTrack(media);
-            }}
+            onClick={handlePlayThisTrack}
             style={{
               border: "none",
               background: "transparent",
@@ -631,7 +690,7 @@ const PlaylistTrackRow = ({
               fontSize: "16px",
             }}
           >
-            ▶
+            <PlayIcon/>
           </button>
         ) : (
           index + 1

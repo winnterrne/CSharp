@@ -9,7 +9,10 @@ interface UserProfileDto {
   email: string;
   role: string;
   phone?: string;
+  bio?: string;
 }
+
+const baseUrl = "http://localhost:5081";
 
 const ProfilePage = () => {
   const authUser = authStore((state) => state.user);
@@ -19,6 +22,7 @@ const ProfilePage = () => {
   const [displayName, setDisplayName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
   const [phone, setPhone] = useState("");
+  const [bio, setBio] = useState("");
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -42,7 +46,7 @@ const ProfilePage = () => {
 
         setProfile(data);
         setDisplayName(data.userName ?? "");
-        setAvatarUrl(data.userImage ?? "");
+        setAvatarUrl( data.userImage ? `${baseUrl}/media/images/users/${data.userImage}`: "");
         setPhone(data.phone ?? "");
       } catch (err) {
         console.error("LOAD PROFILE ERROR:", err);
@@ -65,6 +69,7 @@ const ProfilePage = () => {
         userName: displayName,
         userImage: avatarUrl,
         phone,
+        bio,
       });
 
       const data = res.data?.data as UserProfileDto;
@@ -73,6 +78,7 @@ const ProfilePage = () => {
       setDisplayName(data.userName ?? "");
       setAvatarUrl(data.userImage ?? "");
       setPhone(data.phone ?? "");
+      setBio(data.bio ?? "");
 
       setUser({
         id: data.userID,
@@ -81,6 +87,7 @@ const ProfilePage = () => {
         role: data.role,
         avatarUrl: data.userImage,
         phone: data.phone,
+        bio: data.bio,
       });
 
       setIsEditing(false);
@@ -142,7 +149,9 @@ const ProfilePage = () => {
         </div>
       </section>
 
-      <section style={{ padding: "28px 32px 60px" }}>
+      <section style={{ padding: "28px 32px 60px",
+                       maxWidth : "700px",
+                       margin: "0 auto" }}>
         <div style={{ display: "flex", gap: "12px", marginBottom: "28px" }}>
           {isEditing ? (
             <>
@@ -198,6 +207,18 @@ const ProfilePage = () => {
               placeholder="Số điện thoại"
               style={inputStyle}
             />
+
+            <label style={labelStyle}>Bio</label>
+            <textarea
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
+              placeholder="Giới thiệu bản thân..."
+              style={{
+                ...inputStyle,
+                minHeight: "100px",
+                resize: "vertical",
+              }}
+            />
           </div>
         )}
 
@@ -211,6 +232,35 @@ const ProfilePage = () => {
           <InfoRow label="Email" value={profile.email} />
           <InfoRow label="Vai trò" value={profile.role} />
           <InfoRow label="Số điện thoại" value={profile.phone ?? "Chưa cập nhật"} />
+          <div
+            style={{
+              padding: "16px 0",
+              borderBottom: "1px solid rgba(255,255,255,0.08)",
+            }}
+          >
+            <div
+              style={{
+                color: "#b3b3b3",
+                marginBottom: "10px",
+                fontWeight: 500,
+              }}
+            >
+              Bio
+            </div>
+
+            <div
+              style={{
+                background: "#181818",
+                padding: "14px",
+                borderRadius: "8px",
+                lineHeight: "1.6",
+                whiteSpace: "pre-wrap",
+                wordBreak: "break-word",
+              }}
+            >
+              {profile.bio ?? "No bio yet"}
+            </div>
+          </div>
         </div>
       </section>
     </main>
@@ -223,6 +273,7 @@ const InfoRow = ({ label, value }: { label: string; value: string }) => (
     <span style={{ fontWeight: 600, textAlign: "right" }}>{value}</span>
   </div>
 );
+
 
 const pageStyle: React.CSSProperties = {
   flex: 1,

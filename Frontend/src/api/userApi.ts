@@ -4,6 +4,21 @@ export interface UpdateProfilePayload {
   userName?: string;
   userImage?: string;
   phone?: string;
+  bio?: string;
+}
+
+export interface UserSearchResult {
+  userID: string;
+  userName: string;
+  userImage: string | null;
+  email: string;
+  role: string;
+  phone: string;
+}
+
+export interface ApiResponse<T> {
+  success: boolean;
+  data: T;
 }
 
 export interface UserSearchResult {

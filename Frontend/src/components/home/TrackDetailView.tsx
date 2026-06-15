@@ -5,6 +5,7 @@ import { useFavorite } from "../../hooks/useFavorite";
 import AddToPlaylistButton from "../playlist/AddToPlaylistButton";
 import TrackActionMenu from "../common/TrackActionMenu";
 import ShareMediaModal from "../share/ShareModal";
+import { PlayIcon, ShareIcon } from "../common/icons";
 
 
   type TrackDetailViewProps = {
@@ -150,7 +151,7 @@ import ShareMediaModal from "../share/ShareModal";
             cursor: "pointer",
           }}
         >
-          ▶
+          <PlayIcon/>
         </button>
 
         <button
@@ -179,7 +180,7 @@ import ShareMediaModal from "../share/ShareModal";
             color: "#b3b3b3",
           }}
         >
-          ↗
+          <ShareIcon/>
         </button>
 
         <div style={{ position: "relative" }}>

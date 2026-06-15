@@ -2,6 +2,21 @@ import { useRef, useState } from "react";
 import type { Media } from "../../types/media";
 import type { RepeatMode } from "../../types/player";
 import { useFavorite } from "../../hooks/useFavorite";
+import {
+  ShuffleIcon,
+  PrevIcon,
+  NextIcon,
+  PlayIcon,
+  PauseIcon,
+  RepeatIcon,
+  RepeatOneIcon,
+  HeartIcon,
+  QueueIcon,
+  DeviceIcon,
+  VolumeIcon,
+  FullscreenIcon,
+  NowPlayingIcon,
+} from "../common/icons";
 
 interface PlayerBarProps {
   currentTrack: Media | null;
@@ -50,127 +65,6 @@ const Icon = ({
   >
     {children}
   </span>
-);
-
-const ShuffleIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M16 3h5v5" />
-    <path d="M4 7h3c2.5 0 4 5 6.5 5H21" />
-    <path d="M16 21h5v-5" />
-    <path d="M4 17h3c1.2 0 2.2-.8 3.1-1.9" />
-  </svg>
-);
-
-const PrevIcon = () => (
-  <svg viewBox="0 0 24 24" fill="currentColor">
-    <path d="M6 5h2v14H6z" />
-    <path d="M19 6v12L9 12z" />
-  </svg>
-);
-
-const NextIcon = () => (
-  <svg viewBox="0 0 24 24" fill="currentColor">
-    <path d="M16 5h2v14h-2z" />
-    <path d="M5 6v12l10-6z" />
-  </svg>
-);
-
-const PlayIcon = () => (
-  <svg viewBox="0 0 24 24" fill="currentColor">
-    <path d="M8 5v14l11-7z" />
-  </svg>
-);
-
-const PauseIcon = () => (
-  <svg viewBox="0 0 24 24" fill="currentColor">
-    <path d="M7 5h4v14H7z" />
-    <path d="M13 5h4v14h-4z" />
-  </svg>
-);
-
-const RepeatIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M17 1l4 4-4 4" />
-    <path d="M3 11V9a4 4 0 014-4h14" />
-    <path d="M7 23l-4-4 4-4" />
-    <path d="M21 13v2a4 4 0 01-4 4H3" />
-  </svg>
-);
-
-const RepeatOneIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M17 1l4 4-4 4" />
-    <path d="M3 11V9a4 4 0 014-4h14" />
-    <path d="M7 23l-4-4 4-4" />
-    <path d="M21 13v2a4 4 0 01-4 4H3" />
-    <text x="11.2" y="15.5" fontSize="7" fill="currentColor" stroke="none">
-      1
-    </text>
-  </svg>
-);
-
-const HeartIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.6l-1-1a5.5 5.5 0 00-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 000-7.8z" />
-  </svg>
-);
-
-const QueueIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M4 6h16" />
-    <path d="M4 12h10" />
-    <path d="M4 18h7" />
-    <path d="M17 15l4 3-4 3v-6z" />
-  </svg>
-);
-
-const DeviceIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <rect x="3" y="5" width="18" height="12" rx="2" />
-    <path d="M8 21h8" />
-    <path d="M12 17v4" />
-  </svg>
-);
-
-const VolumeIcon = ({ muted, volume }: { muted: boolean; volume: number }) => {
-  if (muted || volume === 0) {
-    return (
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-      >
-        <path d="M11 5L6 9H3v6h3l5 4z" />
-        <path d="M18 9l4 4" />
-        <path d="M22 9l-4 4" />
-      </svg>
-    );
-  }
-
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M11 5L6 9H3v6h3l5 4z" />
-      {volume > 35 && <path d="M15 9a5 5 0 010 6" />}
-      {volume > 70 && <path d="M18 6a9 9 0 010 12" />}
-    </svg>
-  );
-};
-
-const FullscreenIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M8 3H3v5" />
-    <path d="M16 3h5v5" />
-    <path d="M3 16v5h5" />
-    <path d="M21 16v5h-5" />
-  </svg>
-);
-
-const NowPlayingIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <rect x="4" y="5" width="16" height="14" rx="2" />
-    <path d="M8 15l2.5-3 2 2.5L15 11l3 4" />
-  </svg>
 );
 
 const Slider = ({
@@ -437,7 +331,7 @@ const PlayerBar = ({
           }}
         >
           <Icon size={18}>
-            <HeartIcon />
+            <HeartIcon filled={liked} />
           </Icon>
         </IconBtn>
       </div>

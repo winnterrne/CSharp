@@ -22,7 +22,10 @@ export const useHistoryStore = create<HistoryState>()(
           );
 
           return {
-            recentTracks: [track, ...filtered].slice(0, 50),
+            recentTracks: [
+              { ...track, playedAt: new Date().toISOString() }, // ✅ lưu thời gian
+              ...filtered
+            ].slice(0, 50),
           };
         }),
 
