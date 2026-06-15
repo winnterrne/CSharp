@@ -7,8 +7,8 @@ namespace TuneVault.Domain.Interfaces
 {
     public interface IPlaylistRepository
     {
-        Task<Playlist> GetPlaylistByIdAsync(int playlistId);
-        Task<IEnumerable<Playlist>> GetUserPlaylistsAsync(string userId);
+        Task<(Playlist Playlist, IEnumerable<MediaItem> Songs)> GetPlaylistByIdAsync(int playlistID);
+        Task<(IEnumerable<Playlist> Playlists, Dictionary<int, int> TrackCounts)> GetUserPlaylistsAsync(string userId);
         Task<int> CreatePlaylistAsync(Playlist playlist);
         Task<int> UpdatePlaylistAsync(Playlist playlist);
         Task<int> DeletePlaylistAsync(int playlistId);

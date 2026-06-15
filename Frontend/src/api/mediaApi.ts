@@ -1,8 +1,5 @@
 import api from "./axios";
 
-const API_BASE_URL = "http://localhost:5081/api";
-
-
 export const mediaApi = {
   getMyMedia: () => api.get("/media/my-media"),
 

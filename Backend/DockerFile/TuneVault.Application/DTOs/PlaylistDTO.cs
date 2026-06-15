@@ -8,7 +8,12 @@ public record PlaylistDto (
     string? PlaylistName,
     string UserID
 );
-
+public record MyPlaylistDto (
+    int PlaylistID,
+    string? PlaylistName,
+    string UserID,
+    int TrackCount
+);
 public record PlaylistSongDto (
     int MediaItemID,
     string TitleName,
@@ -31,4 +36,17 @@ public record CreatePlaylistDto(
     string PlaylistName,
     bool IsPublic,
     string? Description
+);
+
+public record  PlaylistTrackCountDto(
+    int PlaylistID,
+    int TrackCount
+);
+
+public record PlaylistDetailDto(
+    int PlaylistID,
+    string? PlaylistName,
+    string? Description,
+    bool IsPublic,
+    List<MediaItemDto> Songs
 );

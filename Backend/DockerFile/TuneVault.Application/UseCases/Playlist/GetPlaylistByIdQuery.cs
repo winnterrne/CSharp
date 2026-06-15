@@ -3,6 +3,5 @@ using TuneVault.Application.DTOs;
 
 namespace TuneVault.Application.UseCases.Playlist;
 
-public record GetPlaylistByIdQuery (
-    int PlaylistID
-) : IRequest<PlaylistDetailSongDto?>;
+public record GetPlaylistByIdQuery(int PlaylistID)
+    : IRequest<PlaylistDetailDto>;

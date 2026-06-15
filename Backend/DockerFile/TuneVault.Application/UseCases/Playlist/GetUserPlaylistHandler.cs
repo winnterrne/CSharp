@@ -1,24 +1,30 @@
-using System.Security.Cryptography.X509Certificates;
 using MediatR;
 using TuneVault.Application.DTOs;
 using TuneVault.Domain.Interfaces;
 
 namespace TuneVault.Application.UseCases.Playlist;
 
-public class GetUserPlaylistHandler : IRequestHandler<GetUserPlaylistQuery, IEnumerable<PlaylistDto>>
+public class GetUserPlaylistHandler 
+    : IRequestHandler<GetUserPlaylistQuery, IEnumerable<MyPlaylistDto>>
 {
-    public readonly IPlaylistRepository _Playlistrepo;
+    private readonly IPlaylistRepository _playlistRepo;
+
     public GetUserPlaylistHandler(IPlaylistRepository playlistRepository)
     {
-        _Playlistrepo = playlistRepository;
+        _playlistRepo = playlistRepository;
     }
-    public async Task<IEnumerable<PlaylistDto>> Handle(GetUserPlaylistQuery request, CancellationToken cancellationToken)
+
+    public async Task<IEnumerable<MyPlaylistDto>> Handle(
+        GetUserPlaylistQuery request,
+        CancellationToken cancellationToken)
     {
-        var result = await _Playlistrepo.GetUserPlaylistsAsync(request.UserID);
-        return result.Select(x => new PlaylistDto(
+        var result = await _playlistRepo.GetUserPlaylistsAsync(request.UserID);
+
+        return result.Playlists.Select(x => new MyPlaylistDto(
             x.PlaylistID,
             x.PlaylistName,
-            x.UserID
+            x.UserID,
+            result.TrackCounts.TryGetValue(x.PlaylistID, out var count) ? count : 0
         ));
     }
 }

@@ -13,14 +13,28 @@ import { usePlayer } from "../../hooks/usePlayer";
 import { useSearch } from "../../hooks/useSearch";
 import TrackActionMenu from "../../components/common/TrackActionMenu";
 import ShareMediaModal from "../../components/share/ShareModal";
+import { PlayIcon, ShareIcon } from "../../components/common/icons";
 
 const formatDuration = (seconds?: number) => {
+  
   if (!seconds || Number.isNaN(seconds)) return "0:00";
 
   const min = Math.floor(seconds / 60);
   const sec = Math.floor(seconds % 60);
 
   return `${min}:${String(sec).padStart(2, "0")}`;
+};
+
+const getArtistName = (media: Media) => {
+  const m = media as any;
+
+  return (
+    m.artist?.name ??
+    m.artist?.artistName ??
+    m.artistName ??
+    m.ArtistName ??
+    "Không rõ nghệ sĩ"
+  );
 };
 
 const getPlaylistFromResponse = (responseData: unknown): Playlist => {
@@ -35,7 +49,7 @@ const getPlaylistFromResponse = (responseData: unknown): Playlist => {
 
 const PlaylistDetailPage = () => {
   const { id } = useParams<{ id: string }>();
-  const { playTrack, setQueue} = usePlayer();
+  const { playTrack} = usePlayer();
 
   const {
     search,
@@ -83,7 +97,12 @@ const PlaylistDetailPage = () => {
       setError("");
 
       const res = await playlistApi.getById(Number(id));
+
+      console.log("PLAYLIST DETAIL RAW:", res.data);
+
       const data = getPlaylistFromResponse(res.data);
+
+      console.log("PLAYLIST DETAIL MAPPED:", data);
 
       setPlaylist(data);
     } catch (err) {
@@ -334,7 +353,7 @@ const PlaylistDetailPage = () => {
             fontSize: "28px",
           }}
         >
-          <img src="/src/assets/icons/share-solid-full.svg" alt="share-media"/>
+          <ShareIcon/>
 
         </button>
 
@@ -488,7 +507,7 @@ const PlaylistDetailPage = () => {
                     marginTop: "4px",
                   }}
                 >
-                  {track.artist?.name ?? "Unknown Artist"}
+                  {getArtistName(track)}
                 </div>
               </div>
 
@@ -578,7 +597,7 @@ const PlaylistTrackRow = ({
   const { playTrack } = usePlayer();
 
   const media = item.media;
-  const artistName = media.artist?.name ?? "Unknown Artist";
+  const artistName = getArtistName(media);
 
   return (
     <div

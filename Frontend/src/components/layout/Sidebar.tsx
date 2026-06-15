@@ -3,6 +3,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { playlistApi } from "../../api/playlistApi";
+import { mediaApi } from "../../api/mediaApi";
 import type { Playlist } from "../../types/playlist";
 import type { Media } from "../../types/media";
 import { ROUTES } from "../../constant/routes";
@@ -78,12 +79,26 @@ const Sidebar = ({
 
       const res = await playlistApi.getMyPlaylists();
 
-      const data: Playlist[] =
-        Array.isArray(res.data) ? res.data
-        : Array.isArray(res.data?.data) ? res.data.data
-        : [];
+      const rawData =
+        Array.isArray(res.data)
+          ? res.data
+          : Array.isArray(res.data?.data)
+            ? res.data.data
+            : [];
 
-      setPlaylists(data);
+      const mappedPlaylists: Playlist[] = rawData.map((item: any) => ({
+        id: item.id ?? item.playlistID ?? item.playlistId ?? 0,
+        playlistID: item.playlistID ?? item.playlistId ?? item.id ?? 0,
+        name: item.name ?? item.playlistName ?? "Playlist chưa có tên",
+        playlistName: item.playlistName ?? item.name ?? "Playlist chưa có tên",
+        description: item.description ?? "",
+        coverUrl: item.coverUrl ?? "",
+        tracks: item.tracks ?? [],
+        trackCount: item.trackCount ?? 0,
+        isPublic: item.isPublic ?? true,
+      }));
+
+      setPlaylists(mappedPlaylists);
     } catch (error) {
       console.error("LOAD PLAYLISTS ERROR:", error);
       setPlaylists([]);
@@ -119,7 +134,7 @@ const Sidebar = ({
   );
 
   const filteredFavorites = favoriteTracks.filter((track) =>
-    track.title.toLowerCase().includes(searchVal.toLowerCase()),
+    (track.title ?? "").toLowerCase().includes(searchVal.toLowerCase()),
   );
 
   const handleOpenPlaylist = (playlist: Playlist) => {
@@ -582,7 +597,7 @@ const TrackRow = ({
         {track.thumbnailUrl ?
           <img
             src={track.thumbnailUrl}
-            alt={track.title}
+            alt={track.title ?? "Media"}
             style={imgFullStyle}
           />
         : "💚"}
@@ -599,7 +614,7 @@ const TrackRow = ({
             textOverflow: "ellipsis",
           }}
         >
-          {track.title}
+          {track.title ?? "Không có tên"}
         </div>
 
         <div

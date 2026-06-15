@@ -16,7 +16,7 @@ export interface Media {
   status: MediaStatus;
   url: string;
   thumbnailUrl?: string;
-  duration: number; // seconds
+  duration: number;
   artist: Artist;
   genre?: string;
   releaseDate?: string;
@@ -34,21 +34,48 @@ export interface MediaSearchResult {
   total: number;
   query: string;
 }
+
 export interface MediaItemDto {
-  mediaItemID: number;
+  mediaItemID?: number;
+  mediaItemId?: number;
+  id?: number;
+
   titleName?: string;
+  title?: string;
+
   filePath?: string;
+
   mediaItemImage?: string;
+  thumbnailUrl?: string;
+  imageUrl?: string;
+  coverUrl?: string;
+
   mediaItemTag?: string;
   mediaItemType?: string;
+
   duration?: number;
   description?: string;
+
   artistID?: number;
+  artistId?: number;
   artistName?: string;
+  ArtistName?: string;
+
+  artist?: {
+    id?: number;
+    artistID?: number;
+    artistId?: number;
+    name?: string;
+    artistName?: string;
+  };
+
   albumID?: number;
+  albumId?: number;
   albumName?: string;
+
   userID?: string;
   uploadAT?: string;
+  createdAt?: string;
 }
 
 export interface MediaItemAlbumDto {
@@ -62,35 +89,60 @@ export interface MediaItemAlbumDto {
 
 export const buildImageUrl = (img?: string) => {
   if (!img) return undefined;
-  // absolute URL
+
   if (img.startsWith("http")) return img;
-  // already a rooted path e.g. /media/...
+
   if (img.startsWith("/")) return `http://localhost:5081${img}`;
-  // contains folder segments (images or media) — prefix host
+
   if (img.includes("/")) return `http://localhost:5081/${img}`;
-  // bare filename from seed data — images live under /media/images/media/
+
   return `http://localhost:5081/media/images/media/${img}`;
 };
 
 export const mapMediaItemDtoToMedia = (item: MediaItemDto): Media => {
+  const mediaId = item.mediaItemID ?? item.mediaItemId ?? item.id ?? 0;
+
   const type: MediaType =
     item.mediaItemType?.toLowerCase() === "video" ? "video" : "audio";
 
+  const artistId =
+    item.artistID ??
+    item.artistId ??
+    item.artist?.artistID ??
+    item.artist?.artistId ??
+    item.artist?.id ??
+    0;
+
+  const artistName =
+    item.artistName ??
+    item.ArtistName ??
+    item.artist?.artistName ??
+    item.artist?.name ??
+    "Không rõ nghệ sĩ";
+
+  const image =
+    item.mediaItemImage ??
+    item.thumbnailUrl ??
+    item.imageUrl ??
+    item.coverUrl;
+
   return {
-    id: String(item.mediaItemID),
-    title: item.titleName ?? "Chưa có tên",
+    id: String(mediaId),
+    title: item.titleName ?? item.title ?? "Chưa có tên",
     description: item.description ?? "",
     type,
     status: "published",
-    url: `http://localhost:5081/api/media/${item.mediaItemID}/stream`,
-    thumbnailUrl: buildImageUrl(item.mediaItemImage),
+    url: `http://localhost:5081/api/media/${mediaId}/stream`,
+    thumbnailUrl: buildImageUrl(image),
     duration: item.duration ?? 0,
     artist: {
-      id: item.artistID ?? 0,
-      name: item.artistName ?? "Unknown Artist",
+      id: artistId,
+      name: artistName,
     },
     genre: item.mediaItemTag ?? undefined,
-    createdAt: item.uploadAT ?? new Date().toISOString(),
+    albumId: item.albumID ?? item.albumId,
+    albumName: item.albumName,
+    createdAt: item.uploadAT ?? item.createdAt ?? new Date().toISOString(),
   };
 };
 
