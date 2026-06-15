@@ -18,8 +18,7 @@ public  class GetArtistProfileHandler : IRequestHandler<GetArtistProfileQuery, A
             artist.ArtistID,
             artist.ArtistName,
             artist.ArtistImage,
-            artist.Bio,
-            followers 
+            artist.Bio 
         );
     }
 } 
