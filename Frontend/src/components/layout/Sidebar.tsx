@@ -3,6 +3,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { playlistApi } from "../../api/playlistApi";
+import { mediaApi } from "../../api/mediaApi";
 import type { Playlist } from "../../types/playlist";
 import type { Media } from "../../types/media";
 import { ROUTES } from "../../constant/routes";
@@ -13,7 +14,11 @@ import { useHistoryStore } from "../../store/historyStore";
 import { useFavorite } from "../../hooks/useFavorite";
 import { authStore } from "../../store/authStore";
 
-type FilterTab = "playlist" | "favorite" | "following";
+import { albumApi } from "../../api/albumApi";
+import type { Album } from "../../types/album";
+import { useAlbumStore } from "../../store/albumStore";
+
+type FilterTab = "playlist" | "favorite" | "following" | "album";
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -42,7 +47,7 @@ const Sidebar = ({
 
   const token = authStore((state) => state.token);
   const isAuthenticated = authStore((state) => state.isAuthenticated);
-
+  const user = authStore((state) => state.user);
   const canUseAuthApi = Boolean(token && isAuthenticated);
 
   const isWide = isExpanded;
@@ -59,6 +64,9 @@ const Sidebar = ({
   const { favoriteTracks, loadFavorites } = useFavorite();
   const { playTrack, setQueue } = usePlayer();
 
+  const [albums, setAlbums] = useState<Album[]>([]);
+  const setSelectedAlbumId = useAlbumStore((s) => s.setSelectedAlbumId);
+
   const fetchPlaylists = useCallback(async () => {
     if (!canUseAuthApi) {
       setPlaylists([]);
@@ -71,12 +79,26 @@ const Sidebar = ({
 
       const res = await playlistApi.getMyPlaylists();
 
-      const data: Playlist[] =
-        Array.isArray(res.data) ? res.data
-        : Array.isArray(res.data?.data) ? res.data.data
-        : [];
+      const rawData =
+        Array.isArray(res.data)
+          ? res.data
+          : Array.isArray(res.data?.data)
+            ? res.data.data
+            : [];
 
-      setPlaylists(data);
+      const mappedPlaylists: Playlist[] = rawData.map((item: any) => ({
+        id: item.id ?? item.playlistID ?? item.playlistId ?? 0,
+        playlistID: item.playlistID ?? item.playlistId ?? item.id ?? 0,
+        name: item.name ?? item.playlistName ?? "Playlist chưa có tên",
+        playlistName: item.playlistName ?? item.name ?? "Playlist chưa có tên",
+        description: item.description ?? "",
+        coverUrl: item.coverUrl ?? "",
+        tracks: item.tracks ?? [],
+        trackCount: item.trackCount ?? 0,
+        isPublic: item.isPublic ?? true,
+      }));
+
+      setPlaylists(mappedPlaylists);
     } catch (error) {
       console.error("LOAD PLAYLISTS ERROR:", error);
       setPlaylists([]);
@@ -97,12 +119,23 @@ const Sidebar = ({
     })();
   }, [fetchPlaylists, loadFavorites, canUseAuthApi]);
 
+  useEffect(() => {
+    albumApi.getAll().then((res) => {
+      setAlbums(res.data?.data ?? []);
+    });
+  }, []);
+
+  const handleOpenAlbum = (album: Album) => {
+    setSelectedAlbumId(album.albumID);
+    navigate(`/album/${album.albumID}`);
+  };
+
   const filteredPlaylists = playlists.filter((playlist) =>
     getPlaylistName(playlist).toLowerCase().includes(searchVal.toLowerCase()),
   );
 
   const filteredFavorites = favoriteTracks.filter((track) =>
-    track.title.toLowerCase().includes(searchVal.toLowerCase()),
+    (track.title ?? "").toLowerCase().includes(searchVal.toLowerCase()),
   );
 
   const handleOpenPlaylist = (playlist: Playlist) => {
@@ -249,6 +282,13 @@ const Sidebar = ({
           >
             Đang follow
           </TabButton>
+
+          <TabButton
+            active={activeTab === "album"}
+            onClick={() => setActiveTab("album")}
+          >
+            Album
+          </TabButton>
         </div>
       </div>
 
@@ -329,7 +369,17 @@ const Sidebar = ({
                 onClick={() => handlePlayTrackList(track, favoriteTracks)}
               />
             ))
-
+        : activeTab === "album" ?
+          albums.length === 0 ?
+            <EmptyText text="Chưa có album" />
+          : albums.map((album) => (
+              <AlbumRow
+                key={album.albumID}
+                album={album}
+                isWide={isWide}
+                onClick={() => handleOpenAlbum(album)}
+              />
+            ))
         : loading ?
           <LoadingText />
         : filteredPlaylists.length === 0 ?
@@ -343,8 +393,11 @@ const Sidebar = ({
                 playlist={playlist}
                 active={location.pathname === ROUTES.PLAYLIST(playlistId)}
                 isWide={isWide}
+                currentUsername={user?.username ?? "Người dùng"}
                 onClick={() => handleOpenPlaylist(playlist)}
               />
+
+
             );
           })
         }
@@ -383,17 +436,18 @@ const PlaylistRow = ({
   playlist,
   active,
   isWide,
+  currentUsername,
   onClick,
 }: {
   playlist: Playlist;
   active: boolean;
   isWide: boolean;
+  currentUsername: string;
   onClick: () => void;
 }) => {
   const [hovered, setHovered] = useState(false);
 
   const playlistName = getPlaylistName(playlist);
-  const trackCount = getPlaylistTrackCount(playlist);
 
   return (
     <div
@@ -444,7 +498,72 @@ const PlaylistRow = ({
             marginTop: "4px",
           }}
         >
-          Danh sách phát • {trackCount} bài
+          Danh sách phát • {currentUsername}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const AlbumRow = ({
+  album,
+  isWide,
+  onClick,
+}: {
+  album: Album;
+  isWide: boolean;
+  onClick: () => void;
+}) => {
+  const [hovered, setHovered] = useState(false);
+  const selectedId = useAlbumStore((s) => s.selectedAlbumId);
+  const active = selectedId === album.albumID;
+
+  return (
+    <div
+      onClick={onClick}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: isWide ? "16px" : "12px",
+        padding: isWide ? "12px" : "8px",
+        borderRadius: "8px",
+        background:
+          active ? "#2a2a2a"
+          : hovered ? "#1a1a1a"
+          : "transparent",
+        cursor: "pointer",
+      }}
+    >
+      <CoverBox size={isWide ? 56 : 48}>
+        {album.albumItemImage ? (
+          <img
+            src={`http://localhost:5081/media/images/album/${album.albumItemImage}`}
+            alt={album.albumName}
+            style={imgFullStyle}
+          />
+        ) : "🎵"}
+      </CoverBox>
+
+      <div style={{ minWidth: 0, flex: 1 }}>
+        <div style={{
+          color: active ? "#1DB954" : "#fff",
+          fontSize: isWide ? "15px" : "14px",
+          fontWeight: 700,
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+        }}>
+          {album.albumName}
+        </div>
+
+        <div style={{
+          color: "#b3b3b3",
+          fontSize: isWide ? "13px" : "12px",
+          marginTop: "4px",
+        }}>
+          Album • {album.artistName}
         </div>
       </div>
     </div>
@@ -481,7 +600,7 @@ const TrackRow = ({
         {track.thumbnailUrl ?
           <img
             src={track.thumbnailUrl}
-            alt={track.title}
+            alt={track.title ?? "Media"}
             style={imgFullStyle}
           />
         : "💚"}
@@ -498,7 +617,7 @@ const TrackRow = ({
             textOverflow: "ellipsis",
           }}
         >
-          {track.title}
+          {track.title ?? "Không có tên"}
         </div>
 
         <div
