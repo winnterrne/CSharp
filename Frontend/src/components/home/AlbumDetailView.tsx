@@ -19,7 +19,7 @@ type AlbumDetailViewProps = {
   tracks: Media[];
 
   onOpenTrack: (track: Media) => void;
-  onOpenArtist: (artistName: string) => void;
+  onOpenArtist: (artistID: number, artistName: string, artistImage: string) => void;
 };
 
 const formatDuration = (seconds?: number) => {
@@ -69,6 +69,9 @@ const AlbumDetailView = ({
     artistName ??
     cover?.artist?.name ??
     "Unknown Artist";
+  
+  const displayArtistID = cover?.artist?.id ?? tracks[0] ?. artist?.id;
+  const displayArtistImage = cover?.artist?.avatarUrl ?? "";
 
   const displayImage =
     albumImage ??
@@ -157,7 +160,10 @@ const AlbumDetailView = ({
             }}
           >
             <span
-              onClick={() => onOpenArtist(displayArtist)}
+             onClick={() => {
+                if (!displayArtistID) return;
+                onOpenArtist(displayArtistID, displayArtist,displayArtistImage);
+              }}
               style={{
                 cursor: "pointer",
                 color: "#fff",
@@ -313,7 +319,7 @@ const TrackRow = ({
   track: Media;
   tracks: Media[];
   onOpenTrack: (track: Media) => void;
-  onOpenArtist: (artistName: string) => void;
+  onOpenArtist: (artistID: number, artistName: string,artistImage: string) => void;
 }) => {
   const [hovered, setHovered] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -322,7 +328,9 @@ const TrackRow = ({
   const { isFavorite, toggleFavorite } = useFavorite();
 
   const liked = isFavorite(track.id);
+  const artistID = track.artist?.id;
   const artistName = track.artist?.name ?? "Unknown Artist";
+    const artistImage = track.artist?.avatarUrl ?? " ";
 
   const handlePlay = () => {
     setQueue(tracks);
@@ -432,7 +440,8 @@ const TrackRow = ({
           <div
             onClick={(e) => {
               e.stopPropagation();
-              onOpenArtist(artistName);
+              if (!artistID) return;
+            onOpenArtist(artistID, artistName,artistImage);
             }}
             style={{
               color: "#b3b3b3",
@@ -452,7 +461,8 @@ const TrackRow = ({
       <div
         onClick={(e) => {
           e.stopPropagation();
-          onOpenArtist(artistName);
+          if (!artistID) return;
+          onOpenArtist(artistID, artistName,artistImage);
         }}
         style={{
           color: "#b3b3b3",

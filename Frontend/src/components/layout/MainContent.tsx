@@ -47,7 +47,9 @@ const MainContent = () => {
   } | null>(null);
 
   const [selectedArtist, setSelectedArtist] = useState<{
+    id: number;
     name: string;
+    image?: string;
     tracks: Media[];
   } | null>(null);
 
@@ -154,7 +156,7 @@ const MainContent = () => {
           ? `http://localhost:5081/media/images/album/${album.albumItemImage}`
           : undefined,
         duration: 0,
-        artist: { id: album.artistID, name: album.artistName },
+        artist: { id: album.artistID, name: album.artistName,},
         albumId: album.albumID,
         albumName: album.albumName,
         createdAt: album.uploadAt,
@@ -171,19 +173,27 @@ const MainContent = () => {
   openAlbum();
 }, [selectedAlbumId, albums]);
 
-  const handleOpenArtist = (artistName: string, tracks: Media[] = allTracks) => {
+  const handleOpenArtist = (artistID: number,artistName: string,artistImage: string, tracks: Media[] = allTracks) => {
     const artistTracks = tracks.filter(
-      (track) => track.artist?.name === artistName,
+      (track) => track.artist?.id === artistID,
     );
 
     setSelectedArtist({
+      id: artistID,
       name: artistName,
+      image: artistImage,
       tracks: artistTracks,
     });
 
     setSelectedTrack(null);
     setSelectedAlbum(null);
     setViewMode("artist");
+
+    console.log("OPEN ARTIST", {
+    artistID,
+    artistName,
+    artistImage,
+});
   };
 
   const handleBackHome = () => {
@@ -355,7 +365,9 @@ const MainContent = () => {
 
       {viewMode === "artist" && selectedArtist && (
         <ArtistDetailView
+          artistId={selectedArtist.id}
           artistName={selectedArtist.name}
+          artistImage={selectedArtist.image}
           tracks={selectedArtist.tracks}
           onOpenTrack={handleOpenTrack}
           onOpenAlbum={handleOpenAlbum}

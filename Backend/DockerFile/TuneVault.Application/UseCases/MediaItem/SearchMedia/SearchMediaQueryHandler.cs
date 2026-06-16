@@ -33,6 +33,7 @@ public class SearchMediaQueryHandler : IRequestHandler<SearchMediaQuery ,SearchR
                 t.Description,
                 t.ArtistID,
                 t.ArtistName,
+                t.ArtistImage,
                 t.AlbumID,
                 t.AlbumName,
                 t.UserID,

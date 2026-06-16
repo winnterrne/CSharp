@@ -111,5 +111,20 @@ namespace TuneVault.Infrastructure.Repositories
                         WHERE FollowerID = @FollowerID AND FollowingArtistID = @FollowingArtistId";
             return await _db.ExecuteDataAsync(sql, new { FollowerID = followerId, FollowingArtistId = followingArtistId });
         }
+        //
+         public async Task<IEnumerable<Artist>> GetFollowedArtistAsync(string userID)
+        {
+            string sql = @"
+                SELECT 
+                    a.ArtistID,
+                    a.ArtistName,
+                    a.ArtistImage
+                FROM Follow f
+                INNER JOIN Artist a
+                    ON f.FollowingArtistID = a.ArtistID
+                WHERE f.FollowerID = @UserID
+            ";
+            return await _db.LoadAllDataSingleAsync<Artist>(sql, new {UserID = userID});
+        }
     }
 }

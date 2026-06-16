@@ -10,7 +10,7 @@ import { ShareIcon } from "../common/icons";
 
   type TrackDetailViewProps = {
     track: Media;
-    onOpenArtist: (artistName: string) => void; 
+    onOpenArtist: (artistID: number,artistName: string, artistImage: string) => void; 
   };
 
   const formatDuration = (seconds?: number) => {
@@ -27,8 +27,10 @@ import { ShareIcon } from "../common/icons";
     const [shareOpen, setShareOpen] = useState(false);
     const { playTrack, setQueue } = usePlayer();
     const { isFavorite, toggleFavorite } = useFavorite();
-
+    const artistID = track.artist?.id;
     const artistName = track.artist?.name ?? "Unknown Artist";
+    const artistImage = track.artist?.avatarUrl ?? " ";
+     console.log(track.artist);
   const liked = isFavorite(track.id);
 
   return (
@@ -107,7 +109,10 @@ import { ShareIcon } from "../common/icons";
             }}
           >
             <span
-              onClick={() => onOpenArtist(artistName)}
+                onClick={() => {
+            if (!artistID) return;
+            onOpenArtist(artistID, artistName,artistImage);
+               }}
               style={{
                 color: "#fff",
                 cursor: "pointer",

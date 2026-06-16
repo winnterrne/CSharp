@@ -17,6 +17,7 @@ import { authStore } from "../../store/authStore";
 import { albumApi } from "../../api/albumApi";
 import type { Album } from "../../types/album";
 import { useAlbumStore } from "../../store/albumStore";
+import { useFollowStore } from "../../store/followStore";
 
 type FilterTab = "playlist" | "favorite" | "following" | "album";
 
@@ -62,6 +63,7 @@ const Sidebar = ({
 
   const recentTracks = useHistoryStore((state) => state.recentTracks);
   const { favoriteTracks, loadFavorites } = useFavorite();
+  const {followedArtists,loadFollowedArtists} = useFollowStore();
   const { playTrack, setQueue } = usePlayer();
 
   const [albums, setAlbums] = useState<Album[]>([]);
@@ -115,9 +117,10 @@ const Sidebar = ({
 
       if (canUseAuthApi) {
         await loadFavorites();
+        await loadFollowedArtists();
       }
     })();
-  }, [fetchPlaylists, loadFavorites, canUseAuthApi]);
+  }, [fetchPlaylists, loadFavorites,loadFollowedArtists ,canUseAuthApi]);
 
   useEffect(() => {
     albumApi.getAll().then((res) => {
@@ -355,8 +358,16 @@ const Sidebar = ({
               />
             ))
 
-        : activeTab === "following" ?
-          <EmptyText text="Chưa có API lấy danh sách đang follow" />
+       : activeTab === "following" ?
+        followedArtists.length === 0 ?
+        <EmptyText text="Chưa follow nghệ sĩ nào" />
+      : followedArtists.map((artist) => (
+          <ArtistRow
+            key={artist.artistID}
+            artist={artist}
+            isWide={isWide}
+          />
+          ))
         : activeTab === "favorite" ?
           filteredFavorites.length === 0 ?
             <EmptyText text="Chưa có bài hát yêu thích" />
@@ -633,7 +644,76 @@ const TrackRow = ({
     </div>
   );
 };
+///
+type FollowedArtist = {
+  artistID: number;
+  artistName: string;
+  artistImage?: string;
+};
 
+const ArtistRow = ({
+  artist,
+  isWide,
+}: {
+  artist: FollowedArtist;
+  isWide: boolean;
+}) => {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: isWide ? "16px" : "12px",
+        padding: isWide ? "12px" : "8px",
+        borderRadius: "8px",
+        background: hovered ? "#1a1a1a" : "transparent",
+        cursor: "pointer",
+      }}
+    >
+      <CoverBox size={isWide ? 56 : 48}>
+        {artist.artistImage ? (
+          <img
+            src={artist.artistImage}
+            alt={artist.artistName}
+            style={imgFullStyle}
+          />
+        ) : (
+          "🎤"
+        )}
+      </CoverBox>
+
+      <div style={{ minWidth: 0, flex: 1 }}>
+        <div
+          style={{
+            color: "#fff",
+            fontSize: isWide ? "15px" : "14px",
+            fontWeight: 700,
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {artist.artistName}
+        </div>
+
+        <div
+          style={{
+            color: "#b3b3b3",
+            fontSize: isWide ? "13px" : "12px",
+            marginTop: "4px",
+          }}
+        >
+          Nghệ sĩ
+        </div>
+      </div>
+    </div>
+  );
+};
+///
 const SmallTile = ({
   title,
   active,

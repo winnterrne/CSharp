@@ -137,4 +137,19 @@ public async Task<IActionResult> UnfollowArtist(int artistId)
             return BadRequest(new { success = false, message = "Failed to unfollow artist"});
         }
     }
+[Authorize]
+[HttpGet("follow-artist")]
+public async Task<IActionResult> GetArtistFollowed()
+    {
+var userID = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (string.IsNullOrEmpty(userID))
+        {
+            return BadRequest("Invalid user id");
+        }
+        var result = await _mediator.Send(
+            new GetArtistFollowedQuery(userID)
+        );
+        return Ok(result);
+    }
 }

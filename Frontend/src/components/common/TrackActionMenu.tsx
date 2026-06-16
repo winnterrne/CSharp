@@ -22,7 +22,7 @@ type TrackActionMenuProps = {
   track: Media;
   open: boolean;
   onClose: () => void;
-  onOpenArtist?: (artistName: string) => void;
+  onOpenArtist?: (artistID: number, artistName: string,artistImage: string) => void;
 };
 
 type PlaylistResponse = {
@@ -54,7 +54,9 @@ const TrackActionMenu = ({
   const { isFavorite, toggleFavorite } = useFavorite();
 
   const liked = isFavorite(track.id);
+  const artistID = track.artist?.id;
   const artistName = track.artist?.name ?? "Unknown Artist";
+  const artistImage = track.artist?.avatarUrl ?? " ";
 
   const showNotice = (message: string) => {
     setNotice(message);
@@ -207,7 +209,9 @@ const TrackActionMenu = ({
           label="Chuyển tới nghệ sĩ"
           arrow
           onClick={() => {
-            onOpenArtist?.(artistName);
+            if (!artistID) return;
+
+            onOpenArtist?.(artistID, artistName,artistImage);
             onClose();
           }}
         />

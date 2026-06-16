@@ -52,7 +52,7 @@ const HomeView = ({
         ? `http://localhost:5081/media/images/album/${album.albumItemImage}`
         : undefined,
         duration: 0,
-        artist: { id: album.artistID, name: album.artistName },
+        artist: { id: album.artistID, name: album.artistName},
         albumId: album.albumID,
         albumName: album.albumName,
         createdAt: album.uploadAt,

@@ -27,6 +27,7 @@ public record MediaItemDto(
     string? Description,
     int? ArtistID,
     string? ArtistName,
+    string? ArtistImage,
     int? AlbumID,
     string? AlbumName,
     string? UserID,

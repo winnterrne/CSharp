@@ -85,5 +85,7 @@ namespace TuneVault.Infrastructure.Repositories
             string sql = @"SELECT COUNT(*) FROM Follow WHERE FollowingArtistID = @ArtistID";
             return await _db.ExecuteScalarAsync<int>(sql, new {ArtistID = artistId});
         }
+
+    
     }
 }
