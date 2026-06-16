@@ -56,19 +56,28 @@ namespace TuneVault.Infrastructure.Repositories
             return await _db.ExecuteDataAsync(sql, new { ArtistID = artistId});
         }
 
-        public async Task<(IEnumerable<Artist>Artists, int TotalCount)> SearchAsync(string keyword, int skip, int take)
+        public async Task<(IEnumerable<Artist> Artists, int TotalCount)> SearchAsync(
+            string keyword, int skip, int take)
         {
+            keyword = keyword?.Trim() ?? "";
+
+            if (string.IsNullOrWhiteSpace(keyword))
+                return (Enumerable.Empty<Artist>(), 0);
+
+            if (skip < 0) skip = 0;
+            if (take <= 0) take = 10;
+
             string sql = @"
-                SELECT * FROM Artist 
-                WHERE ArtistName LIKE @keyword AND IsDeleted = 0
+                SELECT * FROM Artist
+                WHERE ArtistName LIKE @Keyword AND IsDeleted = 0
                 ORDER BY ArtistName ASC
-                OFFSET @skip ROWS FETCH NEXT @take ROWS ONLY";
+                OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY";
 
             string countSql = @"
-            SELECT COUNT(*) FROM Artist 
-            WHERE ArtistName LIKE @keyword AND IsDeleted = 0";
+                SELECT COUNT(*) FROM Artist
+                WHERE ArtistName LIKE @Keyword AND IsDeleted = 0";
 
-            var parameters = new { Keyword = $"%{keyword}%", skip, take };
+            var parameters = new { Keyword = $"%{keyword}%", Skip = skip, Take = take };
 
             var artists = await _db.LoadAllDataSingleAsync<Artist>(sql, parameters);
             var totalCount = await _db.ExecuteScalarAsync<int>(countSql, parameters);
@@ -81,7 +90,7 @@ namespace TuneVault.Infrastructure.Repositories
             return  await _db.LoadDataSingleAsync<Artist?>(sql, new {ArtistID = artistId});
         }
         public async Task<int> GetArtistFollowersCountAsync(int artistId)
-        {
+        {   
             string sql = @"SELECT COUNT(*) FROM Follow WHERE FollowingArtistID = @ArtistID";
             return await _db.ExecuteScalarAsync<int>(sql, new {ArtistID = artistId});
         }
