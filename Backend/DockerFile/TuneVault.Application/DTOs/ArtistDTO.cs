@@ -11,6 +11,10 @@ public record ArtistProfileDto(
     int ArtistID,
     string? ArtistName,
     string? ArtistImage,
-    string? Bio,
-    int Followers
+    string? Bio
+);
+
+public record SearchArtistResultDto(
+    IEnumerable<ArtistProfileDto> Artists,
+    int TotalPages
 );
