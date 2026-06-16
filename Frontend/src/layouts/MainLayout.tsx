@@ -1,7 +1,8 @@
 import { useState, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 
-import SideBar from "../components/layout/SideBar";
+import Sidebar from "../components/layout/Sidebar";
+import type { Media } from "../types/media";
 import PlayerBar from "../components/layout/PlayerBar";
 import Header from "../components/layout/Header";
 import NowPlaying from "../components/layout/NowPlaying";
@@ -66,6 +67,14 @@ const MainLayout = ({ children }: { children: ReactNode }) => {
     toggleRepeatMode,
     playTrack,
   } = usePlayer();
+  
+  const handleSelectSearchTrack = (track: Media) => {
+    navigate(`/track/${track.id}`, {
+      state: {
+        track,
+      },
+    });
+  };
 
   const handleSearch = () => {
     if (!query.trim()) return;
@@ -166,7 +175,7 @@ const MainLayout = ({ children }: { children: ReactNode }) => {
           onNotificationClick={() => navigate("/notifications")}
           onAvatarClick={() => navigate("/profile")}
           onPlayTrack={(track) => playTrack(track)}
-          onSelectTrack={(track) => playTrack(track)}
+          onSelectTrack={handleSelectSearchTrack} 
         />
       </div>
 
@@ -202,7 +211,7 @@ const MainLayout = ({ children }: { children: ReactNode }) => {
               transition: isResizingSidebar ? "none" : "width 0.2s ease",
             }}
           >
-            <SideBar
+            <Sidebar
               isCollapsed={isSidebarCollapsed}
               isExpanded={isOverlaySidebar}
               onToggleCollapse={handleToggleSidebarCollapse}

@@ -25,7 +25,10 @@ import { PlayIcon, ShareIcon } from "../common/icons";
   const TrackDetailView = ({ track, onOpenArtist }: TrackDetailViewProps) => {
     const [menuOpen, setMenuOpen] = useState(false);
     const [shareOpen, setShareOpen] = useState(false);
-    const { playTrack, setQueue } = usePlayer();
+    const { playTrack, setQueue, currentTrack, isPlaying, togglePlay } = usePlayer();
+
+    const isCurrentTrack = currentTrack?.id === track.id;
+    const isThisTrackPlaying = isCurrentTrack && isPlaying;
     const { isFavorite, toggleFavorite } = useFavorite();
 
     const artistName = track.artist?.name ?? "Unknown Artist";
@@ -81,7 +84,7 @@ import { PlayIcon, ShareIcon } from "../common/icons";
 
         <div style={{ minWidth: 0 }}>
           <p style={{ color: "#fff", fontWeight: 700, marginBottom: "8px" }}>
-            Bài hát
+             {track.type === "video" ? "Video" : "Bài hát"}
           </p>
 
           <h1
@@ -134,24 +137,62 @@ import { PlayIcon, ShareIcon } from "../common/icons";
         }}
       >
         <button
-          onClick={() => {
-            setQueue([track]);
-            playTrack(track);
-          }}
-          title="Phát"
-          style={{
-            width: "64px",
-            height: "64px",
-            borderRadius: "50%",
-            border: "none",
-            background: "#1DB954",
-            color: "#000",
-            fontSize: "24px",
-            fontWeight: 900,
-            cursor: "pointer",
-          }}
-        >
-          <PlayIcon/>
+            onClick={() => {
+              if (isCurrentTrack) {
+                togglePlay();
+                return;
+              }
+
+              setQueue([track]);
+              playTrack(track);
+            }}
+            title={isThisTrackPlaying ? "Tạm dừng" : "Phát"}
+            style={{
+              width: "64px",
+              height: "64px",
+              borderRadius: "50%",
+              border: "none",
+              background: "#1DB954",
+              color: "#000",
+              fontSize: "28px",
+              fontWeight: 900,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+          {isThisTrackPlaying ? (
+            <span
+              style={{
+                display: "flex",
+                gap: "5px",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <span
+                style={{
+                  width: "5px",
+                  height: "22px",
+                  background: "#000",
+                  borderRadius: "2px",
+                  display: "block",
+                }}
+              />
+              <span
+                style={{
+                  width: "5px",
+                  height: "22px",
+                  background: "#000",
+                  borderRadius: "2px",
+                  display: "block",
+                }}
+              />
+            </span>
+          ) : (
+            <PlayIcon />
+        )}
         </button>
 
         <button
@@ -225,7 +266,7 @@ import { PlayIcon, ShareIcon } from "../common/icons";
           }}
         >
           <h2 style={{ color: "#fff", marginBottom: "18px" }}>
-            Thông tin bài hát
+            Thông tin {track.type === "video" ? "video" : "bài hát"}
           </h2>
 
           <InfoRow label="Tên bài" value={track.title} />
