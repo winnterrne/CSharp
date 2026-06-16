@@ -6,6 +6,10 @@ import type { UserProfile } from "../../types/profile";
 import { useEffect } from "react";
 import { useHistoryStore } from "../../store/historyStore";
 import { PlayIcon } from "../common/icons";
+import NotificationList from "../notification/NotificationList";
+import { notificationStore } from "../../store/notificationStore";
+import { notificationApi } from "../../api/notificationApi";
+
 export interface HeaderUser {
   displayName: string;
   avatarUrl?: string;
@@ -46,7 +50,6 @@ const formatPlayedAt = (playedAt?: string) => {
   return date.toLocaleDateString("vi-VN");
 };
 
-
 const Header = ({
   searchValue,
   searchResults,
@@ -57,7 +60,6 @@ const Header = ({
   onSearchChange,
   onHomeClick,
   onNotificationClick,
-  onFriendsClick,
   onAvatarClick,
   onPlayTrack,
   onSelectTrack,
@@ -78,6 +80,24 @@ const Header = ({
 
   const [showRecentModal, setShowRecentModal] = useState(false);
   const recentTracks = useHistoryStore((state) => state.recentTracks);
+  const setNotifications = notificationStore((s) => s.setNotifications);
+    const unreadCount = notificationStore((state) => state.unreadCount);
+
+  useEffect(() => {
+    const loadNotifications = async () => {
+      try {
+        const data = await notificationApi.getAll();
+        setNotifications(data);
+      } catch (error) {
+        console.error("LOAD HEADER NOTIFICATIONS ERROR:", error);
+      }
+    };
+
+    loadNotifications();
+  }, [setNotifications]);
+  const [showNotificationList, setShowNotificationList] = useState(false);
+
+
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -352,7 +372,7 @@ const Header = ({
                         justifyContent: "center",
                       }}
                     >
-                      <PlayIcon/>
+                      <PlayIcon />
                     </button>
                   </div>
                 ))}
@@ -370,17 +390,48 @@ const Header = ({
           flexShrink: 0,
         }}
       >
-        <IconActionBtn title="Thông báo" onClick={onNotificationClick}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6V11c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
-          </svg>
-        </IconActionBtn>
+        <div style={{ position: "relative" }}>
+          <IconActionBtn
+            title="Thông báo"
+            onClick={() => {
+              setShowNotificationList((prev) => !prev);
+              onNotificationClick?.();
+            }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6V11c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
+            </svg>
+          </IconActionBtn>
 
-        <IconActionBtn title="Bạn bè" onClick={onFriendsClick}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
-          </svg>
-        </IconActionBtn>
+          {unreadCount > 0 && (
+            <span
+              style={{
+                position: "absolute",
+                top: "-2px",
+                right: "-2px",
+                minWidth: "17px",
+                height: "17px",
+                padding: "0 5px",
+                borderRadius: "999px",
+                background: "#ff2b45",
+                color: "#fff",
+                fontSize: "10px",
+                fontWeight: 800,
+                lineHeight: "17px",
+                textAlign: "center",
+                border: "2px solid #111",
+                boxShadow: "0 0 0 1px rgba(255,255,255,.12)",
+                transform: "translate(35%, -25%)",
+              }}
+            >
+              {unreadCount > 99 ? "99+" : unreadCount}
+            </span>
+          )}
+
+          {showNotificationList && (
+            <NotificationList onClose={() => setShowNotificationList(false)} />
+          )}
+        </div>
 
         {/* Avatar + Account Menu */}
         <div style={{ position: "relative" }}>
@@ -554,10 +605,9 @@ const Header = ({
           >
             <h2 style={{ margin: "0 0 16px", fontSize: "22px" }}>Gần đây</h2>
 
-            {recentTracks.length === 0 ? (
+            {recentTracks.length === 0 ?
               <p style={{ color: "#b3b3b3" }}>Chưa có bài hát nào gần đây.</p>
-            ) : (
-              <div style={{ overflowY: "auto", flex: 1 }}>
+            : <div style={{ overflowY: "auto", flex: 1 }}>
                 {recentTracks.map((track) => (
                   <RecentTrackRow
                     key={track.id}
@@ -569,7 +619,7 @@ const Header = ({
                   />
                 ))}
               </div>
-            )}
+            }
 
             <button
               onClick={() => setShowRecentModal(false)}
@@ -589,156 +639,193 @@ const Header = ({
             </button>
           </div>
         </div>
-        )}
-      </header>
-    );
-  };
-
-  // ─── Sub-components ────────────────────────────────────────────────────────────
-  const IconActionBtn = ({
-    children,
-    title,
-    onClick,
-  }: {
-    children: React.ReactNode;
-    title?: string;
-    onClick?: () => void;
-  }) => (
-    <button
-      title={title}
-      onClick={onClick}
-      style={{
-        background: "transparent",
-        border: "none",
-        borderRadius: "50%",
-        width: "36px",
-        height: "36px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        cursor: "pointer",
-        color: "#b3b3b3",
-        transition: "color 0.2s",
-      }}
-      onMouseEnter={(e) => (e.currentTarget.style.color = "#fff")}
-      onMouseLeave={(e) => (e.currentTarget.style.color = "#b3b3b3")}
-    >
-      {children}
-    </button>
+      )}
+    </header>
   );
+};
 
-  const MenuItem = ({
-    label,
-    onClick,
-  }: {
-    label: string;
-    onClick?: () => void;
-  }) => (
-    <button
-      onClick={onClick}
+// ─── Sub-components ────────────────────────────────────────────────────────────
+const IconActionBtn = ({
+  children,
+  title,
+  onClick,
+}: {
+  children: React.ReactNode;
+  title?: string;
+  onClick?: () => void;
+}) => (
+  <button
+    title={title}
+    onClick={onClick}
+    style={{
+      background: "transparent",
+      border: "none",
+      borderRadius: "50%",
+      width: "36px",
+      height: "36px",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      cursor: "pointer",
+      color: "#b3b3b3",
+      transition: "color 0.2s",
+    }}
+    onMouseEnter={(e) => (e.currentTarget.style.color = "#fff")}
+    onMouseLeave={(e) => (e.currentTarget.style.color = "#b3b3b3")}
+  >
+    {children}
+  </button>
+);
+
+const MenuItem = ({
+  label,
+  onClick,
+}: {
+  label: string;
+  onClick?: () => void;
+}) => (
+  <button
+    onClick={onClick}
+    style={{
+      width: "100%",
+      background: "transparent",
+      border: "none",
+      color: "#fff",
+      padding: "12px",
+      textAlign: "left",
+      borderRadius: "4px",
+      cursor: "pointer",
+      fontSize: "14px",
+      fontWeight: 600,
+    }}
+    onMouseEnter={(e) => (e.currentTarget.style.background = "#3e3e3e")}
+    onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+  >
+    {label}
+  </button>
+);
+const ProfileRow = ({ label, value }: { label: string; value: string }) => (
+  <div
+    style={{
+      display: "flex",
+      justifyContent: "space-between",
+      padding: "12px 0",
+      borderBottom: "1px solid #2f2f2f",
+    }}
+  >
+    <span
       style={{
-        width: "100%",
-        background: "transparent",
-        border: "none",
-        color: "#fff",
-        padding: "12px",
-        textAlign: "left",
-        borderRadius: "4px",
-        cursor: "pointer",
-        fontSize: "14px",
-        fontWeight: 600,
+        color: "#b3b3b3",
       }}
-      onMouseEnter={(e) => (e.currentTarget.style.background = "#3e3e3e")}
-      onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
     >
       {label}
-    </button>
-  );
-  const ProfileRow = ({ label, value }: { label: string; value: string }) => (
+    </span>
+
+    <span>{value}</span>
+  </div>
+);
+
+const RecentTrackRow = ({
+  track,
+  onPlay,
+}: {
+  track: Media;
+  onPlay: (track: Media) => void;
+}) => {
+  const [hovered, setHovered] = useState(false);
+
+  return (
     <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       style={{
         display: "flex",
-        justifyContent: "space-between",
-        padding: "12px 0",
-        borderBottom: "1px solid #2f2f2f",
+        alignItems: "center",
+        gap: "12px",
+        padding: "10px 8px",
+        borderRadius: "8px",
+        background: hovered ? "#2a2a2a" : "transparent",
+        cursor: "pointer",
       }}
     >
-      <span
-        style={{
-          color: "#b3b3b3",
-        }}
-      >
-        {label}
-      </span>
-
-      <span>{value}</span>
-    </div>
-  );
-
-  const RecentTrackRow = ({
-      track,
-      onPlay,
-    }: {
-      track: Media;
-    onPlay: (track: Media) => void;
-  }) => {
-    const [hovered, setHovered] = useState(false);
-
-    return (
       <div
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
         style={{
+          width: "44px",
+          height: "44px",
+          borderRadius: "6px",
+          overflow: "hidden",
+          flexShrink: 0,
+          background: "#282828",
           display: "flex",
           alignItems: "center",
-          gap: "12px",
-          padding: "10px 8px",
-          borderRadius: "8px",
-          background: hovered ? "#2a2a2a" : "transparent",
-          cursor: "pointer",
+          justifyContent: "center",
+          color: "#b3b3b3",
         }}
       >
-        <div style={{
-          width: "44px", height: "44px", borderRadius: "6px",
-          overflow: "hidden", flexShrink: 0, background: "#282828",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          color: "#b3b3b3",
-        }}>
-          {track.thumbnailUrl ? (
-            <img src={track.thumbnailUrl} alt={track.title}
-              style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-          ) : "🎵"}
-        </div>
+        {track.thumbnailUrl ?
+          <img
+            src={track.thumbnailUrl}
+            alt={track.title}
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          />
+        : "🎵"}
+      </div>
 
-        <div style={{ minWidth: 0, flex: 1 }}>
-          <div style={{
-            color: "#fff", fontWeight: 700, fontSize: "14px",
-            whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
-          }}>
-            {track.title}
-          </div>
-          <div style={{ color: "#b3b3b3", fontSize: "13px", marginTop: "3px", display: "flex", gap: "8px" }}>
-            <span>{track.artist?.name ?? "Unknown Artist"}</span>
-            {track.playedAt && <><span>•</span><span>{formatPlayedAt(track.playedAt)}</span></>}
-          </div>
-        </div>
-
-        {/* Nút play hiện khi hover row */}
-        <button
-          onClick={() => onPlay(track)}
-          title="Phát"
+      <div style={{ minWidth: 0, flex: 1 }}>
+        <div
           style={{
-            width: "36px", height: "36px", borderRadius: "50%",
-            border: "none", background: "#1DB954", color: "#000",
-            cursor: "pointer", display: "flex", alignItems: "center",
-            justifyContent: "center", flexShrink: 0,
-            opacity: hovered ? 1 : 0,
-            transition: "opacity .15s",
+            color: "#fff",
+            fontWeight: 700,
+            fontSize: "14px",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
           }}
         >
-          <PlayIcon />
-        </button>
+          {track.title}
+        </div>
+        <div
+          style={{
+            color: "#b3b3b3",
+            fontSize: "13px",
+            marginTop: "3px",
+            display: "flex",
+            gap: "8px",
+          }}
+        >
+          <span>{track.artist?.name ?? "Unknown Artist"}</span>
+          {track.playedAt && (
+            <>
+              <span>•</span>
+              <span>{formatPlayedAt(track.playedAt)}</span>
+            </>
+          )}
+        </div>
       </div>
-    );
-  };
+
+      {/* Nút play hiện khi hover row */}
+      <button
+        onClick={() => onPlay(track)}
+        title="Phát"
+        style={{
+          width: "36px",
+          height: "36px",
+          borderRadius: "50%",
+          border: "none",
+          background: "#1DB954",
+          color: "#000",
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexShrink: 0,
+          opacity: hovered ? 1 : 0,
+          transition: "opacity .15s",
+        }}
+      >
+        <PlayIcon />
+      </button>
+    </div>
+  );
+};
 export default Header;

@@ -90,7 +90,7 @@ namespace TuneVault.Infrastructure.Repositories
             return  await _db.LoadDataSingleAsync<Artist?>(sql, new {ArtistID = artistId});
         }
         public async Task<int> GetArtistFollowersCountAsync(int artistId)
-        {
+        {   
             string sql = @"SELECT COUNT(*) FROM Follow WHERE FollowingArtistID = @ArtistID";
             return await _db.ExecuteScalarAsync<int>(sql, new {ArtistID = artistId});
         }

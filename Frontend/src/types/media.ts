@@ -23,10 +23,8 @@ export interface Media {
   playCount?: number;
   createdAt: string;
   playedAt?: string;
-
   playlistId?: number;
   playlistName?: string;
-
   albumId?: number;
   albumName?: string;
 }
@@ -48,14 +46,12 @@ export interface MediaItemDto {
   filePath?: string;
 
   mediaItemImage?: string;
-  image?: string;
+  thumbnailUrl?: string;
+  imageUrl?: string;
   coverUrl?: string;
 
   mediaItemTag?: string;
-  genre?: string;
-
   mediaItemType?: string;
-  type?: string;
 
   duration?: number;
   description?: string;
@@ -63,55 +59,51 @@ export interface MediaItemDto {
   artistID?: number;
   artistId?: number;
   artistName?: string;
+  ArtistName?: string;
+
+  artist?: {
+    id?: number;
+    artistID?: number;
+    artistId?: number;
+    name?: string;
+    artistName?: string;
+  };
 
   albumID?: number;
   albumId?: number;
   albumName?: string;
-
-  playlistID?: number;
-  playlistId?: number;
-  playlistName?: string;
 
   userID?: string;
   uploadAT?: string;
   createdAt?: string;
 }
 
-const API_HOST = "http://localhost:5081";
+export interface MediaItemAlbumDto {
+  mediaItemID: number;
+  titleName: string;
+  filePath: string;
+  mediaItemImage: string;
+  duration: number;
+  mediaItemTag?: string;
+}
 
-export const buildImageUrl = (img?: string): string | undefined => {
+export const buildImageUrl = (img?: string) => {
   if (!img) return undefined;
 
   if (img.startsWith("http")) return img;
 
-  if (img.startsWith("/")) {
-    return `${API_HOST}${img}`;
-  }
+  if (img.startsWith("/")) return `http://localhost:5081${img}`;
 
-  if (img.includes("/")) {
-    return `${API_HOST}/${img}`;
-  }
+  if (img.includes("/")) return `http://localhost:5081/${img}`;
 
-  return `${API_HOST}/media/images/media/${img}`;
-};
-
-const getMediaId = (item: MediaItemDto): number => {
-  return item.mediaItemID ?? item.mediaItemId ?? item.id ?? 0;
-};
-
-const getTitle = (item: MediaItemDto): string => {
-  return item.titleName ?? item.title ?? "Chưa có tên";
-};
-
-const getMediaType = (item: MediaItemDto): MediaType => {
-  const rawType = item.mediaItemType ?? item.type ?? "audio";
-
-  return rawType.toLowerCase() === "video" ? "video" : "audio";
+  return `http://localhost:5081/media/images/media/${img}`;
 };
 
 export const mapMediaItemDtoToMedia = (item: MediaItemDto): Media => {
-  const mediaId = getMediaId(item);
-  const type = getMediaType(item);
+  const mediaId = item.mediaItemID ?? item.mediaItemId ?? item.id ?? 0;
+
+  const type: MediaType =
+    item.mediaItemType?.toLowerCase() === "video" ? "video" : "audio";
 
   const artistId =
     item.artistID ??
@@ -136,29 +128,50 @@ export const mapMediaItemDtoToMedia = (item: MediaItemDto): Media => {
 
   return {
     id: String(mediaId),
-    title: getTitle(item),
+    title: item.titleName ?? item.title ?? "Chưa có tên",
     description: item.description ?? "",
     type,
     status: "published",
-    url: `${API_HOST}/api/media/${mediaId}/stream`,
-    thumbnailUrl: buildImageUrl(
-      item.mediaItemImage ?? item.image ?? item.coverUrl
-    ),
+    url: `http://localhost:5081/api/media/${mediaId}/stream`,
+    thumbnailUrl: buildImageUrl(image),
     duration: item.duration ?? 0,
-
     artist: {
-      id: item.artistID ?? item.artistId ?? 0,
-      name: item.artistName ?? "Unknown Artist",
+      id: artistId,
+      name: artistName,
     },
-
-    genre: item.mediaItemTag ?? item.genre ?? undefined,
-
+    genre: item.mediaItemTag ?? undefined,
     albumId: item.albumID ?? item.albumId,
     albumName: item.albumName,
-
-    playlistId: item.playlistID ?? item.playlistId,
-    playlistName: item.playlistName,
-
     createdAt: item.uploadAT ?? item.createdAt ?? new Date().toISOString(),
+  };
+};
+
+export const mapAlbumTrackToMedia = (
+  item: MediaItemAlbumDto,
+  albumId?: number,
+  albumName?: string,
+  artistName?: string,
+): Media => {
+  return {
+    id: String(item.mediaItemID),
+    title: item.titleName,
+    type: "audio",
+    status: "published",
+
+    url: `http://localhost:5081/api/media/${item.mediaItemID}/stream`,
+
+    thumbnailUrl: buildImageUrl(item.mediaItemImage),
+
+    duration: item.duration,
+
+    artist: {
+      id: 0,
+      name: artistName ?? "Unknown Artist",
+    },
+    genre: item.mediaItemTag ?? undefined,
+    albumId,
+    albumName,
+
+    createdAt: new Date().toISOString(),
   };
 };

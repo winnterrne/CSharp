@@ -7,7 +7,6 @@ import TrackActionMenu from "../common/TrackActionMenu";
 import ShareMediaModal from "../share/ShareModal";
 import { PlayIcon, ShareIcon } from "../common/icons";
 
-
   type TrackDetailViewProps = {
     track: Media;
     onOpenArtist: (artistName: string) => void; 
@@ -24,6 +23,7 @@ import { PlayIcon, ShareIcon } from "../common/icons";
 
   const TrackDetailView = ({ track, onOpenArtist }: TrackDetailViewProps) => {
     const [menuOpen, setMenuOpen] = useState(false);
+    const [shareOpen, setShareOpen] = useState(false);
 
     const { playTrack, setQueue } = usePlayer();
     const { isFavorite, toggleFavorite } = useFavorite();

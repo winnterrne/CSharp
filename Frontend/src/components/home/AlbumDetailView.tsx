@@ -24,7 +24,7 @@ const formatDuration = (seconds?: number) => {
 const formatTotalDuration = (tracks: Media[]) => {
   const totalSeconds = tracks.reduce(
     (sum, item) => sum + (item.duration ?? 0),
-    0
+    0,
   );
 
   const hours = Math.floor(totalSeconds / 3600);
@@ -43,13 +43,27 @@ const AlbumDetailView = ({
   onOpenTrack,
   onOpenArtist,
 }: AlbumDetailViewProps) => {
-  const { playTrack, setQueue } = usePlayer();
+  const { currentTrack, isPlaying, playTrack, setQueue, togglePlay } =
+    usePlayer();
+
   const [shuffle, setShuffle] = useState(false);
 
   const artistName = cover.artist?.name ?? "Unknown Artist";
+  const isCurrentAlbumPlaying =
+    tracks.some((item) => String(item.id) === String(currentTrack?.id)) &&
+    isPlaying;
 
   const handlePlayAll = () => {
     if (tracks.length === 0) return;
+
+    const currentInAlbum = tracks.some(
+      (item) => String(item.id) === String(currentTrack?.id),
+    );
+
+    if (currentInAlbum) {
+      togglePlay();
+      return;
+    }
 
     const list = shuffle ? [...tracks].sort(() => Math.random() - 0.5) : tracks;
 
@@ -84,7 +98,7 @@ const AlbumDetailView = ({
             fontSize: "72px",
           }}
         >
-          {cover.thumbnailUrl ? (
+          {cover.thumbnailUrl ?
             <img
               src={cover.thumbnailUrl}
               alt={cover.title}
@@ -94,9 +108,7 @@ const AlbumDetailView = ({
                 objectFit: "cover",
               }}
             />
-          ) : (
-            "♪"
-          )}
+          : "♪"}
         </div>
 
         <div style={{ minWidth: 0 }}>
@@ -169,7 +181,7 @@ const AlbumDetailView = ({
             boxShadow: "0 8px 24px rgba(0,0,0,.35)",
           }}
         >
-          ▶
+          {isCurrentAlbumPlaying ? "⏸" : "▶"}
         </button>
 
         <button
@@ -232,10 +244,9 @@ const AlbumDetailView = ({
 
       {/* TRACK TABLE */}
       <section>
-        {tracks.length === 0 ? (
+        {tracks.length === 0 ?
           <EmptyTracks />
-        ) : (
-          <>
+        : <>
             <div
               style={{
                 display: "grid",
@@ -267,7 +278,7 @@ const AlbumDetailView = ({
               />
             ))}
           </>
-        )}
+        }
       </section>
     </div>
   );
@@ -327,7 +338,7 @@ const TrackRow = ({
       }}
     >
       <div style={{ color: "#b3b3b3" }}>
-        {hovered ? (
+        {hovered ?
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -344,9 +355,7 @@ const TrackRow = ({
           >
             ▶
           </button>
-        ) : (
-          index + 1
-        )}
+        : index + 1}
       </div>
 
       <div
@@ -371,7 +380,7 @@ const TrackRow = ({
             justifyContent: "center",
           }}
         >
-          {track.thumbnailUrl ? (
+          {track.thumbnailUrl ?
             <img
               src={track.thumbnailUrl}
               alt={track.title}
@@ -381,9 +390,7 @@ const TrackRow = ({
                 objectFit: "cover",
               }}
             />
-          ) : (
-            "♪"
-          )}
+          : "♪"}
         </div>
 
         <div style={{ minWidth: 0 }}>

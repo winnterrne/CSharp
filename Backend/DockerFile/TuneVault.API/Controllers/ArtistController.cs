@@ -27,8 +27,8 @@ public class ArtistController : Controller
 
         return Ok(result);
     }
-    
-     [HttpGet]
+
+    [HttpGet]
     public async Task<IActionResult> Search([FromQuery] SearchArtistQuery query)
     {
         var result = await _mediator.Send(query);

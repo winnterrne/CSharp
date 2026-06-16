@@ -16,17 +16,25 @@ const ArtistDetailView = ({
   onOpenAlbum,
   onOpenTrack,
 }: ArtistDetailViewProps) => {
-  const { playTrack, setQueue } = usePlayer();
-
+  const { currentTrack, isPlaying, playTrack, setQueue, togglePlay } =
+    usePlayer();
   const firstTrack = tracks[0];
+  const isCurrentArtistTrack =
+    !!firstTrack && String(currentTrack?.id) === String(firstTrack.id);
+
+  const isArtistPlaying = isCurrentArtistTrack && isPlaying;
 
   const handlePlayArtist = () => {
     if (tracks.length === 0) return;
 
+    if (isCurrentArtistTrack) {
+      togglePlay();
+      return;
+    }
+
     setQueue(tracks);
     playTrack(tracks[0]);
   };
-
   return (
     <div>
       {/* NEW: ARTIST HEADER */}
@@ -99,7 +107,7 @@ const ArtistDetailView = ({
             fontWeight: 800,
           }}
         >
-          <PlayIcon/>
+          {isArtistPlaying ? "⏸" : <PlayIcon />}
         </button>
 
         <button

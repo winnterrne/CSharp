@@ -1,8 +1,11 @@
 import type { Notification } from "../../types/notification";
+import type { Media } from "../../types/media";
+import { useNavigate } from "react-router-dom";
 
 type Props = {
   notification: Notification;
   onRead: (id: number) => void;
+  mediaMap?: Record<string, Media>;
 };
 
 const formatDate = (date: string) => {
@@ -15,83 +18,96 @@ const formatDate = (date: string) => {
   });
 };
 
-const getIcon = (type: Notification["type"]) => {
-  switch (type) {
-    case "new_release":
-      return "♪";
-    case "follow":
-      return "👤";
-    case "playlist_update":
-      return "▤";
-    case "share":
-      return "↗";
-    default:
-      return "●";
+const parsePayload = (payload: string) => {
+  try {
+    return JSON.parse(payload);
+  } catch {
+    return null;
   }
 };
 
-const NotificationItem = ({ notification, onRead }: Props) => {
+const NotificationItem = ({
+  notification,
+  onRead,
+  mediaMap = {},
+}: Props) => {
+  const navigate = useNavigate();
+  const data = parsePayload(notification.payload);
+
+  const mediaId = data?.mediaItemID ? String(data.mediaItemID) : "";
+  const media = mediaId ? mediaMap[mediaId] : undefined;
+
+  const title =
+    data?.mediaTitle ??
+    media?.title ??
+    (mediaId ? `Bài hát #${mediaId}` : notification.payload);
+
+  const artist =
+    data?.artistName ??
+    media?.artist?.name ??
+    "";
+
+  const imageUrl =
+    data?.imageUrl ??
+    media?.thumbnailUrl ??
+    "";
+
   return (
     <div
       onClick={() => {
         if (!notification.isRead) {
           onRead(notification.id);
         }
+
+        if (notification.type === "share" && mediaId) {
+          navigate(`/notifications?mediaId=${mediaId}`);
+        }
       }}
       style={{
-        display: "flex",
-        alignItems: "center",
+        display: "grid",
+        gridTemplateColumns: "56px 1fr",
         gap: "14px",
         padding: "14px",
-        borderRadius: "10px",
+        borderRadius: "12px",
         background: notification.isRead ? "transparent" : "#1f1f1f",
         cursor: "pointer",
-        transition: ".15s",
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.background =
-          notification.isRead ? "#1a1a1a" : "#2a2a2a";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.background =
-          notification.isRead ? "transparent" : "#1f1f1f";
       }}
     >
       <div
         style={{
-          width: "52px",
-          height: "52px",
+          width: "56px",
+          height: "56px",
           borderRadius: "8px",
           background: "#282828",
-          flexShrink: 0,
           overflow: "hidden",
-          color: "#fff",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          fontSize: "22px",
-          fontWeight: 800,
+          color: "#b3b3b3",
+          fontSize: "24px",
         }}
       >
-        {/* {notification.imageUrl ?
+        {imageUrl ? (
           <img
-            src={notification.imageUrl}
-            alt={notification.title}
+            src={imageUrl}
+            alt={title}
             style={{
               width: "100%",
               height: "100%",
               objectFit: "cover",
             }}
           />
-        : getIcon(notification.type)} */}
+        ) : (
+          "🎵"
+        )}
       </div>
 
-      <div style={{ minWidth: 0, flex: 1 }}>
+      <div style={{ minWidth: 0 }}>
         <div
           style={{
             color: "#fff",
             fontWeight: notification.isRead ? 600 : 800,
-            marginBottom: "4px",
+            marginBottom: "5px",
           }}
         >
           {notification.title}
@@ -99,13 +115,25 @@ const NotificationItem = ({ notification, onRead }: Props) => {
 
         <div
           style={{
-            color: "#b3b3b3",
-            fontSize: "14px",
-            lineHeight: 1.5,
+            color: "#fff",
+            fontSize: "15px",
+            fontWeight: 800,
           }}
         >
-          {notification.payload}
+          {title}
         </div>
+
+        {artist && (
+          <div
+            style={{
+              color: "#b3b3b3",
+              fontSize: "13px",
+              marginTop: "3px",
+            }}
+          >
+            {artist}
+          </div>
+        )}
 
         <div
           style={{
@@ -117,18 +145,6 @@ const NotificationItem = ({ notification, onRead }: Props) => {
           {formatDate(notification.noticedAt)}
         </div>
       </div>
-
-      {!notification.isRead && (
-        <div
-          style={{
-            width: "10px",
-            height: "10px",
-            borderRadius: "50%",
-            background: "#1DB954",
-            flexShrink: 0,
-          }}
-        />
-      )}
     </div>
   );
 };

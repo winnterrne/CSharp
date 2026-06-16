@@ -4,8 +4,8 @@ import SectionHeader from "./SectionHeader";
 import { useHistoryStore } from "../../store/historyStore";
 import type { Album } from "../../types/album";
 import { albumApi } from "../../api/albumApi";
-import { buildImageUrl, mapAlbumTrackToMedia, type Media } from "../../types/media";
-
+import { mapAlbumTrackToMedia, type Media } from "../../types/media";
+import { useAuth } from "../../hooks/useAuth";
 
 type HomeViewProps = {
   loading: boolean;
@@ -28,20 +28,30 @@ const HomeView = ({
   onOpenAlbum,
   onShowAll,
 }: HomeViewProps) => {
+  const { user } = useAuth();
+
+  const displayName =
+    user?.username ||
+    user?.email ||
+    "bạn";
+
   const recentTracks = useHistoryStore((state) => state.recentTracks);
   const clearHistory = useHistoryStore((state) => state.clearHistory);
 
-  // Thêm handler này vào trong HomeView component
   const handleOpenAlbumById = async (album: Album) => {
     try {
       const res = await albumApi.getTracks(album.albumID);
       const rawTracks = res.data?.data ?? [];
 
       const tracks: Media[] = rawTracks.map((item) =>
-        mapAlbumTrackToMedia(item, album.albumID, album.albumName, album.artistName)
+        mapAlbumTrackToMedia(
+          item,
+          album.albumID,
+          album.albumName,
+          album.artistName
+        )
       );
 
-      // Tạo một Media object "giả" đại diện cho album để truyền vào cover
       const cover: Media = {
         id: String(album.albumID),
         title: album.albumName,
@@ -49,10 +59,13 @@ const HomeView = ({
         status: "published",
         url: "",
         thumbnailUrl: album.albumItemImage
-        ? `http://localhost:5081/media/images/album/${album.albumItemImage}`
-        : undefined,
+          ? `http://localhost:5081/media/images/album/${album.albumItemImage}`
+          : undefined,
         duration: 0,
-        artist: { id: album.artistID, name: album.artistName },
+        artist: {
+          id: album.artistID,
+          name: album.artistName,
+        },
         albumId: album.albumID,
         albumName: album.albumName,
         createdAt: album.uploadAt,
@@ -69,8 +82,6 @@ const HomeView = ({
     recommended.length === 0 &&
     forYou.length === 0 &&
     upcoming.length === 0;
-
-  const firstTrack = recommended[0] ?? forYou[0] ?? upcoming[0];
 
   if (loading) {
     return (
@@ -192,89 +203,10 @@ const HomeView = ({
         </div>
       </section>
 
-      {firstTrack && (
-        <section
-          style={{
-            display: "grid",
-            gridTemplateColumns: "minmax(260px, 420px) 1fr",
-            gap: "32px",
-            marginBottom: "42px",
-            alignItems: "center",
-          }}
-        >
-          <div>
-            <p
-              style={{
-                color: "#b3b3b3",
-                fontWeight: 700,
-                marginBottom: "8px",
-              }}
-            >
-              Bộ sưu tập nổi bật
-            </p>
-
-            <h2
-              style={{
-                color: "#fff",
-                fontSize: "34px",
-                margin: "0 0 12px",
-              }}
-            >
-              {firstTrack.title}
-            </h2>
-
-            <p
-              style={{
-                color: "#b3b3b3",
-                lineHeight: 1.6,
-                marginBottom: "18px",
-              }}
-            >
-              Nghe các bài hát đang có trong TuneVault, lấy trực tiếp từ
-              database backend.
-            </p>
-
-            <button
-              onClick={() => onOpenAlbum(firstTrack, forYou, "Dành cho bạn")}
-              style={{
-                border: "none",
-                borderRadius: "999px",
-                background: "#1DB954",
-                color: "#000",
-                padding: "13px 24px",
-                fontWeight: 800,
-                cursor: "pointer",
-              }}
-            >
-              Mở danh sách
-            </button>
-          </div>
-
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
-              gap: "18px",
-            }}
-          >
-            {forYou.slice(0, 4).map((track) => (
-              <AlbumCardLarge
-                key={track.id}
-                track={track}
-                tracks={forYou}
-                onOpenAlbum={(cover, tracks) =>
-                  onOpenAlbum(cover, tracks, "Dành cho bạn")
-                }
-              />
-            ))}
-          </div>
-        </section>
-      )}
-
       <section style={{ marginBottom: "36px" }}>
         <SectionHeader
           label="Dành cho"
-          title="Phan Ngọc Vinh"
+          title={displayName}
           onShowAll={() => onShowAll("forYou")}
         />
 
@@ -299,15 +231,12 @@ const HomeView = ({
       </section>
 
       <section style={{ marginBottom: "36px" }}>
-        <SectionHeader
-          title="Album nổi bật"
-        />
+        <SectionHeader title="Album nổi bật" />
 
         <div
           style={{
             display: "grid",
-            gridTemplateColumns:
-              "repeat(auto-fill, minmax(170px, 1fr))",
+            gridTemplateColumns: "repeat(auto-fill, minmax(170px, 1fr))",
             gap: "18px",
           }}
         >

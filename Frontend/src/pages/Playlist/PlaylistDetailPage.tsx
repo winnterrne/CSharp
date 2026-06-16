@@ -14,7 +14,6 @@ import { useSearch } from "../../hooks/useSearch";
 import TrackActionMenu from "../../components/common/TrackActionMenu";
 import ShareMediaModal from "../../components/share/ShareModal";
 import { AddToPlaylistIcon, MoreHorizIcon, NowPlayingIcon, PlayIcon, ShareIcon, ShuffleIcon } from "../../components/common/icons";
-import { playerStore } from "../../store/playerStore";
 
 const formatDuration = (seconds?: number) => {
   
@@ -27,7 +26,7 @@ const formatDuration = (seconds?: number) => {
 };
 
 const getArtistName = (media: Media) => {
-  const m = media as any;
+  const m = media as any; 
 
   return (
     m.artist?.name ??
@@ -68,13 +67,11 @@ const PlaylistDetailPage = () => {
   const [playlist, setPlaylist] = useState<Playlist | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [showAddTrackBar, setShowAddTrackBar]  = useState(false);
+  const [showAddTrackBar, setShowAddTrackBar] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState("");
   const [addingTrack, setAddingTrack] = useState(false);
   const [addTrackMessage, setAddTrackMessage] = useState("");
   const [sharePlaylistOpen, setSharePlaylistOpen] = useState(false);
-
-  const { playingContextId, setPlayingContextId } = playerStore();
 
   const playlistTracks = useMemo<PlaylistTrack[]>(() => {
     return playlist?.tracks ?? [];
@@ -85,10 +82,12 @@ const PlaylistDetailPage = () => {
   }, [playlistTracks]);
 
   const isCurrentPlaylistPlaying = useMemo(() => {
-    if (!currentTrack) return false;
-    return playingContextId === `playlist-${id}`;
-  }, [currentTrack, playingContextId, id]);
+  if (!currentTrack) return false;
 
+  return mediaTracks.some(
+      (track) => Number(getMediaId(track)) === Number(getMediaId(currentTrack))
+    );
+  }, [currentTrack, mediaTracks]);
   const totalDuration = useMemo(() => {
     const totalSeconds = mediaTracks.reduce(
       (sum, track) => sum + (track.duration ?? 0),
@@ -138,7 +137,6 @@ const PlaylistDetailPage = () => {
     // thì set queue bằng toàn bộ playlist này và phát bài đầu
     if (!isCurrentPlaylistPlaying) {
       setQueue(mediaTracks);
-      setPlayingContextId(`playlist-${id}`);
       playTrack(mediaTracks[0]);
       return;
     }
@@ -194,7 +192,6 @@ const PlaylistDetailPage = () => {
 
   const handlePlayTrack = (track: Media) => {
     setQueue(mediaTracks);
-    setPlayingContextId(`playlist-${id}`);
     playTrack(track);
   };
 
@@ -593,7 +590,6 @@ const PlaylistDetailPage = () => {
             </div>
 
             {playlistTracks.map((item, index) => (
-              
               <PlaylistTrackRow
                 key={item.id}
                 item={item}
@@ -601,11 +597,6 @@ const PlaylistDetailPage = () => {
                 currentTrack={currentTrack}
                 isPlaying={isPlaying}
                 playlistQueue={mediaTracks}
-                active={
-                  !!currentTrack &&
-                  Number(getMediaId(item.media)) === Number(getMediaId(currentTrack)) &&
-                  playingContextId === `playlist-${id}`  
-                }
                 onPlay={() => handlePlayTrack(item.media)}
               />
             ))}
@@ -629,7 +620,6 @@ const PlaylistTrackRow = ({
   currentTrack,
   isPlaying,
   playlistQueue,
-  active,
   onPlay,
 }: {
   item: PlaylistTrack;
@@ -637,7 +627,6 @@ const PlaylistTrackRow = ({
   currentTrack: Media | null;
   isPlaying: boolean;
   playlistQueue: Media[];
-  active: boolean;
   onPlay: () => void;
 }) => {
   const [hovered, setHovered] = useState(false);
@@ -649,19 +638,28 @@ const PlaylistTrackRow = ({
   const media = item.media;
   const artistName = getArtistName(media);
 
-  const isThisTrackPlaying = active;
-  const showNowPlaying = Boolean(active && isPlaying);
+  const isThisTrackPlaying =
+    currentTrack &&
+    Number(getMediaId(currentTrack)) === Number(getMediaId(media));
+
+  const showNowPlaying = Boolean(isThisTrackPlaying && isPlaying);
 
   const handlePlayThisTrack = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
 
-    if (active) {  // ✅ thay isThisTrackPlaying
-      if (isPlaying) pause();
-      else play();
+    setQueue(playlistQueue);
+
+    if (isThisTrackPlaying) {
+      if (isPlaying) {
+        pause();
+      } else {
+        play();
+      }
+
       return;
     }
 
-    onPlay(); // ✅ dùng onPlay thay vì gọi trực tiếp, để page set context
+    playTrack(media);
   };
 
   return (

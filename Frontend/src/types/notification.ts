@@ -2,6 +2,7 @@ export type NotificationType =
   | "new_release"
   | "follow"
   | "playlist_update"
+  | "share"
   | "system"
   | string;
 
@@ -25,8 +26,14 @@ export interface NotificationDto {
   noticedAT: string;
 }
 
+export interface NotificationState {
+  notifications: Notification[];
+  unreadCount: number;
+  isLoading: boolean;
+}
+
 export const mapNotificationDtoToNotification = (
-  dto: NotificationDto
+  dto: NotificationDto,
 ): Notification => ({
   id: dto.notificationID,
   title: dto.title ?? "Thông báo",

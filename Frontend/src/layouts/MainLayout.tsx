@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 
-import Sidebar from "../components/layout/Sidebar";
+import Sidebar from "../components/layout/SideBar";
 import PlayerBar from "../components/layout/PlayerBar";
 import Header from "../components/layout/Header";
 import NowPlaying from "../components/layout/NowPlaying";
@@ -34,18 +34,14 @@ const MainLayout = ({ children }: { children: ReactNode }) => {
     (isSidebarExpanded || sidebarSize > OVERLAY_TRIGGER_WIDTH);
 
   const sidebarGridWidth =
-    isSidebarCollapsed
-      ? `${MIN_SIDEBAR_WIDTH}px`
-      : isOverlaySidebar
-        ? `${NORMAL_GRID_SIDEBAR_WIDTH}px`
-        : `${sidebarSize}px`;
+    isSidebarCollapsed ? `${MIN_SIDEBAR_WIDTH}px`
+    : isOverlaySidebar ? `${NORMAL_GRID_SIDEBAR_WIDTH}px`
+    : `${sidebarSize}px`;
 
   const sidebarActualWidth =
-    isSidebarCollapsed
-      ? `${MIN_SIDEBAR_WIDTH}px`
-      : isOverlaySidebar
-        ? `${Math.max(sidebarSize, 520)}px`
-        : `${sidebarSize}px`;
+    isSidebarCollapsed ? `${MIN_SIDEBAR_WIDTH}px`
+    : isOverlaySidebar ? `${Math.max(sidebarSize, 520)}px`
+    : `${sidebarSize}px`;
 
   const {
     currentTrack,
@@ -153,16 +149,19 @@ const MainLayout = ({ children }: { children: ReactNode }) => {
           searchLoading={isLoading}
           searchError={error}
           user={
-            user
-              ? {
-                  displayName: user.username,
-                   avatarUrl: user.avatarUrl,
-                }
-              : null
+            user ?
+              {
+                displayName: user.username,
+                avatarUrl: user.avatarUrl,
+              }
+            : null
           }
           onSearchChange={setQuery}
           onSearch={handleSearch}
-          onHomeClick={() => navigate("/")}
+          onHomeClick={() => {
+            window.dispatchEvent(new Event("tunevault:go-home"));
+            navigate("/");
+          }}
           onNotificationClick={() => navigate("/notifications")}
           onAvatarClick={() => navigate("/profile")}
           onPlayTrack={(track) => playTrack(track)}
@@ -215,14 +214,14 @@ const MainLayout = ({ children }: { children: ReactNode }) => {
             style={{
               position: "absolute",
               top: 0,
-              right: isOverlaySidebar ? `calc(${sidebarActualWidth} - 4px)` : "-4px",
+              right:
+                isOverlaySidebar ? `calc(${sidebarActualWidth} - 4px)` : "-4px",
               width: "8px",
               height: "100%",
               cursor: "col-resize",
               zIndex: 1000,
-              background: isResizingSidebar
-                ? "rgba(255,255,255,0.18)"
-                : "transparent",
+              background:
+                isResizingSidebar ? "rgba(255,255,255,0.18)" : "transparent",
             }}
           />
         </div>
@@ -247,9 +246,7 @@ const MainLayout = ({ children }: { children: ReactNode }) => {
         >
           <NowPlaying
             isCollapsed={isNowPlayingCollapsed}
-            onToggleCollapse={() =>
-              setIsNowPlayingCollapsed((prev) => !prev)
-            }
+            onToggleCollapse={() => setIsNowPlayingCollapsed((prev) => !prev)}
           />
         </div>
       </div>

@@ -210,6 +210,13 @@ const MainContent = () => {
     setSelectedTrack(null);
     setSelectedArtist(null);
   };
+  useEffect(() => {
+  window.addEventListener("tunevault:go-home", handleBackHome);
+
+  return () => {
+    window.removeEventListener("tunevault:go-home", handleBackHome);
+  };
+}, []);
 
   const getShowAllData = () => {
     switch (viewMode) {

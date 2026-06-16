@@ -96,5 +96,19 @@ public async Task<IActionResult> RemoveTrack(
     if(result <= 0) return NotFound(new {success = false, message = "Playlist or Media Item not found"});
     return Ok(new {success = true, message = "Track removed from playlist successfully"});
 }
+[HttpGet("search")]
+public async Task<IActionResult> SearchPlaylist([FromQuery] SearchPlaylistQuery query)
+{
+    var result = await _mediator.Send(query);
+
+    return Ok(new
+    {
+        success = true,
+        message = "Search success",
+        data = result.Playlists,
+        totalCount = result.TotalCount,
+        totalPages = result.TotalPages
+    });
+}
 
 }

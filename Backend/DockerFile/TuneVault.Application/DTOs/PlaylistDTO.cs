@@ -61,4 +61,5 @@ public record SearchPlaylistDto(
 public record SearchPlaylistResultDto(
     IEnumerable<PlaylistDto> Playlists,
     int TotalCount,
-    int TotalPages);
+    int TotalPages
+);
