@@ -2,6 +2,8 @@ import type { Media } from "../../types/media";
 import { usePlayer } from "../../hooks/usePlayer";
 import AlbumCardLarge from "./AlbumCardLarge";
 import { useFollowStore } from "../../store/followStore";
+import { useEffect, useState } from "react";
+import { artistApi } from "../../api/artistApi";
 
 type ArtistDetailViewProps = {
   artistId: number;
@@ -11,6 +13,15 @@ type ArtistDetailViewProps = {
   onOpenAlbum: (track: Media, tracks: Media[]) => void;
   onOpenTrack: (track: Media) => void;
 };
+
+type ArtistProfile = {
+  artistID: number;
+  artistName: string;
+  artistImage: string;
+  bio: string;
+};
+
+
 
 const ArtistDetailView = ({
   artistId,
@@ -56,6 +67,25 @@ const handleFollowToggle = async () => {
   artistImage,
 });
 };
+
+const [profile, setProfile] =
+  useState<ArtistProfile | null>(null);
+
+useEffect(() => {
+  const loadProfile = async () => {
+    try {
+      const res = await artistApi.getProfile(artistId);
+
+      setProfile(res.data);
+    } catch (err) {
+      console.error("LOAD ARTIST PROFILE ERROR", err);
+    }
+  };
+
+  if (artistId) {
+    loadProfile();
+  }
+}, [artistId]);
 
   return (
     <div>
@@ -253,21 +283,51 @@ const handleFollowToggle = async () => {
 
       {/* ================= ABOUT ================= */}
       <section
-        style={{
-          marginBottom: "36px",
-          background: "#181818",
-          padding: "24px",
-          borderRadius: "14px",
-        }}
-      >
-        <h2 style={{ color: "#fff", fontSize: "22px", marginBottom: "12px" }}>
-          Giới thiệu
-        </h2>
+  style={{
+    marginBottom: "36px",
+    background: "#181818",
+    borderRadius: "16px",
+    overflow: "hidden",
+  }}
+>
+  {profile?.artistImage && (
+    <img
+      src={`http://localhost:5081/media/images/artist/${profile.artistImage}`}
+      alt={profile.artistName}
+      style={{
+        width: "100%",
+        height: "420px",
+        objectFit: "cover",
+        display: "block",
+      }}
+    />
+  )}
 
-        <p style={{ color: "#b3b3b3", lineHeight: 1.8 }}>
-          {artistName} là một trong những nghệ sĩ nổi bật trên TuneVault.
-        </p>
-      </section>
+  <div
+    style={{
+      padding: "24px",
+    }}
+  >
+    <h2
+      style={{
+        color: "#fff",
+        marginBottom: "16px",
+      }}
+    >
+      {profile?.artistName ?? artistName}
+    </h2>
+
+    <p
+      style={{
+        color: "#b3b3b3",
+        lineHeight: 1.8,
+        fontSize: "15px",
+      }}
+    >
+      {profile?.bio ?? "Chưa có thông tin nghệ sĩ."}
+    </p>
+  </div>
+</section>
 
       {/* ================= ALBUM ================= */}
       <section>

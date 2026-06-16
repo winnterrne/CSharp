@@ -11,8 +11,7 @@ public record ArtistProfileDto(
     int ArtistID,
     string? ArtistName,
     string? ArtistImage,
-    string? Bio,
-    int Followers
+    string? Bio
 );
 
 public record ArtistFollowerDto(

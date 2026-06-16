@@ -15,6 +15,5 @@ namespace TuneVault.Domain.Interfaces
         Task<int> DeleteArtistAsync(string artistId);
         Task<(IEnumerable<Artist> Artists, int TotalCount)> SearchAsync(string keyword, int skip, int take);
         Task<Artist?> GetArtistProfileByIdAsync(int artistId);
-        Task<int> GetArtistFollowersCountAsync(int artistId);
     }
 }
