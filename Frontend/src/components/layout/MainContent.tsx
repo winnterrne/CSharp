@@ -12,9 +12,11 @@ import HomeView from "../home/HomeView";
 import TrackDetailView from "../home/TrackDetailView";
 import ArtistDetailView from "../home/ArtistDetailView";
 import AlbumCardLarge from "../home/AlbumCardLarge";
-
 import type { Album } from "../../types/album";
 import { albumApi } from "../../api/albumApi";
+import { useAlbumStore } from "../../store/albumStore";
+import { mapAlbumTrackToMedia, buildImageUrl } from "../../types/media";
+
 
 type ViewMode =
   | "home"
@@ -66,6 +68,9 @@ const MainContent = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const selectedAlbumId = useAlbumStore((s) => s.selectedAlbumId);
+  const setSelectedAlbumId = useAlbumStore((s) => s.setSelectedAlbumId);
+
   useEffect(() => {
     const fetchHomeData = async () => {
       try {
@@ -86,6 +91,7 @@ const MainContent = () => {
         setRecommended(mediaList.slice(0, 12));
         setForYou(mediaList.slice(4, 16));
         setUpcoming(mediaList.slice(8, 20));
+        setAlbums(albumRes.data?.data ?? []);
 
         const albumList = Array.isArray(albumRes.data?.data)
           ? albumRes.data.data
@@ -114,6 +120,8 @@ const MainContent = () => {
     fetchHomeData();
   }, []);
 
+  
+
   const allTracks = useMemo(() => {
     return uniqueTracks([...recommended, ...forYou, ...upcoming]);
   }, [recommended, forYou, upcoming]);
@@ -140,6 +148,48 @@ const MainContent = () => {
 
     navigate(`/album/${albumId}`);
   };
+
+  useEffect(() => {
+  if (!selectedAlbumId) return;
+
+  const album = albums.find((a) => a.albumID === selectedAlbumId);
+  if (!album) return;
+
+  const openAlbum = async () => {
+    try {
+      const res = await albumApi.getTracks(selectedAlbumId);
+      const rawTracks = res.data?.data ?? [];
+
+      const tracks = rawTracks.map((item) =>
+        mapAlbumTrackToMedia(item, album.albumID, album.albumName, album.artistName)
+      );
+
+      const cover = {
+        id: String(album.albumID),
+        title: album.albumName,
+        type: "audio" as const,
+        status: "published" as const,
+        url: "",
+        thumbnailUrl: album.albumItemImage
+          ? `http://localhost:5081/media/images/album/${album.albumItemImage}`
+          : undefined,
+        duration: 0,
+        artist: { id: album.artistID, name: album.artistName },
+        albumId: album.albumID,
+        albumName: album.albumName,
+        createdAt: album.uploadAt,
+      };
+
+      handleOpenAlbum(cover, tracks, album.albumName);
+    } catch (err) {
+      console.error("Không tải được album từ sidebar:", err);
+    } finally {
+      setSelectedAlbumId(null); // reset sau khi mở
+    }
+  };
+
+  openAlbum();
+}, [selectedAlbumId, albums]);
 
   const handleOpenArtist = (artistName: string, tracks: Media[] = allTracks) => {
     const artistTracks = tracks.filter(
@@ -323,3 +373,4 @@ const MainContent = () => {
 };
 
 export default MainContent;
+

@@ -3,7 +3,6 @@ import type { CSSProperties, ReactNode } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { playlistApi } from "../../api/playlistApi";
-import { mediaApi } from "../../api/mediaApi";
 import type { Playlist } from "../../types/playlist";
 import type { Media } from "../../types/media";
 import { ROUTES } from "../../constant/routes";
