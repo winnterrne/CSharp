@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 
-import Sidebar from "../components/layout/Sidebar";
+import SideBar from "../components/layout/SideBar";
 import PlayerBar from "../components/layout/PlayerBar";
 import Header from "../components/layout/Header";
 import NowPlaying from "../components/layout/NowPlaying";
@@ -202,7 +202,7 @@ const MainLayout = ({ children }: { children: ReactNode }) => {
               transition: isResizingSidebar ? "none" : "width 0.2s ease",
             }}
           >
-            <Sidebar
+            <SideBar
               isCollapsed={isSidebarCollapsed}
               isExpanded={isOverlaySidebar}
               onToggleCollapse={handleToggleSidebarCollapse}
