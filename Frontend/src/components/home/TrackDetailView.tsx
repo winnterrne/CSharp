@@ -24,7 +24,7 @@ import { PlayIcon, ShareIcon } from "../common/icons";
 
   const TrackDetailView = ({ track, onOpenArtist }: TrackDetailViewProps) => {
     const [menuOpen, setMenuOpen] = useState(false);
-    const [shareOpen, setShareOpen] = useState(false);
+
     const { playTrack, setQueue } = usePlayer();
     const { isFavorite, toggleFavorite } = useFavorite();
 

@@ -4,7 +4,7 @@ import SectionHeader from "./SectionHeader";
 import { useHistoryStore } from "../../store/historyStore";
 import type { Album } from "../../types/album";
 import { albumApi } from "../../api/albumApi";
-import { buildImageUrl, mapAlbumTrackToMedia, type Media } from "../../types/media";
+import { mapAlbumTrackToMedia, type Media } from "../../types/media";
 
 
 type HomeViewProps = {

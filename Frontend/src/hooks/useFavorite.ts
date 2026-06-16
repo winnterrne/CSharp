@@ -12,7 +12,6 @@ type FavoriteMediaShape = {
   titleName?: string;
   mediaItemImage?: string;
   artistName?: string;
-  artistID?: number;
 };
 
 type FavoriteResponse = {
@@ -42,7 +41,7 @@ const toMedia = (item: FavoriteMediaShape): Media => {
     thumbnailUrl: buildImageUrl(item.mediaItemImage),
     duration: 0,
     artist: {
-      id: item.artistID ?? 0,
+      id: 0,
       name: item.artistName ?? "Unknown Artist",
     },
     createdAt: new Date().toISOString(),
@@ -151,7 +150,7 @@ export const useFavorite = () => {
     };
 
     listeners.add(listener);
-    loadFavorites();
+    void Promise.resolve().then(loadFavorites);
 
     return () => {
       listeners.delete(listener);
