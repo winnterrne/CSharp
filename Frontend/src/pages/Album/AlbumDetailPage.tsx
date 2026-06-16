@@ -294,16 +294,48 @@ const mapAlbumTrackToMedia = (
 
   const thumbnailUrl = image ? buildMediaImageUrl(String(image)) : "";
 
+ const genre =
+  getValue(media, [
+    "genre",
+    "Genre",
+    "genreName",
+    "GenreName",
+    "mediaGenre",
+    "MediaGenre",
+    "mediaItemTag",
+    "MediaItemTag",
+    "tag",
+    "Tag",
+    "category",
+    "Category",
+    "categoryName",
+    "CategoryName",
+  ]) ??
+  getValue(item, [
+    "genre",
+    "Genre",
+    "genreName",
+    "GenreName",
+    "mediaGenre",
+    "MediaGenre",
+    "mediaItemTag",
+    "MediaItemTag",
+    "tag",
+    "Tag",
+    "category",
+    "Category",
+    "categoryName",
+    "CategoryName",
+  ]) ??
+  "Unknown";
+
   return {
     id,
     title,
     url: buildStreamUrl(id),
     thumbnailUrl,
     duration,
-    genre:
-      getValue(media, ["genre", "Genre", "genreName", "GenreName"]) ??
-      getValue(item, ["genre", "Genre", "genreName", "GenreName"]) ??
-      "Unknown",
+    genre,
     type,
     artist: {
       id: artistId,
@@ -427,6 +459,7 @@ const AlbumDetailPage = () => {
         const mappedTracks = rawTracks.map((item: any) =>
              mapAlbumTrackToMedia(item, mappedAlbum.artistName ?? "Unknown Artist")
         );
+        console.log("ALBUM TRACKS MAPPED:", mappedTracks);
       setTracks(mappedTracks);
     } catch (err) {
       console.error("LOAD ALBUM DETAIL ERROR:", err);
