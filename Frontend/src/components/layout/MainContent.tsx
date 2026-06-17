@@ -2,10 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import type { Media } from "../../types/media";
-import {
-  mapMediaItemDtoToMedia,
-  type MediaItemDto,
-} from "../../types/media";
+import { mapMediaItemDtoToMedia, type MediaItemDto } from "../../types/media";
 import { mediaApi } from "../../api/mediaApi";
 
 import HomeView from "../home/HomeView";
@@ -16,7 +13,6 @@ import type { Album } from "../../types/album";
 import { albumApi } from "../../api/albumApi";
 import { useAlbumStore } from "../../store/albumStore";
 import { mapAlbumTrackToMedia, buildImageUrl } from "../../types/media";
-
 
 type ViewMode =
   | "home"
@@ -56,7 +52,9 @@ const MainContent = () => {
   const [selectedTrack, setSelectedTrack] = useState<Media | null>(null);
 
   const [selectedArtist, setSelectedArtist] = useState<{
+    id: number;
     name: string;
+    image?: string;
     tracks: Media[];
   } | null>(null);
 
@@ -82,9 +80,8 @@ const MainContent = () => {
           albumApi.getAll(),
         ]);
 
-        const mediaDtos: MediaItemDto[] = Array.isArray(mediaRes.data?.data)
-          ? mediaRes.data.data
-          : [];
+        const mediaDtos: MediaItemDto[] =
+          Array.isArray(mediaRes.data?.data) ? mediaRes.data.data : [];
 
         const mediaList = uniqueTracks(mediaDtos.map(mapMediaItemDtoToMedia));
 
@@ -93,11 +90,10 @@ const MainContent = () => {
         setUpcoming(mediaList.slice(8, 20));
         setAlbums(albumRes.data?.data ?? []);
 
-        const albumList = Array.isArray(albumRes.data?.data)
-          ? albumRes.data.data
-          : Array.isArray(albumRes.data)
-            ? albumRes.data
-            : [];
+        const albumList =
+          Array.isArray(albumRes.data?.data) ? albumRes.data.data
+          : Array.isArray(albumRes.data) ? albumRes.data
+          : [];
 
         setAlbums(albumList);
 
@@ -120,8 +116,6 @@ const MainContent = () => {
     fetchHomeData();
   }, []);
 
-  
-
   const allTracks = useMemo(() => {
     return uniqueTracks([...recommended, ...forYou, ...upcoming]);
   }, [recommended, forYou, upcoming]);
@@ -137,7 +131,7 @@ const MainContent = () => {
   const handleOpenAlbum = (
     cover: Media | Album,
     _tracks: Media[] = [],
-    _title?: string
+    _title?: string,
   ) => {
     const albumId = getAlbumIdFromCover(cover);
 
@@ -150,59 +144,78 @@ const MainContent = () => {
   };
 
   useEffect(() => {
-  if (!selectedAlbumId) return;
+    if (!selectedAlbumId) return;
 
-  const album = albums.find((a) => a.albumID === selectedAlbumId);
-  if (!album) return;
+    const album = albums.find((a) => a.albumID === selectedAlbumId);
+    if (!album) return;
 
-  const openAlbum = async () => {
-    try {
-      const res = await albumApi.getTracks(selectedAlbumId);
-      const rawTracks = res.data?.data ?? [];
+    const openAlbum = async () => {
+      try {
+        const res = await albumApi.getTracks(selectedAlbumId);
+        const rawTracks = res.data?.data ?? [];
 
-      const tracks = rawTracks.map((item) =>
-        mapAlbumTrackToMedia(item, album.albumID, album.albumName, album.artistName)
-      );
+        const tracks = rawTracks.map((item) =>
+          mapAlbumTrackToMedia(
+            item,
+            album.albumID,
+            album.albumName,
+            album.artistName,
+          ),
+        );
 
-      const cover = {
-        id: String(album.albumID),
-        title: album.albumName,
-        type: "audio" as const,
-        status: "published" as const,
-        url: "",
-        thumbnailUrl: album.albumItemImage
-          ? `http://localhost:5081/media/images/album/${album.albumItemImage}`
-          : undefined,
-        duration: 0,
-        artist: { id: album.artistID, name: album.artistName },
-        albumId: album.albumID,
-        albumName: album.albumName,
-        createdAt: album.uploadAt,
-      };
+        const cover = {
+          id: String(album.albumID),
+          title: album.albumName,
+          type: "audio" as const,
+          status: "published" as const,
+          url: "",
+          thumbnailUrl:
+            album.albumItemImage ?
+              `http://localhost:5081/media/images/album/${album.albumItemImage}`
+            : undefined,
+          duration: 0,
+          artist: { id: album.artistID, name: album.artistName },
+          albumId: album.albumID,
+          albumName: album.albumName,
+          createdAt: album.uploadAt,
+        };
 
-      handleOpenAlbum(cover, tracks, album.albumName);
-    } catch (err) {
-      console.error("Không tải được album từ sidebar:", err);
-    } finally {
-      setSelectedAlbumId(null); // reset sau khi mở
-    }
-  };
+        handleOpenAlbum(cover, tracks, album.albumName);
+      } catch (err) {
+        console.error("Không tải được album từ sidebar:", err);
+      } finally {
+        setSelectedAlbumId(null); // reset sau khi mở
+      }
+    };
 
-  openAlbum();
-}, [selectedAlbumId, albums]);
+    openAlbum();
+  }, [selectedAlbumId, albums]);
 
-  const handleOpenArtist = (artistName: string, tracks: Media[] = allTracks) => {
+  const handleOpenArtist = (
+    artistID: number,
+    artistName: string,
+    artistImage: string,
+    tracks: Media[] = allTracks,
+  ) => {
     const artistTracks = tracks.filter(
-      (track) => track.artist?.name === artistName
+      (track) => track.artist?.id === artistID,
     );
 
     setSelectedArtist({
+      id: artistID,
       name: artistName,
+      image: artistImage,
       tracks: artistTracks,
     });
 
     setSelectedTrack(null);
     setViewMode("artist");
+
+    console.log("OPEN ARTIST", {
+      artistID,
+      artistName,
+      artistImage,
+    });
   };
 
   const handleBackHome = () => {
@@ -210,11 +223,57 @@ const MainContent = () => {
     setSelectedTrack(null);
     setSelectedArtist(null);
   };
-  useEffect(() => {
+  
+
+  // ✅ NOTIFICATION FLOW: nút Home trên Header quay về home
+useEffect(() => {
   window.addEventListener("tunevault:go-home", handleBackHome);
 
   return () => {
     window.removeEventListener("tunevault:go-home", handleBackHome);
+  };
+}, []);
+
+// ✅ NOTIFICATION FLOW: mở TrackDetailView từ Notification
+useEffect(() => {
+  const openTrack = (track: Media) => {
+    setSelectedTrack(track);
+    setSelectedArtist(null);
+    setViewMode("track");
+  };
+
+  const handleOpenTrackFromNotification = (event: Event) => {
+    const custom = event as CustomEvent<Media>;
+
+    if (!custom.detail) return;
+
+    openTrack(custom.detail);
+  };
+
+  window.addEventListener(
+    "tunevault:open-track",
+    handleOpenTrackFromNotification,
+  );
+
+  const pendingTrack =
+    sessionStorage.getItem("tunevault:pending-open-track");
+
+  if (pendingTrack) {
+    try {
+      const track = JSON.parse(pendingTrack) as Media;
+      openTrack(track);
+    } catch (error) {
+      console.error("OPEN PENDING TRACK ERROR:", error);
+    } finally {
+      sessionStorage.removeItem("tunevault:pending-open-track");
+    }
+  }
+
+  return () => {
+    window.removeEventListener(
+      "tunevault:open-track",
+      handleOpenTrackFromNotification,
+    );
   };
 }, []);
 
@@ -261,9 +320,9 @@ const MainContent = () => {
         paddingBottom: "160px",
         boxSizing: "border-box",
         background:
-          viewMode === "home"
-            ? "linear-gradient(180deg, #0b3b4a 0%, #121212 320px)"
-            : "linear-gradient(180deg, #16485a 0%, #121212 360px)",
+          viewMode === "home" ?
+            "linear-gradient(180deg, #0b3b4a 0%, #121212 320px)"
+          : "linear-gradient(180deg, #16485a 0%, #121212 360px)",
       }}
     >
       {viewMode !== "home" && (
@@ -332,10 +391,9 @@ const MainContent = () => {
             {showAllData.title}
           </h1>
 
-          {showAllData.tracks.length === 0 && !loading ? (
+          {showAllData.tracks.length === 0 && !loading ?
             <p style={{ color: "#b3b3b3" }}>Chưa có bài hát nào.</p>
-          ) : (
-            <div
+          : <div
               style={{
                 display: "grid",
                 gridTemplateColumns: "repeat(auto-fill, minmax(170px, 1fr))",
@@ -351,25 +409,25 @@ const MainContent = () => {
                 />
               ))}
             </div>
-          )}
+          }
         </section>
       )}
 
       {viewMode === "track" &&
-        (selectedTrack ? (
+        (selectedTrack ?
           <TrackDetailView
             track={selectedTrack}
             onOpenArtist={handleOpenArtist}
           />
-        ) : (
-          <div style={{ color: "#fff", padding: "40px" }}>
+        : <div style={{ color: "#fff", padding: "40px" }}>
             Không tìm thấy bài hát.
-          </div>
-        ))}
+          </div>)}
 
       {viewMode === "artist" && selectedArtist && (
         <ArtistDetailView
+          artistId={selectedArtist.id}
           artistName={selectedArtist.name}
+          artistImage={selectedArtist.image}
           tracks={selectedArtist.tracks}
           onOpenTrack={handleOpenTrack}
           onOpenAlbum={handleOpenAlbum}
@@ -380,4 +438,3 @@ const MainContent = () => {
 };
 
 export default MainContent;
-

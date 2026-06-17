@@ -54,6 +54,7 @@ public class MediaItemRepository : IMediaItemRepository
                     SELECT 
                         m.*,
                         a.ArtistName,
+                        a.ArtistImage,
                         al.AlbumName
                     FROM MediaItem m
                     LEFT JOIN Artist a ON m.ArtistID = a.ArtistID
@@ -68,6 +69,7 @@ public class MediaItemRepository : IMediaItemRepository
                     SELECT 
                         m.*,
                         a.ArtistName,
+                        a.ArtistImage,
                         al.AlbumName
                     FROM MediaItem m
                     LEFT JOIN Artist a ON m.ArtistID = a.ArtistID
@@ -158,7 +160,7 @@ public class MediaItemRepository : IMediaItemRepository
     public async Task<MediaItem> GetMediaInfoAsync(int mediaId)
     {
         string sql = @"SELECT 
-                        m.MediaItemID, m.TitleName, m.MediaItemImage, m.Duration, m.MediaItemType, m.filePath, a.ArtistName
+                        m.MediaItemID, m.TitleName, m.MediaItemImage, m.Duration, m.MediaItemType, m.filePath, a.ArtistName, a.ArtistImage
                         FROM MediaItem m
                         JOIN Artist a ON m.ArtistID = a.ArtistID
                         WHERE m.MediaItemID = @MediaItemID AND m.IsDeleted = 0";

@@ -47,6 +47,7 @@ public class UpdateMediaHandler : IRequestHandler<UpdateMediaCommand, MediaItemD
             media.Description,
             media.ArtistID,
             media.ArtistName,
+            media.ArtistImage,
             media.AlbumID,
             media.ArtistName,
             media.UserID,

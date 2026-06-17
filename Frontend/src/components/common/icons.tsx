@@ -11,15 +11,24 @@ export const AddToPlaylistIcon = () => (
 );
 
 export const PlayIcon = () => (
-  <svg width="32" height="32" viewBox="0 0 32 32" fill="currentColor">
-    <path d="M10 7v18l14-9z" />
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+  >
+    <path d="M5 3.868v16.264c0 .79.871 1.268 1.54.845l12.77-8.132a1 1 0 0 0 0-1.69L6.54 3.023A1 1 0 0 0 5 3.868z"/>
   </svg>
 );
 
-
 export const PauseIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+  >
+    <path d="M6 4h4v16H6zm8 0h4v16h-4z"/>
   </svg>
 );
 

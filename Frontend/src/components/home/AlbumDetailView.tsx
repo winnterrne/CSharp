@@ -4,12 +4,29 @@ import { usePlayer } from "../../hooks/usePlayer";
 import { useFavorite } from "../../hooks/useFavorite";
 import AddToPlaylistButton from "../playlist/AddToPlaylistButton";
 import TrackActionMenu from "../common/TrackActionMenu";
+import {
+  PlayIcon,
+  ShuffleIcon,
+  DownloadIcon,
+  MoreHorizIcon,
+  HeartIcon,
+} from "../common/icons";
 
 type AlbumDetailViewProps = {
-  cover: Media;
+  cover?: Media;
+
+  albumTitle?: string;
+  albumImage?: string;
+  artistName?: string;
+
   tracks: Media[];
+
   onOpenTrack: (track: Media) => void;
-  onOpenArtist: (artistName: string) => void;
+  onOpenArtist: (
+    artistID: number,
+    artistName: string,
+    artistImage: string
+  ) => void;
 };
 
 const formatDuration = (seconds?: number) => {
@@ -24,7 +41,7 @@ const formatDuration = (seconds?: number) => {
 const formatTotalDuration = (tracks: Media[]) => {
   const totalSeconds = tracks.reduce(
     (sum, item) => sum + (item.duration ?? 0),
-    0,
+    0
   );
 
   const hours = Math.floor(totalSeconds / 3600);
@@ -39,33 +56,55 @@ const formatTotalDuration = (tracks: Media[]) => {
 
 const AlbumDetailView = ({
   cover,
+  albumTitle,
+  albumImage,
+  artistName,
   tracks,
   onOpenTrack,
   onOpenArtist,
 }: AlbumDetailViewProps) => {
-  const { currentTrack, isPlaying, playTrack, setQueue, togglePlay } =
-    usePlayer();
+  const {
+    currentTrack,
+    isPlaying,
+    playTrack,
+    setQueue,
+    togglePlay,
+  } = usePlayer();
 
   const [shuffle, setShuffle] = useState(false);
 
-  const artistName = cover.artist?.name ?? "Unknown Artist";
-  const isCurrentAlbumPlaying =
-    tracks.some((item) => String(item.id) === String(currentTrack?.id)) &&
-    isPlaying;
+  const displayTitle =
+    albumTitle ?? cover?.albumName ?? cover?.title ?? "Album";
+
+  const displayArtist =
+    artistName ?? cover?.artist?.name ?? "Unknown Artist";
+
+  const displayArtistID =
+    cover?.artist?.id ?? tracks[0]?.artist?.id;
+
+  const displayArtistImage =
+    cover?.artist?.avatarUrl ?? tracks[0]?.artist?.avatarUrl ?? "";
+
+  const displayImage =
+    albumImage ?? cover?.thumbnailUrl ?? "";
+
+  const currentInAlbum = tracks.some(
+    (item) => String(item.id) === String(currentTrack?.id)
+  );
+
+  const isCurrentAlbumPlaying = currentInAlbum && isPlaying;
 
   const handlePlayAll = () => {
     if (tracks.length === 0) return;
-
-    const currentInAlbum = tracks.some(
-      (item) => String(item.id) === String(currentTrack?.id),
-    );
 
     if (currentInAlbum) {
       togglePlay();
       return;
     }
 
-    const list = shuffle ? [...tracks].sort(() => Math.random() - 0.5) : tracks;
+    const list = shuffle
+      ? [...tracks].sort(() => Math.random() - 0.5)
+      : tracks;
 
     setQueue(list);
     playTrack(list[0]);
@@ -73,7 +112,6 @@ const AlbumDetailView = ({
 
   return (
     <div>
-      {/* HEADER */}
       <section
         style={{
           display: "flex",
@@ -98,17 +136,19 @@ const AlbumDetailView = ({
             fontSize: "72px",
           }}
         >
-          {cover.thumbnailUrl ?
+          {displayImage ? (
             <img
-              src={cover.thumbnailUrl}
-              alt={cover.title}
+              src={displayImage}
+              alt={displayTitle}
               style={{
                 width: "100%",
                 height: "100%",
                 objectFit: "cover",
               }}
             />
-          : "♪"}
+          ) : (
+            "♪"
+          )}
         </div>
 
         <div style={{ minWidth: 0 }}>
@@ -131,7 +171,7 @@ const AlbumDetailView = ({
               wordBreak: "break-word",
             }}
           >
-            {cover.title}
+            {displayTitle}
           </h1>
 
           <p
@@ -142,20 +182,26 @@ const AlbumDetailView = ({
             }}
           >
             <span
-              onClick={() => onOpenArtist(artistName)}
+              onClick={() => {
+                if (!displayArtistID) return;
+                onOpenArtist(
+                  displayArtistID,
+                  displayArtist,
+                  displayArtistImage
+                );
+              }}
               style={{
-                cursor: "pointer",
+                cursor: displayArtistID ? "pointer" : "default",
                 color: "#fff",
               }}
             >
-              {artistName}
+              {displayArtist}
             </span>{" "}
             • {tracks.length} bài hát • {formatTotalDuration(tracks)}
           </p>
         </div>
       </section>
 
-      {/* ACTION BAR */}
       <section
         style={{
           display: "flex",
@@ -167,7 +213,7 @@ const AlbumDetailView = ({
         <button
           onClick={handlePlayAll}
           disabled={tracks.length === 0}
-          title="Phát"
+          title={isCurrentAlbumPlaying ? "Tạm dừng" : "Phát"}
           style={{
             width: "60px",
             height: "60px",
@@ -179,9 +225,12 @@ const AlbumDetailView = ({
             fontSize: "24px",
             fontWeight: 900,
             boxShadow: "0 8px 24px rgba(0,0,0,.35)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
-          {isCurrentAlbumPlaying ? "⏸" : "▶"}
+          {isCurrentAlbumPlaying ? "⏸" : <PlayIcon />}
         </button>
 
         <button
@@ -195,10 +244,10 @@ const AlbumDetailView = ({
             cursor: "pointer",
           }}
         >
-          ⇄
+          <ShuffleIcon />
         </button>
 
-        <AddToPlaylistButton mediaId={cover.id} />
+        {cover && <AddToPlaylistButton mediaId={cover.id} />}
 
         <button
           title="Tải xuống"
@@ -210,7 +259,7 @@ const AlbumDetailView = ({
             cursor: "pointer",
           }}
         >
-          ↓
+          <DownloadIcon />
         </button>
 
         <button
@@ -223,7 +272,7 @@ const AlbumDetailView = ({
             cursor: "pointer",
           }}
         >
-          ⋯
+          <MoreHorizIcon />
         </button>
 
         <button
@@ -242,11 +291,11 @@ const AlbumDetailView = ({
         </button>
       </section>
 
-      {/* TRACK TABLE */}
       <section>
-        {tracks.length === 0 ?
+        {tracks.length === 0 ? (
           <EmptyTracks />
-        : <>
+        ) : (
+          <>
             <div
               style={{
                 display: "grid",
@@ -278,7 +327,7 @@ const AlbumDetailView = ({
               />
             ))}
           </>
-        }
+        )}
       </section>
     </div>
   );
@@ -295,18 +344,43 @@ const TrackRow = ({
   track: Media;
   tracks: Media[];
   onOpenTrack: (track: Media) => void;
-  onOpenArtist: (artistName: string) => void;
+  onOpenArtist: (
+    artistID: number,
+    artistName: string,
+    artistImage: string
+  ) => void;
 }) => {
   const [hovered, setHovered] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const { playTrack, setQueue } = usePlayer();
+  const {
+    currentTrack,
+    isPlaying,
+    playTrack,
+    setQueue,
+    togglePlay,
+  } = usePlayer();
+
   const { isFavorite, toggleFavorite } = useFavorite();
 
   const liked = isFavorite(track.id);
+
+  const artistID = track.artist?.id;
   const artistName = track.artist?.name ?? "Unknown Artist";
+  const artistImage = track.artist?.avatarUrl ?? "";
+
+  const isCurrentTrack =
+    String(currentTrack?.id) === String(track.id);
+
+  const isThisPlaying =
+    isCurrentTrack && isPlaying;
 
   const handlePlay = () => {
+    if (isCurrentTrack) {
+      togglePlay();
+      return;
+    }
+
     setQueue(tracks);
     playTrack(track);
   };
@@ -333,29 +407,37 @@ const TrackRow = ({
         borderRadius: "8px",
         cursor: "pointer",
         gap: "12px",
-        background: hovered ? "rgba(255,255,255,.18)" : "transparent",
+        background:
+          hovered || isCurrentTrack
+            ? "rgba(255,255,255,.18)"
+            : "transparent",
         position: "relative",
       }}
     >
       <div style={{ color: "#b3b3b3" }}>
-        {hovered ?
+        {hovered || isCurrentTrack ? (
           <button
             onClick={(e) => {
               e.stopPropagation();
               handlePlay();
             }}
-            title="Phát"
+            title={isThisPlaying ? "Tạm dừng" : "Phát"}
             style={{
               border: "none",
               background: "transparent",
-              color: "#fff",
+              color: isCurrentTrack ? "#1DB954" : "#fff",
               cursor: "pointer",
               fontSize: "16px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
-            ▶
+            {isThisPlaying ? "⏸" : <PlayIcon />}
           </button>
-        : index + 1}
+        ) : (
+          index + 1
+        )}
       </div>
 
       <div
@@ -380,7 +462,7 @@ const TrackRow = ({
             justifyContent: "center",
           }}
         >
-          {track.thumbnailUrl ?
+          {track.thumbnailUrl ? (
             <img
               src={track.thumbnailUrl}
               alt={track.title}
@@ -390,13 +472,15 @@ const TrackRow = ({
                 objectFit: "cover",
               }}
             />
-          : "♪"}
+          ) : (
+            "♪"
+          )}
         </div>
 
         <div style={{ minWidth: 0 }}>
           <div
             style={{
-              color: "#fff",
+              color: isCurrentTrack ? "#1DB954" : "#fff",
               fontWeight: 700,
               whiteSpace: "nowrap",
               overflow: "hidden",
@@ -410,12 +494,14 @@ const TrackRow = ({
           <div
             onClick={(e) => {
               e.stopPropagation();
-              onOpenArtist(artistName);
+              if (!artistID) return;
+              onOpenArtist(artistID, artistName, artistImage);
             }}
             style={{
               color: "#b3b3b3",
               fontSize: "13px",
               marginTop: "4px",
+              cursor: artistID ? "pointer" : "default",
             }}
           >
             {artistName}
@@ -430,7 +516,8 @@ const TrackRow = ({
       <div
         onClick={(e) => {
           e.stopPropagation();
-          onOpenArtist(artistName);
+          if (!artistID) return;
+          onOpenArtist(artistID, artistName, artistImage);
         }}
         style={{
           color: "#b3b3b3",
@@ -438,6 +525,7 @@ const TrackRow = ({
           whiteSpace: "nowrap",
           overflow: "hidden",
           textOverflow: "ellipsis",
+          cursor: artistID ? "pointer" : "default",
         }}
       >
         {artistName}
@@ -471,7 +559,7 @@ const TrackRow = ({
                 fontSize: "20px",
               }}
             >
-              {liked ? "♥" : "♡"}
+              <HeartIcon />
             </button>
 
             <button
@@ -488,7 +576,7 @@ const TrackRow = ({
                 fontSize: "22px",
               }}
             >
-              ⋯
+              <MoreHorizIcon />
             </button>
           </>
         )}
@@ -515,7 +603,9 @@ const EmptyTracks = () => (
     }}
   >
     <div style={{ fontSize: "72px", marginBottom: "20px" }}>♪</div>
+
     <h2 style={{ color: "#fff" }}>Chưa có bài hát</h2>
+
     <p>Danh sách này chưa có bài hát nào.</p>
   </div>
 );

@@ -1,14 +1,19 @@
-import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 import NotificationItem from "../../components/notification/NotificationItem";
 import { useNotification } from "../../hooks/useNotification";
+// import { notificationApi } from "../../api/notificationApi";
 import { mediaApi } from "../../api/mediaApi";
-import { playerStore } from "../../store/playerStore";
-import type { Media } from "../../types/media";
 import { mapMediaItemDtoToMedia } from "../../types/media";
+import {
+  parseNotificationPayload,
+  type Notification,
+} from "../../types/notification";
 
 const NotificationPage = () => {
+  const navigate = useNavigate();
+
   const {
     notifications,
     unreadCount,
@@ -16,86 +21,85 @@ const NotificationPage = () => {
     error,
     markAsRead,
     markAllAsRead,
+    fetchNotifications,
   } = useNotification();
 
-  const [searchParams] = useSearchParams();
-
-  const [mediaMap, setMediaMap] = useState<Record<string, Media>>({});
-  const [selectedSong, setSelectedSong] = useState<Media | null>(null);
-  const [songLoading, setSongLoading] = useState(false);
-  const [songError, setSongError] = useState<string | null>(null);
-  const [showSongPanel, setShowSongPanel] = useState(false);
-
-  const playTrack = playerStore((state) => state.playTrack);
-
+  // ✅ NOTIFICATION FLOW: refresh lại khi mở page lớn
   useEffect(() => {
-    const mediaId = searchParams.get("mediaId");
+    fetchNotifications();
+  }, [fetchNotifications]);
 
-    if (!mediaId) return;
+  const markReadIfNeeded = async (notification: Notification) => {
+    if (notification.isRead) return;
 
-    const loadSong = async () => {
-      try {
-        setSongLoading(true);
-        setSongError(null);
-        setShowSongPanel(true);
+    await markAsRead(notification.id);
+  };
 
-        const res = await mediaApi.getById(mediaId);
-        const dto = res.data?.data ?? res.data;
-        const media = mapMediaItemDtoToMedia(dto);
+  const openTrackInMainContent = async (mediaItemID: number) => {
+    const res = await mediaApi.getById(String(mediaItemID));
+    const dto = res.data?.data ?? res.data;
+    const track = mapMediaItemDtoToMedia(dto);
 
-        setSelectedSong(media);
-        setMediaMap((prev) => ({
-          ...prev,
-          [String(media.id)]: media,
-        }));
-      } catch (err) {
-        console.error("LOAD SONG FROM NOTIFICATION ERROR:", err);
-        setSelectedSong(null);
-        setSongError("Không tải được bài hát này.");
-        setShowSongPanel(true);
-      } finally {
-        setSongLoading(false);
-      }
-    };
+    sessionStorage.setItem(
+      "tunevault:pending-open-track",
+      JSON.stringify(track),
+    );
 
-    loadSong();
-  }, [searchParams]);
+    navigate("/");
 
-  useEffect(() => {
-    const loadMediaNames = async () => {
-      const ids = notifications
-        .map((n) => {
-          try {
-            const data = JSON.parse(n.payload);
-            return data?.mediaItemID ? String(data.mediaItemID) : null;
-          } catch {
-            return null;
-          }
-        })
-        .filter((id): id is string => Boolean(id));
+    setTimeout(() => {
+      window.dispatchEvent(
+        new CustomEvent("tunevault:open-track", {
+          detail: track,
+        }),
+      );
+    }, 80);
+  };
 
-      const uniqueIds = [...new Set(ids)];
+  const handleOpenNotification = async (
+    notification: Notification,
+  ) => {
+    const data = parseNotificationPayload(notification.payload);
 
-      for (const id of uniqueIds) {
-        if (mediaMap[id]) continue;
+    await markReadIfNeeded(notification);
 
-        try {
-          const res = await mediaApi.getById(id);
-          const dto = res.data?.data ?? res.data;
-          const media = mapMediaItemDtoToMedia(dto);
+    const isShareSong =
+      notification.type === "share_song" ||
+      (notification.type === "share" && data.mediaItemID);
 
-          setMediaMap((prev) => ({
-            ...prev,
-            [id]: media,
-          }));
-        } catch (error) {
-          console.error("LOAD MEDIA NAME ERROR:", error);
-        }
-      }
-    };
+    const isSharePlaylist =
+      notification.type === "share_playlist" ||
+      (notification.type === "share" && data.playlistID);
 
-    loadMediaNames();
-  }, [notifications, mediaMap]);
+    if (isShareSong && data.mediaItemID) {
+      await openTrackInMainContent(data.mediaItemID);
+      return;
+    }
+
+    if (isSharePlaylist && data.playlistID) {
+      navigate(`/playlist/${data.playlistID}`);
+      return;
+    }
+
+    if (notification.type === "follow") {
+      return;
+    }
+  };
+
+  const handleMarkAllRead = async () => {
+    await markAllAsRead();
+  };
+
+  const sortedNotifications = [...notifications].sort((a, b) => {
+    if (a.isRead !== b.isRead) {
+      return a.isRead ? 1 : -1;
+    }
+
+    return (
+      new Date(b.noticedAt).getTime() -
+      new Date(a.noticedAt).getTime()
+    );
+  });
 
   return (
     <main
@@ -132,7 +136,7 @@ const NotificationPage = () => {
 
         {unreadCount > 0 && (
           <button
-            onClick={markAllAsRead}
+            onClick={handleMarkAllRead}
             style={{
               border: "none",
               borderRadius: "999px",
@@ -161,7 +165,7 @@ const NotificationPage = () => {
             alignItems: "start",
           }}
         >
-          {notifications.length === 0 ? (
+          {sortedNotifications.length === 0 ? (
             <div
               style={{
                 minHeight: "360px",
@@ -182,162 +186,14 @@ const NotificationPage = () => {
               <p>Các thông báo mới sẽ xuất hiện ở đây.</p>
             </div>
           ) : (
-            notifications.map((item) => (
+            sortedNotifications.map((item) => (
               <NotificationItem
                 key={item.id}
                 notification={item}
-                onRead={markAsRead}
-                mediaMap={mediaMap}
+                onOpen={handleOpenNotification}
               />
             ))
           )}
-        </div>
-      )}
-
-      {showSongPanel && (selectedSong || songLoading || songError) && (
-        <div
-          onClick={() => setShowSongPanel(false)}
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,.72)",
-            zIndex: 99999,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "24px",
-          }}
-        >
-          <aside
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              width: "420px",
-              maxWidth: "100%",
-              background: "#181818",
-              borderRadius: "18px",
-              padding: "22px",
-              border: "1px solid #2a2a2a",
-              boxShadow: "0 20px 60px rgba(0,0,0,.7)",
-              position: "relative",
-              color: "#fff",
-            }}
-          >
-            <button
-              onClick={() => setShowSongPanel(false)}
-              style={{
-                position: "absolute",
-                top: "12px",
-                right: "12px",
-                width: "32px",
-                height: "32px",
-                borderRadius: "50%",
-                border: "none",
-                background: "#2a2a2a",
-                color: "#fff",
-                cursor: "pointer",
-                fontWeight: 800,
-                zIndex: 2,
-              }}
-            >
-              ×
-            </button>
-
-            {songLoading && (
-              <p style={{ color: "#b3b3b3" }}>Đang tải bài hát...</p>
-            )}
-
-            {songError && !songLoading && (
-              <p style={{ color: "#ff7676" }}>{songError}</p>
-            )}
-
-            {!songLoading && selectedSong && (
-              <>
-                <div
-                  style={{
-                    width: "100%",
-                    aspectRatio: "1 / 1",
-                    borderRadius: "14px",
-                    background: "#282828",
-                    overflow: "hidden",
-                    marginBottom: "18px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    color: "#b3b3b3",
-                    fontSize: "48px",
-                  }}
-                >
-                  {selectedSong.thumbnailUrl ? (
-                    <img
-                      src={selectedSong.thumbnailUrl}
-                      alt={selectedSong.title}
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                      }}
-                    />
-                  ) : (
-                    "🎵"
-                  )}
-                </div>
-
-                <p
-                  style={{
-                    color: "#b3b3b3",
-                    fontSize: "13px",
-                    fontWeight: 700,
-                    textTransform: "uppercase",
-                    margin: "0 0 8px",
-                  }}
-                >
-                  Bài hát được chia sẻ
-                </p>
-
-                <h2
-                  style={{
-                    color: "#fff",
-                    fontSize: "28px",
-                    margin: "0 0 8px",
-                    lineHeight: 1.15,
-                  }}
-                >
-                  {selectedSong.title}
-                </h2>
-
-                <p
-                  style={{
-                    color: "#b3b3b3",
-                    fontSize: "15px",
-                    margin: 0,
-                  }}
-                >
-                  {selectedSong.artist?.name ?? "Không rõ nghệ sĩ"}
-                </p>
-
-                <button
-                  onClick={() => {
-                    playTrack(selectedSong);
-                    setShowSongPanel(false);
-                  }}
-                  style={{
-                    marginTop: "22px",
-                    width: "100%",
-                    height: "50px",
-                    border: "none",
-                    borderRadius: "999px",
-                    background: "#1DB954",
-                    color: "#000",
-                    fontWeight: 800,
-                    cursor: "pointer",
-                    fontSize: "15px",
-                  }}
-                >
-                  ▶ Phát bài hát
-                </button>
-              </>
-            )}
-          </aside>
         </div>
       )}
     </main>

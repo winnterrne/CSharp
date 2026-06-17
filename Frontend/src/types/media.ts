@@ -60,6 +60,7 @@ export interface MediaItemDto {
   artistId?: number;
   artistName?: string;
   ArtistName?: string;
+  artistImage? : string;
 
   artist?: {
     id?: number;
@@ -100,6 +101,7 @@ export const buildImageUrl = (img?: string) => {
 };
 
 export const mapMediaItemDtoToMedia = (item: MediaItemDto): Media => {
+  console.log(item);
   const mediaId = item.mediaItemID ?? item.mediaItemId ?? item.id ?? 0;
 
   const type: MediaType =
@@ -120,6 +122,10 @@ export const mapMediaItemDtoToMedia = (item: MediaItemDto): Media => {
     item.artist?.name ??
     "Không rõ nghệ sĩ";
 
+  const artistAvatar =
+  item.artistImage ??
+  "";
+
   const image =
     item.mediaItemImage ??
     item.thumbnailUrl ??
@@ -138,6 +144,10 @@ export const mapMediaItemDtoToMedia = (item: MediaItemDto): Media => {
     artist: {
       id: artistId,
       name: artistName,
+      avatarUrl: item.artistImage
+    ? `http://localhost:5081/media/images/artist/${item.artistImage}`
+    : "",
+      
     },
     genre: item.mediaItemTag ?? undefined,
     albumId: item.albumID ?? item.albumId,

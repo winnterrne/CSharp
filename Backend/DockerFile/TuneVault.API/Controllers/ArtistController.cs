@@ -1,6 +1,5 @@
 using MediatR;
-using TuneVault.Application.DTOs;
-using TuneVault.Application.UseCases;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using TuneVault.Application.UseCases.Artist;
 namespace TuneVault.API.Controllers;
@@ -25,18 +24,7 @@ public class ArtistController : Controller
         if (result == null)
             return NotFound();
 
-        return Ok(result);
-    }
+    return Ok(result);
+}
 
-    [HttpGet]
-    public async Task<IActionResult> Search([FromQuery] SearchArtistQuery query)
-    {
-        var result = await _mediator.Send(query);
-
-        return Ok(new
-        {
-            success = true,
-            data = result
-        });
-    }
 }

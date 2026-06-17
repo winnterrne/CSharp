@@ -1,27 +1,44 @@
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
 import NotificationItem from "./NotificationItem";
 import { notificationApi } from "../../api/notificationApi";
 import { notificationStore } from "../../store/notificationStore";
+import { mediaApi } from "../../api/mediaApi";
+import {
+  parseNotificationPayload,
+  type Notification,
+} from "../../types/notification";
+import { mapMediaItemDtoToMedia } from "../../types/media";
 
 type Props = {
   onClose?: () => void;
 };
 
 const NotificationList = ({ onClose }: Props) => {
+  const navigate = useNavigate();
+
   const notifications = notificationStore((s) => s.notifications);
+
   const unreadCount = notificationStore((s) => s.unreadCount);
+
   const isLoading = notificationStore((s) => s.isLoading);
 
   const setNotifications = notificationStore((s) => s.setNotifications);
+
   const setLoading = notificationStore((s) => s.setLoading);
-  const markAsRead = notificationStore((s) => s.markAsRead);
-  const markAllAsRead = notificationStore((s) => s.markAllAsRead);
+
+  const markAsReadStore = notificationStore((s) => s.markAsRead);
+
+  const markAllAsReadStore = notificationStore((s) => s.markAllAsRead);
 
   useEffect(() => {
     const loadNotifications = async () => {
       try {
         setLoading(true);
+
         const data = await notificationApi.getAll();
+
         setNotifications(data);
       } catch (error) {
         console.error("LOAD NOTIFICATIONS ERROR:", error);
@@ -33,25 +50,69 @@ const NotificationList = ({ onClose }: Props) => {
     loadNotifications();
   }, [setLoading, setNotifications]);
 
-  const handleRead = async (id: number) => {
-    const current = notifications.find((n) => n.id === id);
+  const markReadIfNeeded = async (notification: Notification) => {
+    if (notification.isRead) return;
 
-    if (!current || current.isRead) return;
-
-    // Cập nhật FE trước để badge trừ liền
-    markAsRead(id);
+    markAsReadStore(notification.id);
 
     try {
-      await notificationApi.markAsRead(id);
+      await notificationApi.markAsRead(notification.id);
     } catch (error) {
       console.error("MARK NOTIFICATION READ ERROR:", error);
+    }
+  };
+
+  const openTrackInMainContent = async (mediaItemID: number) => {
+    const res = await mediaApi.getById(String(mediaItemID));
+    const dto = res.data?.data ?? res.data;
+    const track = mapMediaItemDtoToMedia(dto);
+
+    // ✅ NOTIFICATION FLOW: lưu tạm để MainContent mở sau khi navigate("/")
+    sessionStorage.setItem(
+      "tunevault:pending-open-track",
+      JSON.stringify(track),
+    );
+
+    navigate("/");
+
+    setTimeout(() => {
+      window.dispatchEvent(
+        new CustomEvent("tunevault:open-track", {
+          detail: track,
+        }),
+      );
+    }, 80);
+  };
+  const handleOpenNotification = async (notification: Notification) => {
+    const data = parseNotificationPayload(notification.payload);
+
+    await markReadIfNeeded(notification);
+
+    const isShareSong =
+      notification.type === "share_song" ||
+      (notification.type === "share" && data.mediaItemID);
+
+    const isSharePlaylist =
+      notification.type === "share_playlist" ||
+      (notification.type === "share" && data.playlistID);
+
+    if (isShareSong && data.mediaItemID) {
+      await openTrackInMainContent(data.mediaItemID);
+      onClose?.();
+      return;
+    }
+
+    if (isSharePlaylist && data.playlistID) {
+      navigate(`/playlist/${data.playlistID}`);
+      onClose?.();
+      return;
     }
   };
 
   const handleMarkAllRead = async () => {
     if (unreadCount <= 0) return;
 
-    markAllAsRead();
+    markAllAsReadStore();
 
     try {
       await notificationApi.markAllAsRead();
@@ -61,12 +122,11 @@ const NotificationList = ({ onClose }: Props) => {
   };
 
   const sortedNotifications = [...notifications].sort((a, b) => {
-    if (a.isRead !== b.isRead) return a.isRead ? 1 : -1;
+    if (a.isRead !== b.isRead) {
+      return a.isRead ? 1 : -1;
+    }
 
-    return (
-      new Date(b.noticedAt).getTime() -
-      new Date(a.noticedAt).getTime()
-    );
+    return new Date(b.noticedAt).getTime() - new Date(a.noticedAt).getTime();
   });
 
   return (
@@ -75,8 +135,8 @@ const NotificationList = ({ onClose }: Props) => {
         position: "absolute",
         top: "46px",
         right: 0,
-        width: "380px",
-        maxHeight: "520px",
+        width: "390px",
+        maxHeight: "540px",
         background: "#181818",
         color: "#fff",
         borderRadius: "14px",
@@ -97,9 +157,7 @@ const NotificationList = ({ onClose }: Props) => {
         }}
       >
         <div>
-          <h3 style={{ margin: 0, fontSize: "18px" }}>
-            Thông báo
-          </h3>
+          <h3 style={{ margin: 0, fontSize: "18px" }}>Thông báo</h3>
 
           <p
             style={{
@@ -108,9 +166,9 @@ const NotificationList = ({ onClose }: Props) => {
               fontSize: "13px",
             }}
           >
-            {unreadCount > 0
-              ? `${unreadCount} thông báo chưa đọc`
-              : "Bạn đã đọc hết thông báo"}
+            {unreadCount > 0 ?
+              `${unreadCount} thông báo chưa đọc`
+            : "Bạn đã đọc hết thông báo"}
           </p>
         </div>
 
@@ -154,7 +212,7 @@ const NotificationList = ({ onClose }: Props) => {
       <div
         style={{
           padding: "10px",
-          maxHeight: "430px",
+          maxHeight: "450px",
           overflowY: "auto",
         }}
       >
@@ -181,7 +239,7 @@ const NotificationList = ({ onClose }: Props) => {
             <NotificationItem
               key={notification.id}
               notification={notification}
-              onRead={handleRead}
+              onOpen={handleOpenNotification}
             />
           ))}
       </div>

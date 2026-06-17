@@ -1,11 +1,11 @@
 import type { Notification } from "../../types/notification";
-import type { Media } from "../../types/media";
-import { useNavigate } from "react-router-dom";
+import {
+  parseNotificationPayload,
+} from "../../types/notification";
 
 type Props = {
   notification: Notification;
-  onRead: (id: number) => void;
-  mediaMap?: Record<string, Media>;
+  onOpen: (notification: Notification) => void;
 };
 
 const formatDate = (date: string) => {
@@ -18,58 +18,54 @@ const formatDate = (date: string) => {
   });
 };
 
-const parsePayload = (payload: string) => {
-  try {
-    return JSON.parse(payload);
-  } catch {
-    return null;
-  }
+const getIcon = (type: string) => {
+  if (type === "share_song") return "🎵";
+  if (type === "share_playlist") return "📃";
+  if (type === "follow") return "👤";
+  return "🔔";
 };
 
 const NotificationItem = ({
   notification,
-  onRead,
-  mediaMap = {},
+  onOpen,
 }: Props) => {
-  const navigate = useNavigate();
-  const data = parsePayload(notification.payload);
+  const data =
+    parseNotificationPayload(notification.payload);
 
-  const mediaId = data?.mediaItemID ? String(data.mediaItemID) : "";
-  const media = mediaId ? mediaMap[mediaId] : undefined;
+  const mainTitle =
+    data.mediaTitle ??
+    data.playlistName ??
+    data.followerName ??
+    notification.title;
 
-  const title =
-    data?.mediaTitle ??
-    media?.title ??
-    (mediaId ? `Bài hát #${mediaId}` : notification.payload);
-
-  const artist =
-    data?.artistName ??
-    media?.artist?.name ??
-    "";
+  const subTitle =
+    notification.type === "share_song"
+      ? data.artistName
+      : notification.type === "share_playlist"
+        ? `${data.trackCount ?? 0} bài hát`
+        : notification.type === "follow"
+          ? "Đã bắt đầu theo dõi bạn"
+          : "";
 
   const imageUrl =
-    data?.imageUrl ??
-    media?.thumbnailUrl ??
+    data.imageUrl ??
+    data.senderAvatar ??
+    data.followerAvatar ??
     "";
 
   return (
     <div
-      onClick={() => {
-        if (!notification.isRead) {
-          onRead(notification.id);
-        }
-
-        if (notification.type === "share" && mediaId) {
-          navigate(`/notifications?mediaId=${mediaId}`);
-        }
-      }}
+      // ✅ NOTIFICATION FLOW: click item mở track/playlist/follow
+      onClick={() => onOpen(notification)}
       style={{
         display: "grid",
-        gridTemplateColumns: "56px 1fr",
+        gridTemplateColumns: "56px 1fr 10px",
         gap: "14px",
         padding: "14px",
         borderRadius: "12px",
-        background: notification.isRead ? "transparent" : "#1f1f1f",
+        background: notification.isRead
+          ? "transparent"
+          : "#1f1f1f",
         cursor: "pointer",
       }}
     >
@@ -77,7 +73,8 @@ const NotificationItem = ({
         style={{
           width: "56px",
           height: "56px",
-          borderRadius: "8px",
+          borderRadius:
+            notification.type === "follow" ? "50%" : "8px",
           background: "#282828",
           overflow: "hidden",
           display: "flex",
@@ -85,12 +82,13 @@ const NotificationItem = ({
           justifyContent: "center",
           color: "#b3b3b3",
           fontSize: "24px",
+          flexShrink: 0,
         }}
       >
         {imageUrl ? (
           <img
             src={imageUrl}
-            alt={title}
+            alt={mainTitle}
             style={{
               width: "100%",
               height: "100%",
@@ -98,7 +96,7 @@ const NotificationItem = ({
             }}
           />
         ) : (
-          "🎵"
+          getIcon(notification.type)
         )}
       </div>
 
@@ -118,12 +116,15 @@ const NotificationItem = ({
             color: "#fff",
             fontSize: "15px",
             fontWeight: 800,
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
           }}
         >
-          {title}
+          {mainTitle}
         </div>
 
-        {artist && (
+        {subTitle && (
           <div
             style={{
               color: "#b3b3b3",
@@ -131,7 +132,7 @@ const NotificationItem = ({
               marginTop: "3px",
             }}
           >
-            {artist}
+            {subTitle}
           </div>
         )}
 
@@ -145,6 +146,18 @@ const NotificationItem = ({
           {formatDate(notification.noticedAt)}
         </div>
       </div>
+
+      {!notification.isRead && (
+        <div
+          style={{
+            width: "9px",
+            height: "9px",
+            borderRadius: "50%",
+            background: "#1DB954",
+            alignSelf: "center",
+          }}
+        />
+      )}
     </div>
   );
 };

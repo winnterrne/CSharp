@@ -1,39 +1,44 @@
 using System.Text.Json;
 using MediatR;
 using TuneVault.Application.DTOs;
+using TuneVault.Application.Interfaces;
 using TuneVault.Domain.Entities;
 using TuneVault.Domain.Interfaces;
-using TuneVault.Application.Interfaces;
 
 namespace TuneVault.Application.UseCases.Share;
 
-public class ShareMediaHandler : IRequestHandler<ShareMediaCommand, ShareMediaResponseDto>
+public class ShareMediaHandler
+    : IRequestHandler<ShareMediaCommand, ShareMediaResponseDto>
 {
     private readonly IShareRepository _shareRepo;
     private readonly INotificationRepository _notifRepo;
     private readonly IUserRepository _userRepo;
     private readonly INotificationPushService _pushService;
     private readonly IMediaItemRepository _mediaRepo;
+    private readonly IPlaylistRepository _playlistRepo;
 
     public ShareMediaHandler(
         IShareRepository shareRepo,
         INotificationRepository notifRepo,
         IUserRepository userRepo,
         INotificationPushService pushService,
-        IMediaItemRepository mediaRepo)
+        IMediaItemRepository mediaRepo,
+        IPlaylistRepository playlistRepo)
     {
         _shareRepo = shareRepo;
         _notifRepo = notifRepo;
         _userRepo = userRepo;
         _pushService = pushService;
         _mediaRepo = mediaRepo;
+        _playlistRepo = playlistRepo;
     }
 
     public async Task<ShareMediaResponseDto> Handle(
         ShareMediaCommand request,
         CancellationToken cancellationToken)
     {
-        var receiver = await _userRepo.GetUserByIdAsync(request.ReceiverID);
+        var receiver =
+            await _userRepo.GetUserByIdAsync(request.ReceiverID);
 
         if (receiver == null)
             throw new Exception("Người nhận không tồn tại");
@@ -44,11 +49,12 @@ public class ShareMediaHandler : IRequestHandler<ShareMediaCommand, ShareMediaRe
         if (request.MediaItemID != null && request.PlaylistID != null)
             throw new Exception("Chỉ được chia sẻ một loại nội dung");
 
-        var alreadyShared = await _shareRepo.AlreadySharedAsync(
-            request.SenderID,
-            request.ReceiverID,
-            request.MediaItemID,
-            request.PlaylistID);
+        var alreadyShared =
+            await _shareRepo.AlreadySharedAsync(
+                request.SenderID,
+                request.ReceiverID,
+                request.MediaItemID,
+                request.PlaylistID);
 
         if (alreadyShared)
             throw new Exception("Bạn đã chia sẻ nội dung này rồi");
@@ -63,46 +69,81 @@ public class ShareMediaHandler : IRequestHandler<ShareMediaCommand, ShareMediaRe
             SharedAt = DateTime.UtcNow
         };
 
-        var shareID = await _shareRepo.CreateShareMediaAsync(share);
+        var shareID =
+            await _shareRepo.CreateShareMediaAsync(share);
+
         share.ShareID = shareID;
 
-        var sender = await _userRepo.GetUserByIdAsync(request.SenderID);
+        var sender =
+            await _userRepo.GetUserByIdAsync(request.SenderID);
 
         TuneVault.Domain.Entities.MediaItem? media = null;
 
+        TuneVault.Domain.Entities.Playlist? playlist = null;
+        int playlistTrackCount = 0;
+
         if (request.MediaItemID.HasValue)
         {
-            media = await _mediaRepo.GetMediaByIdAsync(
-                request.MediaItemID.Value
-            );
+            media =
+                await _mediaRepo.GetMediaByIdAsync(
+                    request.MediaItemID.Value);
         }
 
-        var notification = new Domain.Entities.Notification
+        if (request.PlaylistID.HasValue)
         {
-            NotificationID = 0,
-            Title = $"{sender?.UserName ?? "Ai đó"} đã chia sẻ với bạn",
-            Type = "share",
-            Payload = JsonSerializer.Serialize(new
-            {
-                shareID = shareID,
-                senderName = sender?.UserName,
+            var playlistResult =
+                await _playlistRepo.GetPlaylistByIdAsync(
+                    request.PlaylistID.Value);
 
-                mediaItemID = request.MediaItemID,
-                mediaTitle = media?.TitleName,
-                artistName = media?.ArtistName,
-                imageUrl = media?.MediaItemImage,
+            playlist = playlistResult.Playlist;
+            playlistTrackCount = playlistResult.Songs.Count();
+        }
 
-                playlistID = request.PlaylistID
-            }),
-            IsRead = false,
-            UserID = request.ReceiverID
-        };
+        var isSong = request.MediaItemID.HasValue;
 
-        await _notifRepo.CreateNotificationAsync(notification);
+        // ✅ NOTIFICATION FLOW: phân loại rõ share_song / share_playlist
+        var notification =
+    new TuneVault.Domain.Entities.Notification
+    {
+        NotificationID = 0,
+        Title = isSong
+                ? $"{sender?.UserName ?? "Ai đó"} đã chia sẻ bài hát"
+                : $"{sender?.UserName ?? "Ai đó"} đã chia sẻ playlist",
+        Type = isSong ? "share_song" : "share_playlist",
+        Payload = JsonSerializer.Serialize(new
+        {
+            shareID,
+            senderID = request.SenderID,
+            senderName = sender?.UserName,
+            senderAvatar = sender?.UserImage,
 
+            targetType = isSong ? "song" : "playlist",
+
+            mediaItemID = request.MediaItemID,
+            mediaTitle = media?.TitleName,
+            artistName = media?.ArtistName,
+            imageUrl = media?.MediaItemImage,
+
+            playlistID = request.PlaylistID,
+            playlistName = playlist?.PlaylistName,
+            playlistDescription = playlist?.Description,
+            trackCount = playlistTrackCount
+        }),
+        IsRead = false,
+        UserID = request.ReceiverID,
+        NoticedAT = DateTime.UtcNow,
+        IsDeleted = false
+    };
+
+        var notificationID =
+            await _notifRepo.CreateNotificationAsync(notification);
+
+        notification.NotificationID = notificationID;
+
+        // ✅ NOTIFICATION FLOW: push realtime về FE
         await _pushService.SendNotificationAsync(
             request.ReceiverID,
-            notification.Title ?? "Bạn có thông báo mới"
+            notification
         );
 
         return new ShareMediaResponseDto(

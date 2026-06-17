@@ -30,6 +30,7 @@ public class GetMediaByUserHandler : IRequestHandler<GetMediaByUserQuery, IEnume
             media.Description,
             media.ArtistID,
             media.ArtistName,
+            media.ArtistImage,
             media.AlbumID,
             media.AlbumName,
             media.UserID,
