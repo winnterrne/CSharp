@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import type { Media } from "../../types/media";
 import { authStore } from "../../store/authStore";
-import { userApi } from "../../api/userApi";
+import { userApi, type UserSearchResult } from "../../api/userApi";
 import type { UserProfile } from "../../types/profile";
-import { useEffect } from "react";
 import { useHistoryStore } from "../../store/historyStore";
 import { PlayIcon } from "../common/icons";
+
 export interface HeaderUser {
   displayName: string;
   avatarUrl?: string;
@@ -29,9 +31,9 @@ export interface HeaderProps {
   onSelectTrack?: (track: Media) => void;
 }
 
-// Thêm helper format ngày
 const formatPlayedAt = (playedAt?: string) => {
   if (!playedAt) return "";
+
   const date = new Date(playedAt);
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
@@ -43,9 +45,21 @@ const formatPlayedAt = (playedAt?: string) => {
   if (diffMins < 60) return `${diffMins} phút trước`;
   if (diffHours < 24) return `${diffHours} giờ trước`;
   if (diffDays < 7) return `${diffDays} ngày trước`;
+
   return date.toLocaleDateString("vi-VN");
 };
 
+const buildUserImageUrl = (img?: string | null) => {
+  if (!img) return undefined;
+
+  if (img.startsWith("http")) return img;
+
+  if (img.startsWith("/")) return `http://localhost:5081${img}`;
+
+  if (img.includes("/")) return `http://localhost:5081/${img}`;
+
+  return `http://localhost:5081/media/images/users/${img}`;
+};
 
 const Header = ({
   searchValue,
@@ -62,8 +76,13 @@ const Header = ({
   onPlayTrack,
   onSelectTrack,
 }: HeaderProps) => {
+  const navigate = useNavigate();
+
   const [searchFocused, setSearchFocused] = useState(false);
   const [showAccountMenu, setShowAccountMenu] = useState(false);
+
+  const [userResults, setUserResults] = useState<UserSearchResult[]>([]);
+  const [userSearching, setUserSearching] = useState(false);
 
   const avatarInitial = user?.displayName?.charAt(0).toUpperCase() ?? "?";
   const avatarBg = user?.avatarColor ?? "#e91429";
@@ -73,7 +92,6 @@ const Header = ({
   const logout = authStore((state) => state.logout);
 
   const [profile, setProfile] = useState<UserProfile | null>(null);
-
   const [showProfileModal, setShowProfileModal] = useState(false);
 
   const [showRecentModal, setShowRecentModal] = useState(false);
@@ -94,6 +112,33 @@ const Header = ({
 
     loadProfile();
   }, [authUser?.id]);
+
+  useEffect(() => {
+    const value = searchValue.trim();
+
+    if (!value) {
+      setUserResults([]);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      try {
+        setUserSearching(true);
+
+        const res = await userApi.search(value);
+        const data = res.data?.data;
+
+        setUserResults(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error("HEADER SEARCH USER ERROR:", error);
+        setUserResults([]);
+      } finally {
+        setUserSearching(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchValue]);
 
   return (
     <header
@@ -129,7 +174,6 @@ const Header = ({
           maxWidth: "560px",
         }}
       >
-        {/* Home Button */}
         <button
           onClick={onHomeClick}
           title="Trang chủ"
@@ -160,9 +204,7 @@ const Header = ({
           </svg>
         </button>
 
-        {/* Search Wrapper */}
         <div style={{ position: "relative", flex: 1 }}>
-          {/* Search Bar */}
           <div
             style={{
               display: "flex",
@@ -203,7 +245,7 @@ const Header = ({
               value={searchValue}
               onChange={(e) => onSearchChange(e.target.value)}
               onFocus={() => setSearchFocused(true)}
-              onBlur={() => setTimeout(() => setSearchFocused(false), 150)}
+              onBlur={() => setTimeout(() => setSearchFocused(false), 180)}
               onKeyDown={(e) => {
                 if (e.key === "Enter") onSearch();
               }}
@@ -219,7 +261,6 @@ const Header = ({
             />
           </div>
 
-          {/* Search Dropdown */}
           {showDropdown && (
             <div
               style={{
@@ -236,7 +277,7 @@ const Header = ({
                 overflowY: "auto",
               }}
             >
-              {searchLoading && (
+              {(searchLoading || userSearching) && (
                 <div style={{ padding: "12px", color: "#b3b3b3" }}>
                   Đang tìm kiếm...
                 </div>
@@ -248,11 +289,15 @@ const Header = ({
                 </div>
               )}
 
-              {!searchLoading && !searchError && searchResults.length === 0 && (
-                <div style={{ padding: "12px", color: "#b3b3b3" }}>
-                  Không tìm thấy kết quả
-                </div>
-              )}
+              {!searchLoading &&
+                !userSearching &&
+                !searchError &&
+                searchResults.length === 0 &&
+                userResults.length === 0 && (
+                  <div style={{ padding: "12px", color: "#b3b3b3" }}>
+                    Không tìm thấy kết quả
+                  </div>
+                )}
 
               {!searchLoading &&
                 !searchError &&
@@ -279,7 +324,6 @@ const Header = ({
                       e.currentTarget.style.background = "transparent";
                     }}
                   >
-                    {/* Thumbnail */}
                     <div
                       style={{
                         width: "48px",
@@ -294,7 +338,7 @@ const Header = ({
                         fontSize: "20px",
                       }}
                     >
-                      {item.thumbnailUrl ?
+                      {item.thumbnailUrl ? (
                         <img
                           src={item.thumbnailUrl}
                           alt={item.title}
@@ -304,10 +348,13 @@ const Header = ({
                             objectFit: "cover",
                           }}
                         />
-                      : "🎵"}
+                      ) : item.type === "video" ? (
+                        "🎬"
+                      ) : (
+                        "🎵"
+                      )}
                     </div>
 
-                    {/* Info */}
                     <div style={{ flex: 1, overflow: "hidden" }}>
                       <div
                         style={{
@@ -320,6 +367,7 @@ const Header = ({
                       >
                         {item.title}
                       </div>
+
                       <div
                         style={{
                           color: "#b3b3b3",
@@ -329,16 +377,16 @@ const Header = ({
                           textOverflow: "ellipsis",
                         }}
                       >
-                        {item.type === "video" ? "Video" : "Bài hát"} • {item.artist.name}
+                        {item.type === "video" ? "Video" : "Bài hát"} •{" "}
+                        {item.artist?.name ?? "Unknown Artist"}
                       </div>
                     </div>
 
-                    {/* Play button */}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                          onPlayTrack?.(item);
-                          onSelectTrack?.(item);
+                        onPlayTrack?.(item);
+                        onSelectTrack?.(item);
                       }}
                       title="Phát"
                       style={{
@@ -356,10 +404,118 @@ const Header = ({
                         justifyContent: "center",
                       }}
                     >
-                      <PlayIcon/>
+                      <PlayIcon />
                     </button>
                   </div>
                 ))}
+
+              {userResults.length > 0 && (
+                <>
+                  <div
+                    style={{
+                      padding: "12px 8px 6px",
+                      color: "#b3b3b3",
+                      fontSize: "13px",
+                      fontWeight: 800,
+                    }}
+                  >
+                    Người dùng
+                  </div>
+
+                  {userResults.map((searchUser) => {
+                    const avatarUrl = buildUserImageUrl(searchUser.userImage);
+                    const initial =
+                      searchUser.userName?.trim().charAt(0).toUpperCase() ||
+                      "?";
+
+                    return (
+                      <div
+                        key={searchUser.userID}
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          setSearchFocused(false);
+                          navigate(`/profile/${searchUser.userID}`);
+                        }}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "12px",
+                          padding: "8px",
+                          borderRadius: "6px",
+                          cursor: "pointer",
+                          transition: "background 0.15s",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = "#3a3a3a";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = "transparent";
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: "48px",
+                            height: "48px",
+                            borderRadius: "50%",
+                            overflow: "hidden",
+                            flexShrink: 0,
+                            background: "#444",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            color: "#fff",
+                            fontSize: "18px",
+                            fontWeight: 900,
+                          }}
+                        >
+                          {avatarUrl ? (
+                            <img
+                              src={avatarUrl}
+                              alt={searchUser.userName}
+                              onError={(e) => {
+                                e.currentTarget.style.display = "none";
+                              }}
+                              style={{
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "cover",
+                              }}
+                            />
+                          ) : (
+                            initial
+                          )}
+                        </div>
+
+                        <div style={{ flex: 1, overflow: "hidden" }}>
+                          <div
+                            style={{
+                              color: "#fff",
+                              fontWeight: 700,
+                              whiteSpace: "nowrap",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                            }}
+                          >
+                            {searchUser.userName}
+                          </div>
+
+                          <div
+                            style={{
+                              color: "#b3b3b3",
+                              fontSize: "13px",
+                              whiteSpace: "nowrap",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                            }}
+                          >
+                            Người dùng • {searchUser.email}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </>
+              )}
             </div>
           )}
         </div>
@@ -386,7 +542,6 @@ const Header = ({
           </svg>
         </IconActionBtn>
 
-        {/* Avatar + Account Menu */}
         <div style={{ position: "relative" }}>
           <button
             onClick={() => setShowAccountMenu(!showAccountMenu)}
@@ -413,13 +568,15 @@ const Header = ({
             }
             onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
           >
-            {user?.avatarUrl ?
+            {user?.avatarUrl ? (
               <img
-                src={user.avatarUrl}
+                src={buildUserImageUrl(user.avatarUrl)}
                 alt={user.displayName}
                 style={{ width: "100%", height: "100%", objectFit: "cover" }}
               />
-            : avatarInitial}
+            ) : (
+              avatarInitial
+            )}
           </button>
 
           {showAccountMenu && (
@@ -443,6 +600,7 @@ const Header = ({
                   onAvatarClick?.();
                 }}
               />
+
               <MenuItem
                 label="Gần đây"
                 onClick={() => {
@@ -450,6 +608,7 @@ const Header = ({
                   setShowRecentModal(true);
                 }}
               />
+
               <div
                 style={{
                   height: "1px",
@@ -457,6 +616,7 @@ const Header = ({
                   margin: "4px 0",
                 }}
               />
+
               <MenuItem
                 label="Đăng xuất"
                 onClick={() => {
@@ -468,6 +628,7 @@ const Header = ({
           )}
         </div>
       </div>
+
       {showProfileModal && profile && (
         <div
           onClick={() => setShowProfileModal(false)}
@@ -491,20 +652,11 @@ const Header = ({
               color: "#fff",
             }}
           >
-            <h2
-              style={{
-                marginBottom: "24px",
-              }}
-            >
-              Hồ sơ cá nhân
-            </h2>
+            <h2 style={{ marginBottom: "24px" }}>Hồ sơ cá nhân</h2>
 
             <ProfileRow label="Tên" value={profile.userName} />
-
             <ProfileRow label="Email" value={profile.email} />
-
             <ProfileRow label="Vai trò" value={profile.role} />
-
             <ProfileRow
               label="Số điện thoại"
               value={profile.phone ?? "Chưa cập nhật"}
@@ -593,156 +745,189 @@ const Header = ({
             </button>
           </div>
         </div>
-        )}
-      </header>
-    );
-  };
+      )}
+    </header>
+  );
+};
 
-  // ─── Sub-components ────────────────────────────────────────────────────────────
-  const IconActionBtn = ({
-    children,
-    title,
-    onClick,
-  }: {
-    children: React.ReactNode;
-    title?: string;
-    onClick?: () => void;
-  }) => (
-    <button
-      title={title}
-      onClick={onClick}
+const IconActionBtn = ({
+  children,
+  title,
+  onClick,
+}: {
+  children: React.ReactNode;
+  title?: string;
+  onClick?: () => void;
+}) => (
+  <button
+    title={title}
+    onClick={onClick}
+    style={{
+      background: "transparent",
+      border: "none",
+      borderRadius: "50%",
+      width: "36px",
+      height: "36px",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      cursor: "pointer",
+      color: "#b3b3b3",
+      transition: "color 0.2s",
+    }}
+    onMouseEnter={(e) => (e.currentTarget.style.color = "#fff")}
+    onMouseLeave={(e) => (e.currentTarget.style.color = "#b3b3b3")}
+  >
+    {children}
+  </button>
+);
+
+const MenuItem = ({
+  label,
+  onClick,
+}: {
+  label: string;
+  onClick?: () => void;
+}) => (
+  <button
+    onClick={onClick}
+    style={{
+      width: "100%",
+      background: "transparent",
+      border: "none",
+      color: "#fff",
+      padding: "12px",
+      textAlign: "left",
+      borderRadius: "4px",
+      cursor: "pointer",
+      fontSize: "14px",
+      fontWeight: 600,
+    }}
+    onMouseEnter={(e) => (e.currentTarget.style.background = "#3e3e3e")}
+    onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+  >
+    {label}
+  </button>
+);
+
+const ProfileRow = ({ label, value }: { label: string; value: string }) => (
+  <div
+    style={{
+      display: "flex",
+      justifyContent: "space-between",
+      padding: "12px 0",
+      borderBottom: "1px solid #2f2f2f",
+    }}
+  >
+    <span style={{ color: "#b3b3b3" }}>{label}</span>
+    <span>{value}</span>
+  </div>
+);
+
+const RecentTrackRow = ({
+  track,
+  onPlay,
+}: {
+  track: Media;
+  onPlay: (track: Media) => void;
+}) => {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       style={{
-        background: "transparent",
-        border: "none",
-        borderRadius: "50%",
-        width: "36px",
-        height: "36px",
         display: "flex",
         alignItems: "center",
-        justifyContent: "center",
+        gap: "12px",
+        padding: "10px 8px",
+        borderRadius: "8px",
+        background: hovered ? "#2a2a2a" : "transparent",
         cursor: "pointer",
-        color: "#b3b3b3",
-        transition: "color 0.2s",
-      }}
-      onMouseEnter={(e) => (e.currentTarget.style.color = "#fff")}
-      onMouseLeave={(e) => (e.currentTarget.style.color = "#b3b3b3")}
-    >
-      {children}
-    </button>
-  );
-
-  const MenuItem = ({
-    label,
-    onClick,
-  }: {
-    label: string;
-    onClick?: () => void;
-  }) => (
-    <button
-      onClick={onClick}
-      style={{
-        width: "100%",
-        background: "transparent",
-        border: "none",
-        color: "#fff",
-        padding: "12px",
-        textAlign: "left",
-        borderRadius: "4px",
-        cursor: "pointer",
-        fontSize: "14px",
-        fontWeight: 600,
-      }}
-      onMouseEnter={(e) => (e.currentTarget.style.background = "#3e3e3e")}
-      onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-    >
-      {label}
-    </button>
-  );
-  const ProfileRow = ({ label, value }: { label: string; value: string }) => (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        padding: "12px 0",
-        borderBottom: "1px solid #2f2f2f",
       }}
     >
-      <span
-        style={{
-          color: "#b3b3b3",
-        }}
-      >
-        {label}
-      </span>
-
-      <span>{value}</span>
-    </div>
-  );
-
-  const RecentTrackRow = ({
-      track,
-      onPlay,
-    }: {
-      track: Media;
-    onPlay: (track: Media) => void;
-  }) => {
-    const [hovered, setHovered] = useState(false);
-
-    return (
       <div
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
         style={{
+          width: "44px",
+          height: "44px",
+          borderRadius: "6px",
+          overflow: "hidden",
+          flexShrink: 0,
+          background: "#282828",
           display: "flex",
           alignItems: "center",
-          gap: "12px",
-          padding: "10px 8px",
-          borderRadius: "8px",
-          background: hovered ? "#2a2a2a" : "transparent",
-          cursor: "pointer",
+          justifyContent: "center",
+          color: "#b3b3b3",
         }}
       >
-        <div style={{
-          width: "44px", height: "44px", borderRadius: "6px",
-          overflow: "hidden", flexShrink: 0, background: "#282828",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          color: "#b3b3b3",
-        }}>
-          {track.thumbnailUrl ? (
-            <img src={track.thumbnailUrl} alt={track.title}
-              style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-          ) : "🎵"}
-        </div>
+        {track.thumbnailUrl ? (
+          <img
+            src={track.thumbnailUrl}
+            alt={track.title}
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          />
+        ) : (
+          "🎵"
+        )}
+      </div>
 
-        <div style={{ minWidth: 0, flex: 1 }}>
-          <div style={{
-            color: "#fff", fontWeight: 700, fontSize: "14px",
-            whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
-          }}>
-            {track.title}
-          </div>
-          <div style={{ color: "#b3b3b3", fontSize: "13px", marginTop: "3px", display: "flex", gap: "8px" }}>
-            <span>{track.artist?.name ?? "Unknown Artist"}</span>
-            {track.playedAt && <><span>•</span><span>{formatPlayedAt(track.playedAt)}</span></>}
-          </div>
-        </div>
-
-        {/* Nút play hiện khi hover row */}
-        <button
-          onClick={() => onPlay(track)}
-          title="Phát"
+      <div style={{ minWidth: 0, flex: 1 }}>
+        <div
           style={{
-            width: "36px", height: "36px", borderRadius: "50%",
-            border: "none", background: "#1DB954", color: "#000",
-            cursor: "pointer", display: "flex", alignItems: "center",
-            justifyContent: "center", flexShrink: 0,
-            opacity: hovered ? 1 : 0,
-            transition: "opacity .15s",
+            color: "#fff",
+            fontWeight: 700,
+            fontSize: "14px",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
           }}
         >
-          <PlayIcon />
-        </button>
+          {track.title}
+        </div>
+
+        <div
+          style={{
+            color: "#b3b3b3",
+            fontSize: "13px",
+            marginTop: "3px",
+            display: "flex",
+            gap: "8px",
+          }}
+        >
+          <span>{track.artist?.name ?? "Unknown Artist"}</span>
+          {track.playedAt && (
+            <>
+              <span>•</span>
+              <span>{formatPlayedAt(track.playedAt)}</span>
+            </>
+          )}
+        </div>
       </div>
-    );
-  };
+
+      <button
+        onClick={() => onPlay(track)}
+        title="Phát"
+        style={{
+          width: "36px",
+          height: "36px",
+          borderRadius: "50%",
+          border: "none",
+          background: "#1DB954",
+          color: "#000",
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexShrink: 0,
+          opacity: hovered ? 1 : 0,
+          transition: "opacity .15s",
+        }}
+      >
+        <PlayIcon />
+      </button>
+    </div>
+  );
+};
+
 export default Header;

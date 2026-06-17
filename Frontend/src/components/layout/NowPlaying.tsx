@@ -12,19 +12,17 @@ const formatDuration = (seconds: number) => {
 interface NowPlayingProps {
   isCollapsed: boolean;
   onToggleCollapse: () => void;
+
+  // Giữ prop này để MainLayout có truyền vào cũng không bị lỗi.
+  // Nhưng trong kiểu Spotify thì không cần dùng nó, vì PlayerBar vẫn hiện.
+  onFullscreenChange?: (open: boolean) => void;
 }
 
 const NowPlaying = ({
   isCollapsed,
   onToggleCollapse,
 }: NowPlayingProps) => {
-  const {
-    currentTrack,
-    queue,
-    playTrack,
-    isPlaying,
-    position,
-  } = usePlayer();
+  const { currentTrack, queue, playTrack, isPlaying, position } = usePlayer();
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const modalVideoRef = useRef<HTMLVideoElement>(null);
@@ -36,7 +34,15 @@ const NowPlaying = ({
 
   const isVideo = currentTrack?.type === "video";
 
-  // Load video bằng blob vì API stream của bạn cần Authorization token
+  const openVideoTheater = () => {
+    setIsVideoOpen(true);
+  };
+
+  const closeVideoTheater = () => {
+    setIsVideoOpen(false);
+  };
+
+  // Load video bằng blob vì API stream cần Authorization token
   useEffect(() => {
     if (!currentTrack || !isVideo) {
       setVideoBlobUrl("");
@@ -88,7 +94,7 @@ const NowPlaying = ({
     };
   }, [currentTrack?.id, currentTrack?.url, isVideo]);
 
-  // Khi đổi blob video thì gắn vào video nhỏ
+  // Gắn blob vào video nhỏ
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !videoBlobUrl) return;
@@ -111,7 +117,7 @@ const NowPlaying = ({
     }
   }, [isPlaying, videoBlobUrl, isVideo]);
 
-  // Đồng bộ thời gian video nhỏ theo position của player
+  // Tua video nhỏ theo position của PlayerBar
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !videoBlobUrl || !isVideo) return;
@@ -121,7 +127,7 @@ const NowPlaying = ({
     }
   }, [position, videoBlobUrl, isVideo]);
 
-  // Khi mở modal thì sync modal video theo player
+  // Khi mở theater video thì sync thời gian theo player
   useEffect(() => {
     const video = modalVideoRef.current;
     if (!video || !videoBlobUrl || !isVideoOpen) return;
@@ -133,9 +139,9 @@ const NowPlaying = ({
     } else {
       video.pause();
     }
-  }, [isVideoOpen, videoBlobUrl]);
+  }, [isVideoOpen, videoBlobUrl, position, isPlaying]);
 
-  // Modal cũng play / pause theo player
+  // Play / pause theater video theo PlayerBar
   useEffect(() => {
     const video = modalVideoRef.current;
     if (!video || !isVideoOpen || !videoBlobUrl) return;
@@ -147,7 +153,7 @@ const NowPlaying = ({
     }
   }, [isPlaying, isVideoOpen, videoBlobUrl]);
 
-  // Modal cũng tua theo player
+  // Tua theater video theo PlayerBar
   useEffect(() => {
     const video = modalVideoRef.current;
     if (!video || !isVideoOpen || !videoBlobUrl) return;
@@ -288,8 +294,8 @@ const NowPlaying = ({
         <div style={{ padding: "16px" }}>
           {isVideo && videoBlobUrl ? (
             <div
-              onClick={() => setIsVideoOpen(true)}
-              title="Bấm để phóng to video"
+              onClick={openVideoTheater}
+              title="Bấm để mở video"
               style={{
                 width: "100%",
                 borderRadius: "12px",
@@ -326,7 +332,7 @@ const NowPlaying = ({
                   pointerEvents: "none",
                 }}
               >
-                ⛶ Phóng to
+                ⛶ Mở video
               </div>
             </div>
           ) : currentTrack.thumbnailUrl ? (
@@ -462,7 +468,7 @@ const NowPlaying = ({
                         justifyContent: "center",
                       }}
                     >
-                      🎵
+                      {track.type === "video" ? "🎬" : "🎵"}
                     </div>
                   )}
 
@@ -495,66 +501,108 @@ const NowPlaying = ({
         </div>
       </aside>
 
-      {/* Modal phóng to video */}
+      {/* Theater video: phủ app nhưng chừa PlayerBar 90px ở dưới */}
       {isVideoOpen && isVideo && videoBlobUrl && (
         <div
-          onClick={() => setIsVideoOpen(false)}
           style={{
             position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.88)",
-            zIndex: 9999,
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: "90px",
+            background: "#000",
+
+            // PlayerBar đang zIndex 200, nên modal để 150 để PlayerBar nổi lên trên.
+            zIndex: 150,
+
             display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "24px",
+            flexDirection: "column",
+            overflow: "hidden",
           }}
         >
+          {/* Header trên video */}
           <div
-            onClick={(e) => e.stopPropagation()}
             style={{
-              width: "min(1100px, 95vw)",
-              background: "#121212",
-              borderRadius: "14px",
-              overflow: "hidden",
-              position: "relative",
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              height: "86px",
+              zIndex: 3,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "0 34px",
+              boxSizing: "border-box",
+              background:
+                "linear-gradient(180deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0) 100%)",
             }}
           >
-            <button
-              onClick={() => setIsVideoOpen(false)}
+            <div
               style={{
-                position: "absolute",
-                top: "12px",
-                right: "12px",
-                zIndex: 2,
-                width: "34px",
-                height: "34px",
-                borderRadius: "50%",
-                border: "none",
-                background: "rgba(0,0,0,0.7)",
                 color: "#fff",
-                cursor: "pointer",
-                fontSize: "18px",
+                fontSize: "22px",
+                fontWeight: 800,
+                maxWidth: "60%",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
               }}
             >
-              ✕
-            </button>
+              {currentTrack.title}
+            </div>
 
-            <video
-              ref={modalVideoRef}
-              src={videoBlobUrl}
-              poster={currentTrack.thumbnailUrl}
-              controls
-              muted
-              playsInline
+            <button
+              onClick={closeVideoTheater}
+              title="Đóng video"
               style={{
-                width: "100%",
-                maxHeight: "80vh",
-                background: "#000",
-                display: "block",
+                width: "44px",
+                height: "44px",
+                borderRadius: "50%",
+                border: "none",
+                background: "rgba(0,0,0,0.45)",
+                color: "#fff",
+                cursor: "pointer",
+                fontSize: "34px",
+                lineHeight: "44px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
               }}
-            />
+            >
+              ×
+            </button>
           </div>
+
+          {/* Video chính, không controls mặc định */}
+          <video
+            ref={modalVideoRef}
+            src={videoBlobUrl}
+            poster={currentTrack.thumbnailUrl}
+            muted
+            playsInline
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "contain",
+              background: "#000",
+              display: "block",
+            }}
+          />
+
+          {/* Lớp tối nhẹ dưới đáy */}
+          <div
+            style={{
+              position: "absolute",
+              left: 0,
+              right: 0,
+              bottom: 0,
+              height: "120px",
+              pointerEvents: "none",
+              background:
+                "linear-gradient(0deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0) 100%)",
+            }}
+          />
         </div>
       )}
     </>

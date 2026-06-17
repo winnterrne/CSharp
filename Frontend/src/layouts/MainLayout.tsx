@@ -264,25 +264,25 @@ const MainLayout = ({ children }: { children: ReactNode }) => {
       </div>
 
       <div style={{ flexShrink: 0 }}>
-        <PlayerBar
-          currentTrack={currentTrack}
-          isPlaying={isPlaying}
-          position={position}
-          duration={duration}
-          volume={volume}
-          isShuffle={isShuffle}
-          repeatMode={repeatMode}
-          isMuted={isMuted}
-          onTogglePlay={togglePlay}
-          onPrev={previous}
-          onNext={next}
-          onSeek={seek}
-          onVolumeChange={setVolume}
-          onToggleShuffle={toggleShuffle}
-          onToggleRepeatMode={toggleRepeatMode}
-          onToggleMuted={() => setMuted(!isMuted)}
-        />
-      </div>
+      <PlayerBar
+        currentTrack={currentTrack}
+        isPlaying={isPlaying}
+        position={position}
+        duration={duration}
+        volume={volume}
+        isShuffle={isShuffle}
+        repeatMode={repeatMode}
+        isMuted={isMuted}
+        onTogglePlay={togglePlay}
+        onPrev={previous}
+        onNext={next}
+        onSeek={seek}
+        onVolumeChange={setVolume}
+        onToggleShuffle={toggleShuffle}
+        onToggleRepeatMode={toggleRepeatMode}
+        onToggleMuted={() => setMuted(!isMuted)}
+      />
+    </div>
     </div>
   );
 };

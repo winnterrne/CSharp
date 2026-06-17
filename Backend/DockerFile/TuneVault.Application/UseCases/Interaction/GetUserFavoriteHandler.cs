@@ -18,6 +18,8 @@ public class GetUserFavoriteHandler : IRequestHandler<GetUserFavoriteQuery, IEnu
             x.MediaItemID,
             x.TitleName,
             x.MediaItemImage,
+            x.MediaItemTag,
+            x.Duration,
             x.ArtistID,
             x.ArtistName
         ));

@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import type { Media } from "../../types/media";
 import type { RepeatMode } from "../../types/player";
 import { useFavorite } from "../../hooks/useFavorite";
@@ -207,6 +208,7 @@ const PlayerBar = ({
   onToggleRepeatMode,
   onToggleMuted,
 }: PlayerBarProps) => {
+  const navigate = useNavigate();
   const safeDuration = duration || currentTrack?.duration || 0;
   const { isFavorite, toggleFavorite } = useFavorite();
 
@@ -215,7 +217,15 @@ const PlayerBar = ({
     safeDuration > 0 ? Math.min((position / safeDuration) * 100, 100) : 0;
 
   const artistName = currentTrack?.artist?.name ?? "";
+  const handleOpenCurrentTrack = () => {
+    if (!currentTrack) return;
 
+    navigate(`/track/${currentTrack.id}`, {
+      state: {
+        track: currentTrack,
+      },
+    });
+  };
   const handleSeekPercent = (percent: number) => {
     if (!safeDuration) return;
 
@@ -289,20 +299,36 @@ const PlayerBar = ({
         </div>
 
         <div style={{ minWidth: 0 }}>
-          <div
+          <button
+            onClick={handleOpenCurrentTrack}
+            disabled={!currentTrack}
+            title={currentTrack?.title ?? "Chưa phát bài nào"}
             style={{
+              display: "block",
+              maxWidth: "220px",
+              padding: 0,
+              margin: 0,
+              border: "none",
+              background: "transparent",
               color: currentTrack ? "#fff" : "#6b6b6b",
               fontSize: "14px",
               fontWeight: 600,
               whiteSpace: "nowrap",
               overflow: "hidden",
               textOverflow: "ellipsis",
-              maxWidth: "220px",
+              cursor: currentTrack ? "pointer" : "default",
+              textAlign: "left",
             }}
-            title={currentTrack?.title ?? "Chưa phát bài nào"}
+            onMouseEnter={(e) => {
+              if (!currentTrack) return;
+              e.currentTarget.style.textDecoration = "underline";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.textDecoration = "none";
+            }}
           >
             {currentTrack?.title ?? "Chưa phát bài nào"}
-          </div>
+          </button>
 
           <div
             style={{

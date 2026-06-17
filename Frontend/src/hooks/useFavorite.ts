@@ -9,9 +9,40 @@ type FavoriteMediaShape = {
   mediaItemID?: number;
   mediaItemId?: number;
   id?: number;
+
   titleName?: string;
+  title?: string;
+
   mediaItemImage?: string;
+  thumbnailUrl?: string;
+  imageUrl?: string;
+  coverUrl?: string;
+
+  artistID?: number;
+  artistId?: number;
   artistName?: string;
+  ArtistName?: string;
+
+  mediaItemTag?: string;
+  MediaItemTag?: string;
+  genre?: string;
+  Genre?: string;
+  category?: string;
+  categoryName?: string;
+
+  mediaItemType?: string;
+  MediaItemType?: string;
+  type?: string;
+
+  duration?: number;
+  Duration?: number;
+
+  albumID?: number;
+  albumId?: number;
+  albumName?: string;
+
+  uploadAT?: string;
+  createdAt?: string;
 };
 
 type FavoriteResponse = {
@@ -28,23 +59,68 @@ const getIdFromFavorite = (item: FavoriteMediaShape): string => {
   return String(item.mediaItemID ?? item.mediaItemId ?? item.id ?? "");
 };
 
+const getTitleFromFavorite = (item: FavoriteMediaShape): string => {
+  return item.titleName ?? item.title ?? "Bài hát yêu thích";
+};
+
+const getImageFromFavorite = (item: FavoriteMediaShape) => {
+  return (
+    item.mediaItemImage ??
+    item.thumbnailUrl ??
+    item.imageUrl ??
+    item.coverUrl
+  );
+};
+
+const getArtistNameFromFavorite = (item: FavoriteMediaShape): string => {
+  return item.artistName ?? item.ArtistName ?? "Unknown Artist";
+};
+
+const getGenreFromFavorite = (item: FavoriteMediaShape): string | undefined => {
+  return (
+    item.mediaItemTag ??
+    item.MediaItemTag ??
+    item.genre ??
+    item.Genre ??
+    item.category ??
+    item.categoryName ??
+    undefined
+  );
+};
+
+const getTypeFromFavorite = (item: FavoriteMediaShape): "audio" | "video" => {
+  const rawType = item.mediaItemType ?? item.MediaItemType ?? item.type ?? "audio";
+
+  return rawType.toLowerCase() === "video" ? "video" : "audio";
+};
+
+const getDurationFromFavorite = (item: FavoriteMediaShape): number => {
+  return item.duration ?? item.Duration ?? 0;
+};
+
 const toMedia = (item: FavoriteMediaShape): Media => {
   const id = getIdFromFavorite(item);
 
   return {
     id,
-    title: item.titleName ?? "Bài hát yêu thích",
+    title: getTitleFromFavorite(item),
     description: "",
-    type: "audio",
+    type: getTypeFromFavorite(item),
     status: "published",
     url: `http://localhost:5081/api/media/${id}/stream`,
-    thumbnailUrl: buildImageUrl(item.mediaItemImage),
-    duration: 0,
+    thumbnailUrl: buildImageUrl(getImageFromFavorite(item)),
+    duration: getDurationFromFavorite(item),
     artist: {
-      id: 0,
-      name: item.artistName ?? "Unknown Artist",
+      id: item.artistID ?? item.artistId ?? 0,
+      name: getArtistNameFromFavorite(item),
     },
-    createdAt: new Date().toISOString(),
+
+    // FIX thể loại favorite bị Unknown
+    genre: getGenreFromFavorite(item),
+
+    albumId: item.albumID ?? item.albumId,
+    albumName: item.albumName,
+    createdAt: item.uploadAT ?? item.createdAt ?? new Date().toISOString(),
   };
 };
 
@@ -56,6 +132,8 @@ const parseFavorites = (responseData: unknown) => {
     : Array.isArray(body.data)
       ? body.data
       : [];
+
+  console.log("FAVORITE RAW DATA:", rawData);
 
   const validItems = rawData.filter(
     (item) => getIdFromFavorite(item).length > 0,
@@ -103,6 +181,9 @@ export const useFavorite = () => {
       setLoading(true);
 
       const res = await favoriteApi.getFavorites();
+
+      console.log("FAVORITE API DATA:", res.data);
+
       const parsed = parseFavorites(res.data);
 
       syncFavorites(parsed.ids, parsed.tracks);

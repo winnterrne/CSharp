@@ -1,10 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+
 import { useSearch } from "../../hooks/useSearch";
 import SearchTopResult from "./SearchTopResult";
 import SearchResultCard from "./SearchResultCard";
+import SearchUserSection from "./SearchUserSection";
 
-type SearchFilter = "all" | "song" | "artist" | "album";
+import { userApi, type UserSearchResult } from "../../api/userApi";
+
+type SearchFilter = "all" | "song" | "artist" | "album" | "user";
 
 const tabs: {
   key: SearchFilter;
@@ -14,25 +18,66 @@ const tabs: {
   { key: "song", label: "Bài hát" },
   { key: "artist", label: "Nghệ sĩ" },
   { key: "album", label: "Album" },
+  { key: "user", label: "Người dùng" },
 ];
 
 const SearchPage = () => {
   const [params] = useSearchParams();
   const query = params.get("q") ?? "";
 
-  // NEW: filter tab cho kết quả tìm kiếm
   const [filter, setFilter] = useState<SearchFilter>("all");
 
-  // FIX: chỉ gọi useSearch 1 lần
   const { search, searchResults, isLoading, error } = useSearch();
 
+  const [users, setUsers] = useState<UserSearchResult[]>([]);
+  const [userLoading, setUserLoading] = useState(false);
+  const [userError, setUserError] = useState("");
+
   useEffect(() => {
-    if (query.trim()) {
-      search(query);
+    if (!query.trim()) {
+      setUsers([]);
+      setUserError("");
+      return;
     }
+
+    search(query);
+
+    const loadUsers = async () => {
+      try {
+        setUserLoading(true);
+        setUserError("");
+
+        const res = await userApi.search(query);
+
+        console.log("SEARCH USER RESPONSE:", res.data);
+
+        const body = res.data as any;
+
+        const data =
+          Array.isArray(body) ? body :
+          Array.isArray(body?.data) ? body.data :
+          Array.isArray(body?.data?.items) ? body.data.items :
+          Array.isArray(body?.items) ? body.items :
+          [];
+
+        console.log("SEARCH USER DATA:", data);
+
+        setUsers(data);
+      } catch (err: any) {
+        console.error("SEARCH USER ERROR:", err);
+        console.error("STATUS:", err.response?.status);
+        console.error("DATA:", err.response?.data);
+
+        setUsers([]);
+        setUserError("Không tìm được người dùng.");
+      } finally {
+        setUserLoading(false);
+      }
+    };
+
+    loadUsers();
   }, [query, search]);
 
-  // NEW: lọc kết quả theo type
   const filteredResults = useMemo(() => {
     if (filter === "all") return searchResults;
 
@@ -49,7 +94,16 @@ const SearchPage = () => {
     });
   }, [filter, searchResults]);
 
-  const hasResults = filteredResults.length > 0;
+  const showMediaSection = filter === "all" || filter !== "user";
+  const showUserSection = filter === "all" || filter === "user";
+
+  const hasMediaResults = filteredResults.length > 0;
+  const hasUserResults = users.length > 0;
+
+  const hasAnyResult =
+    filter === "user" ? hasUserResults
+    : filter === "all" ? hasMediaResults || hasUserResults
+    : hasMediaResults;
 
   return (
     <main
@@ -64,7 +118,6 @@ const SearchPage = () => {
         background: "linear-gradient(180deg, #181818 0%, #121212 280px)",
       }}
     >
-      {/* HEADER */}
       <h1
         style={{
           fontSize: "32px",
@@ -74,7 +127,6 @@ const SearchPage = () => {
         {query.trim() ? `Kết quả cho "${query}"` : "Tìm kiếm"}
       </h1>
 
-      {/* NEW: FILTER TABS */}
       <div
         style={{
           display: "flex",
@@ -103,8 +155,7 @@ const SearchPage = () => {
         ))}
       </div>
 
-      {/* LOADING */}
-      {isLoading && (
+      {(isLoading || userLoading) && (
         <p
           style={{
             color: "#b3b3b3",
@@ -114,7 +165,6 @@ const SearchPage = () => {
         </p>
       )}
 
-      {/* ERROR */}
       {error && (
         <p
           style={{
@@ -125,8 +175,17 @@ const SearchPage = () => {
         </p>
       )}
 
-      {/* EMPTY */}
-      {!isLoading && query.trim() && !hasResults && (
+      {userError && filter === "user" && (
+        <p
+          style={{
+            color: "#ff4d4f",
+          }}
+        >
+          {userError}
+        </p>
+      )}
+
+      {!isLoading && !userLoading && query.trim() && !hasAnyResult && (
         <div
           style={{
             color: "#b3b3b3",
@@ -137,40 +196,42 @@ const SearchPage = () => {
         </div>
       )}
 
-      {/* RESULT */}
-      {!isLoading && hasResults && (
+      {!isLoading && !userLoading && hasAnyResult && (
         <>
-          {/* TOP RESULT: chỉ hiện khi tab tất cả */}
-          {filter === "all" && (
+          {filter === "all" && hasMediaResults && (
             <section style={{ marginBottom: "36px" }}>
               <SearchTopResult item={filteredResults[0]} />
             </section>
           )}
 
-          {/* SONG LIST */}
-          <section>
-            <h2
-              style={{
-                fontSize: "24px",
-                marginBottom: "16px",
-              }}
-            >
-              {filter === "all" ?
-                "Bài hát"
-              : tabs.find((t) => t.key === filter)?.label}
-            </h2>
+          {showMediaSection && hasMediaResults && (
+            <section style={{ marginBottom: "38px" }}>
+              <h2
+                style={{
+                  fontSize: "24px",
+                  marginBottom: "16px",
+                }}
+              >
+                {filter === "all" ?
+                  "Bài hát"
+                : tabs.find((t) => t.key === filter)?.label}
+              </h2>
 
-            <div
-              style={{
-                display: "grid",
-                gap: "10px",
-              }}
-            >
-              {filteredResults.map((item) => (
-                <SearchResultCard key={item.id} item={item} />
-              ))}
-            </div>
-          </section>
+              <div
+                style={{
+                  display: "grid",
+                  gap: "10px",
+                }}
+              >
+                {filteredResults.map((item) => (
+                  <SearchResultCard key={item.id} item={item} />
+                ))}
+              </div>
+            </section>
+          )}
+        {showUserSection && hasUserResults && (
+          <SearchUserSection users={users} />
+        )}
         </>
       )}
     </main>
