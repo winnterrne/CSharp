@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import type { UserSearchResult } from "../../api/userApi";
 
 const buildUserImageUrl = (img?: string | null) => {
@@ -11,29 +13,27 @@ const buildUserImageUrl = (img?: string | null) => {
 
   return `http://localhost:5081/media/images/users/${img}`;
 };
-const SearchUserCard = ({ user }: { user: UserSearchResult }) => {
-  const avatarUrl = buildUserImageUrl(user.userImage);
-  const initial = user.userName?.trim().charAt(0).toUpperCase() || "?";
 
-  return (
-    <div
-      style={{
-        background: "#181818",
-        borderRadius: "12px",
-        padding: "16px",
-        display: "flex",
-        alignItems: "center",
-        gap: "12px",
-        border: "1px solid #242424",
-      }}
-    >
+const UserAvatar = ({
+  userName,
+  userImage,
+}: {
+  userName: string;
+  userImage?: string | null;
+}) => {
+  const [imageError, setImageError] = useState(false);
+
+  const avatarUrl = buildUserImageUrl(userImage);
+  const initial = userName?.trim().charAt(0).toUpperCase() || "?";
+
+  if (!avatarUrl || imageError) {
+    return (
       <div
         style={{
           width: "54px",
           height: "54px",
           borderRadius: "50%",
-          overflow: "hidden",
-          background: "#333",
+          background: "linear-gradient(135deg, #444, #242424)",
           flexShrink: 0,
           display: "flex",
           alignItems: "center",
@@ -43,23 +43,70 @@ const SearchUserCard = ({ user }: { user: UserSearchResult }) => {
           fontSize: "20px",
         }}
       >
-        {avatarUrl ? (
-          <img
-            src={avatarUrl}
-            alt={user.userName}
-            onError={(e) => {
-              e.currentTarget.style.display = "none";
-            }}
-            style={{
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-            }}
-          />
-        ) : (
-          initial
-        )}
+        {initial}
       </div>
+    );
+  }
+
+  return (
+    <img
+      src={avatarUrl}
+      alt={userName}
+      onError={() => setImageError(true)}
+      style={{
+        width: "54px",
+        height: "54px",
+        borderRadius: "50%",
+        objectFit: "cover",
+        flexShrink: 0,
+        background: "#333",
+      }}
+    />
+  );
+};
+
+const SearchUserCard = ({ user }: { user: UserSearchResult }) => {
+  const navigate = useNavigate();
+
+  const userId = user.userID;
+  const userName = user.userName ?? "Unknown User";
+
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        console.log("CLICK SEARCH USER:", user);
+
+        if (!userId) {
+          console.log("USER ID RỖNG");
+          return;
+        }
+
+        navigate(`/profile/${userId}`);
+      }}
+      style={{
+        width: "100%",
+        background: "#181818",
+        borderRadius: "12px",
+        padding: "16px",
+        display: "flex",
+        alignItems: "center",
+        gap: "12px",
+        border: "1px solid #242424",
+        cursor: "pointer",
+        transition: "background .15s ease, transform .15s ease",
+        textAlign: "left",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.background = "#242424";
+        e.currentTarget.style.transform = "translateY(-1px)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.background = "#181818";
+        e.currentTarget.style.transform = "translateY(0)";
+      }}
+    >
+      <UserAvatar userName={userName} userImage={user.userImage} />
 
       <div style={{ minWidth: 0 }}>
         <div
@@ -72,7 +119,7 @@ const SearchUserCard = ({ user }: { user: UserSearchResult }) => {
             textOverflow: "ellipsis",
           }}
         >
-          {user.userName}
+          {userName}
         </div>
 
         <div
@@ -85,7 +132,7 @@ const SearchUserCard = ({ user }: { user: UserSearchResult }) => {
             textOverflow: "ellipsis",
           }}
         >
-          {user.email}
+          {user.email ?? "Chưa có email"}
         </div>
 
         <div
@@ -95,10 +142,10 @@ const SearchUserCard = ({ user }: { user: UserSearchResult }) => {
             marginTop: "4px",
           }}
         >
-          {user.role}
+          {user.role ?? "User"}
         </div>
       </div>
-    </div>
+    </button>
   );
 };
 

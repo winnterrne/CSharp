@@ -4,6 +4,7 @@ import { useSearchParams } from "react-router-dom";
 import { useSearch } from "../../hooks/useSearch";
 import SearchTopResult from "./SearchTopResult";
 import SearchResultCard from "./SearchResultCard";
+import SearchUserSection from "./SearchUserSection";
 
 import { userApi, type UserSearchResult } from "../../api/userApi";
 
@@ -19,18 +20,6 @@ const tabs: {
   { key: "album", label: "Album" },
   { key: "user", label: "Người dùng" },
 ];
-
-const buildUserImageUrl = (img?: string | null) => {
-  if (!img) return undefined;
-
-  if (img.startsWith("http")) return img;
-
-  if (img.startsWith("/")) return `http://localhost:5081${img}`;
-
-  if (img.includes("/")) return `http://localhost:5081/${img}`;
-
-  return `http://localhost:5081/media/images/user/${img}`;
-};
 
 const SearchPage = () => {
   const [params] = useSearchParams();
@@ -240,122 +229,9 @@ const SearchPage = () => {
               </div>
             </section>
           )}
-
-          {showUserSection && hasUserResults && (
-            <section>
-              <h2
-                style={{
-                  fontSize: "24px",
-                  marginBottom: "16px",
-                }}
-              >
-                Người dùng
-              </h2>
-
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
-                  gap: "14px",
-                }}
-              >
-                {users.map((user: any) => {
-                  const userId = user.userID ?? user.userId ?? user.id;
-                  const userName = user.userName ?? user.username ?? user.name ?? "Unknown User";
-                  const userImage = user.userImage ?? user.avatarUrl ?? user.imageUrl ?? null;
-                  const avatarUrl = buildUserImageUrl(userImage);
-                  const initial = userName.trim().charAt(0).toUpperCase() || "?";
-
-                  return (
-                    <div
-                      key={userId}
-                      style={{
-                        background: "#181818",
-                        borderRadius: "12px",
-                        padding: "16px",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "12px",
-                        border: "1px solid #242424",
-                      }}
-                    >
-                      <div
-                        style={{
-                          width: "54px",
-                          height: "54px",
-                          borderRadius: "50%",
-                          overflow: "hidden",
-                          background: "#333",
-                          flexShrink: 0,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          color: "#fff",
-                          fontWeight: 900,
-                          fontSize: "20px",
-                        }}
-                      >
-                        {avatarUrl ? (
-                          <img
-                            src={avatarUrl}
-                            alt={userName}
-                            onError={(e) => {
-                              e.currentTarget.style.display = "none";
-                            }}
-                            style={{
-                              width: "100%",
-                              height: "100%",
-                              objectFit: "cover",
-                            }}
-                          />
-                        ) : (
-                          initial
-                        )}
-                      </div>
-
-                      <div style={{ minWidth: 0 }}>
-                        <div
-                          style={{
-                            color: "#fff",
-                            fontWeight: 800,
-                            fontSize: "15px",
-                            whiteSpace: "nowrap",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                          }}
-                        >
-                          {userName}
-                        </div>
-
-                        <div
-                          style={{
-                            color: "#b3b3b3",
-                            fontSize: "13px",
-                            marginTop: "4px",
-                            whiteSpace: "nowrap",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                          }}
-                        >
-                          {user.email ?? "Chưa có email"}
-                        </div>
-
-                        <div
-                          style={{
-                            color: "#777",
-                            fontSize: "12px",
-                            marginTop: "4px",
-                          }}
-                        >
-                          {user.role ?? "User"}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </section>
-          )}
+        {showUserSection && hasUserResults && (
+          <SearchUserSection users={users} />
+        )}
         </>
       )}
     </main>
