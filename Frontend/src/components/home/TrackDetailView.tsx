@@ -36,7 +36,7 @@ import { aiApi } from "../../api/aiApi";
     const artistName = track.artist?.name ?? "Unknown Artist";
     const liked = isFavorite(track.id);
     const getMediaId = (media: Media) => {
-    const m = media as any; 
+    const m = media as any;
 
     return m.id ?? m.mediaItemID ?? m.mediaItemId ?? 0;
   };
@@ -48,21 +48,13 @@ import { aiApi } from "../../api/aiApi";
 
    const fetchAiDescription = async () => {
     const mediaId = getMediaId(track);
-    console.log("mediaId =", mediaId);        // ← xem ra bao nhiêu
-    console.log("track object =", track);      // ← xem field id là gì
-
-    if (!mediaId) {
-      setAiError("Không tìm được ID bài hát");
-      setAiStatus("error");
-      return;
-    }
     setAiStatus("loading");
     setAiDescription(null);
     setAiError(null);
     try {
       const res = await aiApi.getDescription(mediaId);
       // Điều chỉnh nếu backend trả về shape khác
-      const desc = res.data?.data ?? "";
+      const desc = res.data?.description ?? res.data?.data?.description ?? "";
       setAiDescription(desc);
       setAiStatus("success");
     } catch (err: any) {
@@ -127,7 +119,7 @@ import { aiApi } from "../../api/aiApi";
 
         <div style={{ minWidth: 0 }}>
           <p style={{ color: "#fff", fontWeight: 700, marginBottom: "8px" }}>
-             {track.type === "video" ? "Video" : "Bài hát"}
+            Bài hát
           </p>
 
           <h1
@@ -330,24 +322,9 @@ import { aiApi } from "../../api/aiApi";
                     ✕
                   </button>
                 </div>
-                <div style={{ color: "#b3b3b3", lineHeight: 1.8, fontSize: "14px" }}>
-                  {aiDescription.split("\n").map((line, i) => {
-                    // Dòng trống → khoảng cách
-                    if (line.trim() === "") return <div key={i} style={{ height: "8px" }} />;
-
-                    // Render **text** thành bold
-                    const parts = line.split(/\*\*(.*?)\*\*/g);
-                    return (
-                      <p key={i} style={{ margin: "4px 0" }}>
-                        {parts.map((part, j) =>
-                          j % 2 === 1
-                            ? <strong key={j} style={{ color: "#fff" }}>{part}</strong>
-                            : part
-                        )}
-                      </p>
-                    );
-                  })}
-                </div>
+                <p style={{ color: "#b3b3b3", lineHeight: 1.8, fontSize: "14px", margin: 0 }}>
+                  {aiDescription}
+                </p>
               </div>
             )}
 

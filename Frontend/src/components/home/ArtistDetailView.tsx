@@ -2,49 +2,107 @@ import type { Media } from "../../types/media";
 import { usePlayer } from "../../hooks/usePlayer";
 import AlbumCardLarge from "./AlbumCardLarge";
 import { PlayIcon } from "../common/icons";
+import { useFollowStore } from "../../store/followStore";
+import { useEffect, useState } from "react";
+import { artistApi } from "../../api/artistApi";
 
 type ArtistDetailViewProps = {
+  artistId: number;
   artistName: string;
+  artistImage?: string;
   tracks: Media[];
   onOpenAlbum: (track: Media, tracks: Media[]) => void;
   onOpenTrack: (track: Media) => void;
 };
 
-const formatDuration = (seconds?: number) => {
-  if (!seconds) return "0:00";
-
-  const min = Math.floor(seconds / 60);
-  const sec = Math.floor(seconds % 60);
-
-  return `${min}:${String(sec).padStart(2, "0")}`;
+type ArtistProfile = {
+  artistID: number;
+  artistName: string;
+  artistImage: string;
+  bio: string;
 };
 
+
+
 const ArtistDetailView = ({
+  artistId,
   artistName,
+  artistImage = "",
   tracks,
   onOpenAlbum,
   onOpenTrack,
 }: ArtistDetailViewProps) => {
-  const { playTrack, setQueue } = usePlayer();
+  const { currentTrack, isPlaying, playTrack, setQueue, togglePlay } =
+    usePlayer();
+
+
+  const {
+    toggleFollow,
+    isFollowing,
+  } = useFollowStore();
 
   const firstTrack = tracks[0];
+  const isCurrentArtistTrack =
+    !!firstTrack && String(currentTrack?.id) === String(firstTrack.id);
+
+  const isArtistPlaying = isCurrentArtistTrack && isPlaying;
+
+  const isFollowed = isFollowing(artistId);
 
   const handlePlayArtist = () => {
     if (tracks.length === 0) return;
+
+    if (isCurrentArtistTrack) {
+      togglePlay();
+      return;
+    }
 
     setQueue(tracks);
     playTrack(tracks[0]);
   };
 
-  const handleOpenAndPlayTrack = (track: Media) => {
-    setQueue(tracks);
-    playTrack(track);
-    onOpenTrack(track);
+const handleFollowToggle = async () => {
+  if (artistId === undefined || artistId === null) {
+    console.error("artistId is missing");
+    return;
+  }
+  const id = Number(artistId);
+  console.log("artistId =", id, typeof artistId);
+  if (Number.isNaN(id)) {
+    console.error("ArtistId invalid:", artistId);
+    return;
+  }
+  await toggleFollow(id, artistName, artistImage || "");
+  console.log({
+  artistId,
+  artistName,
+  artistImage,
+});
+};
+
+const [profile, setProfile] =
+  useState<ArtistProfile | null>(null);
+
+useEffect(() => {
+  const loadProfile = async () => {
+    try {
+      const res = await artistApi.getProfile(artistId);
+
+      setProfile(res.data);
+    } catch (err) {
+      console.error("LOAD ARTIST PROFILE ERROR", err);
+    }
   };
+
+  if (artistId) {
+    loadProfile();
+  }
+}, [artistId]);
 
   return (
     <div>
-      {/* ARTIST HEADER */}
+
+      {/* ================= HEADER ================= */}
       <section
         style={{
           minHeight: "280px",
@@ -57,13 +115,7 @@ const ArtistDetailView = ({
         }}
       >
         <div>
-          <p
-            style={{
-              color: "#fff",
-              fontWeight: 700,
-              marginBottom: "10px",
-            }}
-          >
+          <p style={{ color: "#fff", fontWeight: 700, marginBottom: "10px" }}>
             ✓ Nghệ sĩ đã xác minh
           </p>
 
@@ -73,7 +125,6 @@ const ArtistDetailView = ({
               fontSize: "72px",
               lineHeight: 1,
               margin: 0,
-              wordBreak: "break-word",
             }}
           >
             {artistName}
@@ -92,7 +143,7 @@ const ArtistDetailView = ({
         </div>
       </section>
 
-      {/* ACTION BAR */}
+      {/* ================= ACTION BAR ================= */}
       <div
         style={{
           display: "flex",
@@ -101,10 +152,10 @@ const ArtistDetailView = ({
           marginBottom: "28px",
         }}
       >
+        {/* PLAY */}
         <button
           onClick={handlePlayArtist}
           disabled={tracks.length === 0}
-          title="Phát nghệ sĩ"
           style={{
             width: "58px",
             height: "58px",
@@ -114,28 +165,31 @@ const ArtistDetailView = ({
             cursor: tracks.length === 0 ? "not-allowed" : "pointer",
             fontSize: "22px",
             fontWeight: 800,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
           }}
         >
-          <PlayIcon />
+          {isArtistPlaying ? "⏸" : <PlayIcon />}
         </button>
 
+        {/* FOLLOW */}
         <button
+          onClick={handleFollowToggle}
           style={{
-            background: "transparent",
-            border: "1px solid #727272",
+            background: isFollowed ? "#1DB954" : "transparent",
+            border: isFollowed ? "none" : "1px solid #727272",
             borderRadius: "999px",
-            color: "#fff",
-            padding: "8px 18px",
+            color: isFollowed ? "#000" : "#fff",
+            padding: "8px 20px",
             fontWeight: 700,
+            fontSize: "14px",
             cursor: "pointer",
+            transition: "all 0.2s ease",
+            minWidth: "120px",
           }}
         >
-          Theo dõi
+          {isFollowed ? "✓ Đang theo dõi" : "Theo dõi"}
         </button>
 
+        {/* MORE */}
         <button
           style={{
             background: "none",
@@ -149,194 +203,170 @@ const ArtistDetailView = ({
         </button>
       </div>
 
-      {/* POPULAR SONGS */}
+      {/* ================= POPULAR ================= */}
       <section style={{ marginBottom: "36px" }}>
-        <h2
-          style={{
-            color: "#fff",
-            fontSize: "22px",
-            marginBottom: "16px",
-          }}
-        >
+        <h2 style={{ color: "#fff", fontSize: "22px", marginBottom: "16px" }}>
           Phổ biến
         </h2>
 
-        {tracks.length === 0 ? (
-          <p style={{ color: "#b3b3b3" }}>
-            Chưa có bài hát/video của nghệ sĩ này.
-          </p>
-        ) : (
-          tracks.slice(0, 5).map((track, index) => (
-            <div
-              key={track.id}
-              onClick={() => handleOpenAndPlayTrack(track)}
-              style={{
-                display: "grid",
-                gridTemplateColumns: "40px minmax(0, 1fr) 90px 100px",
-                alignItems: "center",
-                height: "58px",
-                padding: "0 8px",
-                borderRadius: "8px",
-                cursor: "pointer",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = "#1a1a1a";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = "transparent";
-              }}
-            >
-              <div style={{ color: "#b3b3b3" }}>{index + 1}</div>
-
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "12px",
-                  minWidth: 0,
-                }}
-              >
-                {track.thumbnailUrl ? (
-                  <img
-                    src={track.thumbnailUrl}
-                    alt={track.title}
-                    style={{
-                      width: "42px",
-                      height: "42px",
-                      borderRadius: "6px",
-                      objectFit: "cover",
-                    }}
-                  />
-                ) : (
-                  <div
-                    style={{
-                      width: "42px",
-                      height: "42px",
-                      borderRadius: "6px",
-                      background: "#282828",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      color: "#b3b3b3",
-                      fontSize: "18px",
-                    }}
-                  >
-                    {track.type === "video" ? "🎬" : "♪"}
-                  </div>
-                )}
-
-                <div
-                  style={{
-                    minWidth: 0,
-                  }}
-                >
-                  <div
-                    style={{
-                      color: "#fff",
-                      fontWeight: 600,
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                    }}
-                  >
-                    {track.title}
-                  </div>
-
-                  <div
-                    style={{
-                      color: "#b3b3b3",
-                      fontSize: "13px",
-                      marginTop: "3px",
-                    }}
-                  >
-                    {track.type === "video" ? "Video" : "Bài hát"}
-                  </div>
-                </div>
-              </div>
-
-              <div
-                style={{
-                  color: "#b3b3b3",
-                  fontSize: "13px",
-                  textAlign: "right",
-                }}
-              >
-                {track.genre ?? ""}
-              </div>
-
-              <div style={{ color: "#b3b3b3", textAlign: "right" }}>
-                {formatDuration(track.duration)}
-              </div>
-            </div>
-          ))
-        )}
-      </section>
-
-      {/* ABOUT ARTIST */}
-      <section
-        style={{
-          marginBottom: "36px",
-          background: "#181818",
-          padding: "24px",
-          borderRadius: "14px",
-        }}
-      >
-        <h2
-          style={{
-            color: "#fff",
-            fontSize: "22px",
-            marginBottom: "12px",
-          }}
-        >
-          Giới thiệu
-        </h2>
-
-        <p
-          style={{
-            color: "#b3b3b3",
-            lineHeight: 1.8,
-          }}
-        >
-          {artistName} là một trong những nghệ sĩ nổi bật trên TuneVault. Những
-          bài hát/video của nghệ sĩ này thường xuất hiện trong các danh sách phát
-          được yêu thích nhất và có lượng người nghe ổn định.
-        </p>
-      </section>
-
-      {/* ARTIST ALBUMS */}
-      {tracks.length > 0 && (
-        <section>
-          <h2
-            style={{
-              color: "#fff",
-              fontSize: "22px",
-              marginBottom: "16px",
-            }}
-          >
-            Album / Playlist
-          </h2>
-
+        {tracks.slice(0, 5).map((track, index) => (
           <div
+            key={track.id}
+            onClick={() => onOpenTrack(track)}
+            onDoubleClick={() => {
+              setQueue(tracks);
+              playTrack(track);
+            }}
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
-              gap: "18px",
+              gridTemplateColumns: "40px minmax(0, 1fr) 100px",
+              alignItems: "center",
+              height: "58px",
+              padding: "0 8px",
+              borderRadius: "8px",
+              cursor: "pointer",
             }}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.background = "#1a1a1a")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.background = "transparent")
+            }
           >
-            {tracks.slice(0, 6).map((track) => (
-              <AlbumCardLarge
-                key={track.id}
-                track={track}
-                tracks={tracks}
-                onOpenAlbum={onOpenAlbum}
-              />
-            ))}
+            <div style={{ color: "#b3b3b3" }}>{index + 1}</div>
+
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "12px",
+                minWidth: 0,
+              }}
+            >
+              {track.thumbnailUrl ? (
+                <img
+                  src={track.thumbnailUrl}
+                  alt={track.title}
+                  style={{
+                    width: "42px",
+                    height: "42px",
+                    borderRadius: "6px",
+                    objectFit: "cover",
+                  }}
+                />
+              ) : (
+                <div
+                  style={{
+                    width: "42px",
+                    height: "42px",
+                    borderRadius: "6px",
+                    background: "#282828",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "#b3b3b3",
+                    fontSize: "12px",
+                  }}
+                >
+                  ♪
+                </div>
+              )}
+
+              <div
+                style={{
+                  color: "#fff",
+                  fontWeight: 600,
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                {track.title}
+              </div>
+            </div>
+
+            <div style={{ color: "#b3b3b3", textAlign: "right" }}>
+              {Math.floor(track.duration / 60)}:
+              {String(Math.floor(track.duration % 60)).padStart(2, "0")}
+            </div>
           </div>
-        </section>
-      )}
+        ))}
+      </section>
+
+      {/* ================= ABOUT ================= */}
+      <section
+  style={{
+    marginBottom: "36px",
+    background: "#181818",
+    borderRadius: "16px",
+    overflow: "hidden",
+  }}
+>
+  {profile?.artistImage && (
+    <img
+      src={`http://localhost:5081/media/images/artist/${profile.artistImage}`}
+      alt={profile.artistName}
+      style={{
+        width: "100%",
+        height: "420px",
+        objectFit: "cover",
+        display: "block",
+      }}
+    />
+  )}
+
+  <div
+    style={{
+      padding: "24px",
+    }}
+  >
+    <h2
+      style={{
+        color: "#fff",
+        marginBottom: "16px",
+      }}
+    >
+      {profile?.artistName ?? artistName}
+    </h2>
+
+    <p
+      style={{
+        color: "#b3b3b3",
+        lineHeight: 1.8,
+        fontSize: "15px",
+      }}
+    >
+      {profile?.bio ?? "Chưa có thông tin nghệ sĩ."}
+    </p>
+  </div>
+</section>
+
+      {/* ================= ALBUM ================= */}
+      <section>
+        <h2 style={{ color: "#fff", fontSize: "22px", marginBottom: "16px" }}>
+          Album / Playlist
+        </h2>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
+            gap: "18px",
+          }}
+        >
+          {tracks.slice(0, 6).map((track) => (
+            <AlbumCardLarge
+              key={track.id}
+              track={track}
+              tracks={tracks}
+              onOpenAlbum={onOpenAlbum}
+            />
+          ))}
+        </div>
+      </section>
 
       {!firstTrack && (
-        <p style={{ color: "#b3b3b3", marginTop: "20px" }}>
+        <p style={{ color: "#b3b3b3" }}>
           Chưa có bài hát của nghệ sĩ này.
         </p>
       )}

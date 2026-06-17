@@ -85,7 +85,6 @@ export interface MediaItemAlbumDto {
   mediaItemImage: string;
   duration: number;
   mediaItemTag?: string;
-  mediaItemType?: string;
 }
 
 export const buildImageUrl = (img?: string) => {
@@ -156,7 +155,7 @@ export const mapAlbumTrackToMedia = (
   return {
     id: String(item.mediaItemID),
     title: item.titleName,
-    type: item.mediaItemType?.toLowerCase() === "video" ? "video" : "audio",
+    type: "audio",
     status: "published",
 
     url: `http://localhost:5081/api/media/${item.mediaItemID}/stream`,

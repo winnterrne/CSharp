@@ -1,8 +1,11 @@
 import type { Notification } from "../../types/notification";
+import {
+  parseNotificationPayload,
+} from "../../types/notification";
 
 type Props = {
   notification: Notification;
-  onRead: (id: number) => void;
+  onOpen: (notification: Notification) => void;
 };
 
 const formatDate = (date: string) => {
@@ -15,83 +18,102 @@ const formatDate = (date: string) => {
   });
 };
 
-const getIcon = (type: Notification["type"]) => {
-  switch (type) {
-    case "new_release":
-      return "♪";
-    case "follow":
-      return "👤";
-    case "playlist_update":
-      return "▤";
-    case "share":
-      return "↗";
-    default:
-      return "●";
-  }
+const getIcon = (type: string) => {
+  if (type === "share_song") return "🎵";
+  if (type === "share_playlist") return "📃";
+  if (type === "follow") return "👤";
+  return "🔔";
 };
 
-const NotificationItem = ({ notification, onRead }: Props) => {
+const NotificationItem = ({
+  notification,
+  onOpen,
+}: Props) => {
+  const data =
+    parseNotificationPayload(notification.payload);
+
+  const mainTitle =
+    data.mediaTitle ??
+    data.playlistName ??
+    data.followerName ??
+    notification.title;
+
+  const subTitle =
+    notification.type === "share_song"
+      ? data.artistName
+      : notification.type === "share_playlist"
+        ? `${data.trackCount ?? 0} bài hát`
+        : notification.type === "follow"
+          ? "Đã bắt đầu theo dõi bạn"
+          : "";
+
+  const userImageBaseUrl = "http://localhost:5081/media/images/users/";
+
+  const imageUrl = (() => {
+    const raw =
+      data.imageUrl ??
+      data.senderAvatar ??
+      data.followerAvatar ??
+      "";
+
+    return raw && !raw.startsWith("http")
+      ? `${userImageBaseUrl}${raw}`
+      : raw;
+  })();
+
   return (
     <div
-      onClick={() => {
-        if (!notification.isRead) {
-          onRead(notification.id);
-        }
-      }}
+      // ✅ NOTIFICATION FLOW: click item mở track/playlist/follow
+      onClick={() => onOpen(notification)}
       style={{
-        display: "flex",
-        alignItems: "center",
+        display: "grid",
+        gridTemplateColumns: "56px 1fr 10px",
         gap: "14px",
         padding: "14px",
-        borderRadius: "10px",
-        background: notification.isRead ? "transparent" : "#1f1f1f",
+        borderRadius: "12px",
+        background: notification.isRead
+          ? "transparent"
+          : "#1f1f1f",
         cursor: "pointer",
-        transition: ".15s",
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.background =
-          notification.isRead ? "#1a1a1a" : "#2a2a2a";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.background =
-          notification.isRead ? "transparent" : "#1f1f1f";
       }}
     >
       <div
         style={{
-          width: "52px",
-          height: "52px",
-          borderRadius: "8px",
+          width: "56px",
+          height: "56px",
+          borderRadius:
+            notification.type === "follow" ? "50%" : "8px",
           background: "#282828",
-          flexShrink: 0,
           overflow: "hidden",
-          color: "#fff",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          fontSize: "22px",
-          fontWeight: 800,
+          color: "#b3b3b3",
+          fontSize: "24px",
+          flexShrink: 0,
         }}
       >
-        {/* {notification.imageUrl ?
+        {imageUrl ? (
           <img
-            src={notification.imageUrl}
-            alt={notification.title}
+            src={imageUrl}
+            alt={mainTitle}
             style={{
               width: "100%",
               height: "100%",
               objectFit: "cover",
             }}
           />
-        : getIcon(notification.type)} */}
+        ) : (
+          getIcon(notification.type)
+        )}
       </div>
 
-      <div style={{ minWidth: 0, flex: 1 }}>
+      <div style={{ minWidth: 0 }}>
         <div
           style={{
             color: "#fff",
             fontWeight: notification.isRead ? 600 : 800,
-            marginBottom: "4px",
+            marginBottom: "5px",
           }}
         >
           {notification.title}
@@ -99,13 +121,28 @@ const NotificationItem = ({ notification, onRead }: Props) => {
 
         <div
           style={{
-            color: "#b3b3b3",
-            fontSize: "14px",
-            lineHeight: 1.5,
+            color: "#fff",
+            fontSize: "15px",
+            fontWeight: 800,
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
           }}
         >
-          {notification.payload}
+          {mainTitle}
         </div>
+
+        {subTitle && (
+          <div
+            style={{
+              color: "#b3b3b3",
+              fontSize: "13px",
+              marginTop: "3px",
+            }}
+          >
+            {subTitle}
+          </div>
+        )}
 
         <div
           style={{
@@ -121,11 +158,11 @@ const NotificationItem = ({ notification, onRead }: Props) => {
       {!notification.isRead && (
         <div
           style={{
-            width: "10px",
-            height: "10px",
+            width: "9px",
+            height: "9px",
             borderRadius: "50%",
             background: "#1DB954",
-            flexShrink: 0,
+            alignSelf: "center",
           }}
         />
       )}

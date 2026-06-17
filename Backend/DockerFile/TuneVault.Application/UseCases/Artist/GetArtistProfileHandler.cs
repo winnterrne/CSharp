@@ -13,7 +13,6 @@ public  class GetArtistProfileHandler : IRequestHandler<GetArtistProfileQuery, A
     {
         var artist = await _repo.GetArtistProfileByIdAsync(request.ArtistId);
         if(artist == null) return null;
-        var followers = await _repo.GetArtistFollowersCountAsync(request.ArtistId);
         return new ArtistProfileDto(
             artist.ArtistID,
             artist.ArtistName,

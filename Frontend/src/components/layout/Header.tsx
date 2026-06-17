@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
 import type { Media } from "../../types/media";
 import { authStore } from "../../store/authStore";
 import { userApi, type UserSearchResult } from "../../api/userApi";
 import type { UserProfile } from "../../types/profile";
 import { useHistoryStore } from "../../store/historyStore";
 import { PlayIcon } from "../common/icons";
+import NotificationList from "../notification/NotificationList";
+import { notificationStore } from "../../store/notificationStore";
+import { notificationApi } from "../../api/notificationApi";
+import { startNotificationSignalR } from "../../api/notificationSignalR";
 
 export interface HeaderUser {
   displayName: string;
@@ -71,8 +74,7 @@ const Header = ({
   onSearchChange,
   onHomeClick,
   onNotificationClick,
-  onFriendsClick,
-  onAvatarClick,
+  // onAvatarClick,
   onPlayTrack,
   onSelectTrack,
 }: HeaderProps) => {
@@ -96,6 +98,22 @@ const Header = ({
 
   const [showRecentModal, setShowRecentModal] = useState(false);
   const recentTracks = useHistoryStore((state) => state.recentTracks);
+  const setNotifications = notificationStore((s) => s.setNotifications);
+  const unreadCount = notificationStore((state) => state.unreadCount);
+
+  useEffect(() => {
+    const loadNotifications = async () => {
+      try {
+        const data = await notificationApi.getAll();
+        setNotifications(data);
+      } catch (error) {
+        console.error("LOAD HEADER NOTIFICATIONS ERROR:", error);
+      }
+    };
+
+    loadNotifications();
+  }, [setNotifications]);
+  const [showNotificationList, setShowNotificationList] = useState(false);
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -112,6 +130,12 @@ const Header = ({
 
     loadProfile();
   }, [authUser?.id]);
+  // ✅ NOTIFICATION FLOW: bật SignalR để badge tăng realtime
+  useEffect(() => {
+    startNotificationSignalR().catch((error) => {
+      console.error("START NOTIFICATION SIGNALR ERROR:", error);
+    });
+  }, []);
 
   useEffect(() => {
     const value = searchValue.trim();
@@ -178,7 +202,7 @@ const Header = ({
           onClick={onHomeClick}
           title="Trang chủ"
           style={{
-            background: "#2a2a2a",
+            background: "#787878",
             border: "none",
             borderRadius: "50%",
             width: "48px",
@@ -196,11 +220,11 @@ const Header = ({
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.transform = "scale(1)";
-            e.currentTarget.style.background = "#aa1389";
+            e.currentTarget.style.background = "#787878";
           }}
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
-            <path d="M12.5 3.247a1 1 0 0 0-1 0L4 7.577V20h4.5v-6a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v6H20V7.577l-7.5-4.33zm-2-1.732a3 3 0 0 1 3 0l7.5 4.33a2 2 0 0 1 1 1.732V21a1 1 0 0 1-1 1h-6.5a1 1 0 0 1-1-1v-6h-3v6a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7.577a2 2 0 0 1 1-1.732l7.5-4.33z" />
+          <svg viewBox="0 0 24 24" width="30" height="30 " fill="currentColor">
+            <path d="M12 3.54 3 10v10a1 1 0 0 0 1 1h5v-6h6v6h5a1 1 0 0 0 1-1V10l-9-6.46z" />
           </svg>
         </button>
 
@@ -530,17 +554,48 @@ const Header = ({
           flexShrink: 0,
         }}
       >
-        <IconActionBtn title="Thông báo" onClick={onNotificationClick}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6V11c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
-          </svg>
-        </IconActionBtn>
+        <div style={{ position: "relative" }}>
+          <IconActionBtn
+            title="Thông báo"
+            onClick={() => {
+              setShowNotificationList((prev) => !prev);
+              onNotificationClick?.();
+            }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6V11c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
+            </svg>
+          </IconActionBtn>
 
-        <IconActionBtn title="Bạn bè" onClick={onFriendsClick}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
-          </svg>
-        </IconActionBtn>
+          {unreadCount > 0 && (
+            <span
+              style={{
+                position: "absolute",
+                top: "-2px",
+                right: "-2px",
+                minWidth: "17px",
+                height: "17px",
+                padding: "0 5px",
+                borderRadius: "999px",
+                background: "#ff2b45",
+                color: "#fff",
+                fontSize: "10px",
+                fontWeight: 800,
+                lineHeight: "17px",
+                textAlign: "center",
+                border: "2px solid #111",
+                boxShadow: "0 0 0 1px rgba(255,255,255,.12)",
+                transform: "translate(35%, -25%)",
+              }}
+            >
+              {unreadCount > 99 ? "99+" : unreadCount}
+            </span>
+          )}
+
+          {showNotificationList && (
+            <NotificationList onClose={() => setShowNotificationList(false)} />
+          )}
+        </div>
 
         <div style={{ position: "relative" }}>
           <button
@@ -593,11 +648,21 @@ const Header = ({
                 zIndex: 9999,
               }}
             >
+              {/* ✅ MENU MỚI */}
+
+              <MenuItem
+                label="Tài khoản"
+                onClick={() => {
+                  setShowAccountMenu(false);
+                  navigate("/account");
+                }}
+              />
+
               <MenuItem
                 label="Hồ sơ"
                 onClick={() => {
                   setShowAccountMenu(false);
-                  onAvatarClick?.();
+                  navigate("/profile");
                 }}
               />
 
@@ -710,10 +775,9 @@ const Header = ({
           >
             <h2 style={{ margin: "0 0 16px", fontSize: "22px" }}>Gần đây</h2>
 
-            {recentTracks.length === 0 ? (
+            {recentTracks.length === 0 ?
               <p style={{ color: "#b3b3b3" }}>Chưa có bài hát nào gần đây.</p>
-            ) : (
-              <div style={{ overflowY: "auto", flex: 1 }}>
+            : <div style={{ overflowY: "auto", flex: 1 }}>
                 {recentTracks.map((track) => (
                   <RecentTrackRow
                     key={track.id}
@@ -725,7 +789,7 @@ const Header = ({
                   />
                 ))}
               </div>
-            )}
+            }
 
             <button
               onClick={() => setShowRecentModal(false)}
@@ -750,6 +814,7 @@ const Header = ({
   );
 };
 
+// ─── Sub-components ────────────────────────────────────────────────────────────
 const IconActionBtn = ({
   children,
   title,
@@ -809,7 +874,6 @@ const MenuItem = ({
     {label}
   </button>
 );
-
 const ProfileRow = ({ label, value }: { label: string; value: string }) => (
   <div
     style={{
@@ -819,7 +883,14 @@ const ProfileRow = ({ label, value }: { label: string; value: string }) => (
       borderBottom: "1px solid #2f2f2f",
     }}
   >
-    <span style={{ color: "#b3b3b3" }}>{label}</span>
+    <span
+      style={{
+        color: "#b3b3b3",
+      }}
+    >
+      {label}
+    </span>
+
     <span>{value}</span>
   </div>
 );
@@ -861,15 +932,13 @@ const RecentTrackRow = ({
           color: "#b3b3b3",
         }}
       >
-        {track.thumbnailUrl ? (
+        {track.thumbnailUrl ?
           <img
             src={track.thumbnailUrl}
             alt={track.title}
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
-        ) : (
-          "🎵"
-        )}
+        : "🎵"}
       </div>
 
       <div style={{ minWidth: 0, flex: 1 }}>
@@ -885,7 +954,6 @@ const RecentTrackRow = ({
         >
           {track.title}
         </div>
-
         <div
           style={{
             color: "#b3b3b3",
@@ -905,6 +973,7 @@ const RecentTrackRow = ({
         </div>
       </div>
 
+      {/* Nút play hiện khi hover row */}
       <button
         onClick={() => onPlay(track)}
         title="Phát"
@@ -929,5 +998,4 @@ const RecentTrackRow = ({
     </div>
   );
 };
-
 export default Header;

@@ -3,6 +3,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { playlistApi } from "../../api/playlistApi";
+import { mediaApi } from "../../api/mediaApi";
 import type { Playlist } from "../../types/playlist";
 import type { Media } from "../../types/media";
 import { ROUTES } from "../../constant/routes";
@@ -16,6 +17,7 @@ import { authStore } from "../../store/authStore";
 import { albumApi } from "../../api/albumApi";
 import type { Album } from "../../types/album";
 import { useAlbumStore } from "../../store/albumStore";
+import { useFollowStore } from "../../store/followStore";
 
 type FilterTab = "playlist" | "favorite" | "following" | "album";
 
@@ -46,7 +48,7 @@ const Sidebar = ({
 
   const token = authStore((state) => state.token);
   const isAuthenticated = authStore((state) => state.isAuthenticated);
-  const user = authStore((state) => state.user);
+
   const canUseAuthApi = Boolean(token && isAuthenticated);
 
   const isWide = isExpanded;
@@ -61,6 +63,7 @@ const Sidebar = ({
 
   const recentTracks = useHistoryStore((state) => state.recentTracks);
   const { favoriteTracks, loadFavorites } = useFavorite();
+  const { followedArtists, loadFollowedArtists } = useFollowStore();
   const { playTrack, setQueue } = usePlayer();
 
   const [albums, setAlbums] = useState<Album[]>([]);
@@ -79,11 +82,9 @@ const Sidebar = ({
       const res = await playlistApi.getMyPlaylists();
 
       const rawData =
-        Array.isArray(res.data)
-          ? res.data
-          : Array.isArray(res.data?.data)
-            ? res.data.data
-            : [];
+        Array.isArray(res.data) ? res.data
+        : Array.isArray(res.data?.data) ? res.data.data
+        : [];
 
       const mappedPlaylists: Playlist[] = rawData.map((item: any) => ({
         id: item.id ?? item.playlistID ?? item.playlistId ?? 0,
@@ -114,15 +115,58 @@ const Sidebar = ({
 
       if (canUseAuthApi) {
         await loadFavorites();
+        await loadFollowedArtists();
       }
     })();
-  }, [fetchPlaylists, loadFavorites, canUseAuthApi]);
+  }, [fetchPlaylists, loadFavorites, loadFollowedArtists, canUseAuthApi]);
+
+// ✅ Khi đổi route, reload lại playlist để Sidebar sync DB
+useEffect(() => {
+  if (!canUseAuthApi) return;
+
+  fetchPlaylists();
+}, [location.pathname, canUseAuthApi, fetchPlaylists]);
 
   useEffect(() => {
     albumApi.getAll().then((res) => {
       setAlbums(res.data?.data ?? []);
     });
   }, []);
+ useEffect(() => {
+  const reloadPlaylists = () => {
+    fetchPlaylists();
+  };
+
+  const handleDeleted = (event: Event) => {
+    const custom = event as CustomEvent<{ playlistId: number }>;
+    const deletedId = Number(custom.detail?.playlistId);
+
+    // ✅ Xóa khỏi Sidebar ngay lập tức
+    setPlaylists((prev) =>
+      prev.filter((playlist) => {
+        const currentId =
+          playlist.playlistID ??
+          playlist.id ??
+          0;
+
+        return Number(currentId) !== deletedId;
+      }),
+    );
+
+    // ✅ Reload lại sau một chút để sync DB
+    setTimeout(() => {
+      fetchPlaylists();
+    }, 300);
+  };
+
+  window.addEventListener("tunevault:playlist-updated", reloadPlaylists);
+  window.addEventListener("tunevault:playlist-deleted", handleDeleted);
+
+  return () => {
+    window.removeEventListener("tunevault:playlist-updated", reloadPlaylists);
+    window.removeEventListener("tunevault:playlist-deleted", handleDeleted);
+  };
+}, [fetchPlaylists]);
 
   const handleOpenAlbum = (album: Album) => {
     setSelectedAlbumId(album.albumID);
@@ -176,8 +220,13 @@ const Sidebar = ({
           <PlusIcon />
         </IconBtn>
 
-        <IconBtn title="Phóng to thư viện" onClick={onToggleExpand}>
-          <ExpandIcon />
+        <IconBtn
+          title={isExpanded ? "Thu về bình thường" : "Phóng to thư viện"}
+          onClick={onToggleExpand}
+        >
+          {isExpanded ?
+            <CollapseIcon />
+          : <ExpandIcon />}
         </IconBtn>
 
         <div style={collapsedListStyle}>
@@ -245,12 +294,13 @@ const Sidebar = ({
             <IconBtn title="Tạo playlist" onClick={handleCreatePlaylist}>
               <PlusIcon />
             </IconBtn>
-
             <IconBtn
               title={isWide ? "Thu về bình thường" : "Phóng to thư viện"}
               onClick={onToggleExpand}
             >
-              <ExpandIcon />
+              {isWide ?
+                <CollapseIcon />
+              : <ExpandIcon />}
             </IconBtn>
           </div>
         </div>
@@ -356,7 +406,16 @@ const Sidebar = ({
             ))
 
         : activeTab === "following" ?
-          <EmptyText text="Chưa có API lấy danh sách đang follow" />
+          followedArtists.length === 0 ?
+            <EmptyText text="Chưa follow nghệ sĩ nào" />
+          : followedArtists.map((artist) => (
+              <ArtistRow
+                key={artist.artistID}
+                artist={artist}
+                isWide={isWide}
+              />
+            ))
+
         : activeTab === "favorite" ?
           filteredFavorites.length === 0 ?
             <EmptyText text="Chưa có bài hát yêu thích" />
@@ -368,6 +427,7 @@ const Sidebar = ({
                 onClick={() => handlePlayTrackList(track, favoriteTracks)}
               />
             ))
+
         : activeTab === "album" ?
           albums.length === 0 ?
             <EmptyText text="Chưa có album" />
@@ -379,6 +439,7 @@ const Sidebar = ({
                 onClick={() => handleOpenAlbum(album)}
               />
             ))
+
         : loading ?
           <LoadingText />
         : filteredPlaylists.length === 0 ?
@@ -392,11 +453,8 @@ const Sidebar = ({
                 playlist={playlist}
                 active={location.pathname === ROUTES.PLAYLIST(playlistId)}
                 isWide={isWide}
-                currentUsername={user?.username ?? "Người dùng"}
                 onClick={() => handleOpenPlaylist(playlist)}
               />
-
-
             );
           })
         }
@@ -435,18 +493,17 @@ const PlaylistRow = ({
   playlist,
   active,
   isWide,
-  currentUsername,
   onClick,
 }: {
   playlist: Playlist;
   active: boolean;
   isWide: boolean;
-  currentUsername: string;
   onClick: () => void;
 }) => {
   const [hovered, setHovered] = useState(false);
 
   const playlistName = getPlaylistName(playlist);
+  const trackCount = getPlaylistTrackCount(playlist);
 
   return (
     <div
@@ -497,7 +554,7 @@ const PlaylistRow = ({
             marginTop: "4px",
           }}
         >
-          Danh sách phát • {currentUsername}
+          Danh sách phát • {trackCount} bài
         </div>
       </div>
     </div>
@@ -536,32 +593,36 @@ const AlbumRow = ({
       }}
     >
       <CoverBox size={isWide ? 56 : 48}>
-        {album.albumItemImage ? (
+        {album.albumItemImage ?
           <img
             src={`http://localhost:5081/media/images/album/${album.albumItemImage}`}
             alt={album.albumName}
             style={imgFullStyle}
           />
-        ) : "🎵"}
+        : "🎵"}
       </CoverBox>
 
       <div style={{ minWidth: 0, flex: 1 }}>
-        <div style={{
-          color: active ? "#1DB954" : "#fff",
-          fontSize: isWide ? "15px" : "14px",
-          fontWeight: 700,
-          whiteSpace: "nowrap",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-        }}>
+        <div
+          style={{
+            color: active ? "#1DB954" : "#fff",
+            fontSize: isWide ? "15px" : "14px",
+            fontWeight: 700,
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
           {album.albumName}
         </div>
 
-        <div style={{
-          color: "#b3b3b3",
-          fontSize: isWide ? "13px" : "12px",
-          marginTop: "4px",
-        }}>
+        <div
+          style={{
+            color: "#b3b3b3",
+            fontSize: isWide ? "13px" : "12px",
+            marginTop: "4px",
+          }}
+        >
           Album • {album.artistName}
         </div>
       </div>
@@ -635,7 +696,74 @@ const TrackRow = ({
     </div>
   );
 };
+///
+type FollowedArtist = {
+  artistID: number;
+  artistName: string;
+  artistImage?: string;
+};
 
+const ArtistRow = ({
+  artist,
+  isWide,
+}: {
+  artist: FollowedArtist;
+  isWide: boolean;
+}) => {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: isWide ? "16px" : "12px",
+        padding: isWide ? "12px" : "8px",
+        borderRadius: "8px",
+        background: hovered ? "#1a1a1a" : "transparent",
+        cursor: "pointer",
+      }}
+    >
+      <CoverBox size={isWide ? 56 : 48}>
+        {artist.artistImage ?
+          <img
+            src={artist.artistImage}
+            alt={artist.artistName}
+            style={imgFullStyle}
+          />
+        : "🎤"}
+      </CoverBox>
+
+      <div style={{ minWidth: 0, flex: 1 }}>
+        <div
+          style={{
+            color: "#fff",
+            fontSize: isWide ? "15px" : "14px",
+            fontWeight: 700,
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {artist.artistName}
+        </div>
+
+        <div
+          style={{
+            color: "#b3b3b3",
+            fontSize: isWide ? "13px" : "12px",
+            marginTop: "4px",
+          }}
+        >
+          Nghệ sĩ
+        </div>
+      </div>
+    </div>
+  );
+};
+///
 const SmallTile = ({
   title,
   active,
@@ -773,8 +901,11 @@ const LoadingText = () => (
 );
 
 const LibraryIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm4-4h12c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H8c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2zm1 3v10h10V5H9z" />
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M3 22a1 1 0 0 1-1-1V3a1 1 0 0 1 2 0v18h18a1 1 0 1 1 0 2H3z" />
+    <path d="M8 2h2v16H8z" />
+    <path d="M14 2h2v16h-2z" />
+    <path d="M20 2h2v16h-2z" />
   </svg>
 );
 
@@ -783,10 +914,44 @@ const PlusIcon = () => (
     <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
   </svg>
 );
+const CollapseIcon = () => (
+  <svg
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    {/* mũi tên trên phải chĩa vào giữa */}
+    <path d="M18 6L12 12" />
+    <path d="M14 6h4v4" />
 
+    {/* mũi tên dưới trái chĩa vào giữa */}
+    <path d="M6 18L12 12" />
+    <path d="M10 18H6v-4" />
+  </svg>
+);
 const ExpandIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M5 5h6v2H8.41l4.3 4.29-1.42 1.42L7 8.41V11H5V5zm14 0v6h-2V8.41l-4.29 4.3-1.42-1.42L15.59 7H13V5h6zM5 19v-6h2v2.59l4.29-4.3 1.42 1.42L8.41 17H11v2H5zm14 0h-6v-2h2.59l-4.3-4.29 1.42-1.42L17 15.59V13h2v6z" />
+  <svg
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    {/* trên phải */}
+    <path d="M12 12L18 6" />
+    <path d="M14 6h4v4" />
+
+    {/* dưới trái */}
+    <path d="M12 12L6 18" />
+    <path d="M10 18H6v-4" />
   </svg>
 );
 
