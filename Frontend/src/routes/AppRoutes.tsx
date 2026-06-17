@@ -9,7 +9,8 @@ import SearchPage from "../pages/Search/SearchPage";
 import PlaylistDetailPage from "../pages/Playlist/PlaylistDetailPage";
 import NotificationPage from "../pages/Notification/NotificationPage";
 import AlbumDetailPage from "../pages/Album/AlbumDetailPage";
-
+import TrackPage from "../pages/Track/TrackPage";
+import ArtistPage from "../pages/Artist/ArtistPage";
 export default function AppRoutes() {
   return (
     <Routes>
@@ -72,9 +73,24 @@ export default function AppRoutes() {
           </MainLayout>
         }
       />
-
-
+      <Route 
+        path="/track/:id" 
+        element={
+            <MainLayout>
+              <TrackPage />
+            </MainLayout>
+        } 
+      />
+      <Route
+        path="/artist/:artistName"
+        element={
+          <MainLayout>
+            <ArtistPage />
+          </MainLayout>
+        }
+      />
     </Routes>
+
     
   );
 }

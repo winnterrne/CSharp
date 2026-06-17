@@ -460,6 +460,7 @@ const AlbumDetailPage = () => {
         const mappedTracks = rawTracks.map((item: any) =>
              mapAlbumTrackToMedia(item, mappedAlbum.artistName ?? "Unknown Artist")
         );
+        console.log("ALBUM TRACKS MAPPED:", mappedTracks);
       setTracks(mappedTracks);
     } catch (err) {
       console.error("LOAD ALBUM DETAIL ERROR:", err);

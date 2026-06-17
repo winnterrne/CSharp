@@ -48,13 +48,21 @@ import { aiApi } from "../../api/aiApi";
 
    const fetchAiDescription = async () => {
     const mediaId = getMediaId(track);
+    console.log("mediaId =", mediaId);        // ← xem ra bao nhiêu
+    console.log("track object =", track);      // ← xem field id là gì
+
+    if (!mediaId) {
+      setAiError("Không tìm được ID bài hát");
+      setAiStatus("error");
+      return;
+    }
     setAiStatus("loading");
     setAiDescription(null);
     setAiError(null);
     try {
       const res = await aiApi.getDescription(mediaId);
       // Điều chỉnh nếu backend trả về shape khác
-      const desc = res.data?.description ?? res.data?.data?.description ?? "";
+      const desc = res.data?.data ?? "";
       setAiDescription(desc);
       setAiStatus("success");
     } catch (err: any) {
@@ -119,7 +127,7 @@ import { aiApi } from "../../api/aiApi";
 
         <div style={{ minWidth: 0 }}>
           <p style={{ color: "#fff", fontWeight: 700, marginBottom: "8px" }}>
-            Bài hát
+             {track.type === "video" ? "Video" : "Bài hát"}
           </p>
 
           <h1
@@ -263,7 +271,7 @@ import { aiApi } from "../../api/aiApi";
           }}
         >
           <h2 style={{ color: "#fff", marginBottom: "18px" }}>
-            Thông tin bài hát
+            Thông tin {track.type === "video" ? "video" : "bài hát"}
           </h2>
 
           <InfoRow label="Tên bài" value={track.title} />
@@ -363,9 +371,24 @@ import { aiApi } from "../../api/aiApi";
                     ✕
                   </button>
                 </div>
-                <p style={{ color: "#b3b3b3", lineHeight: 1.8, fontSize: "14px", margin: 0 }}>
-                  {aiDescription}
-                </p>
+                <div style={{ color: "#b3b3b3", lineHeight: 1.8, fontSize: "14px" }}>
+                  {aiDescription.split("\n").map((line, i) => {
+                    // Dòng trống → khoảng cách
+                    if (line.trim() === "") return <div key={i} style={{ height: "8px" }} />;
+
+                    // Render **text** thành bold
+                    const parts = line.split(/\*\*(.*?)\*\*/g);
+                    return (
+                      <p key={i} style={{ margin: "4px 0" }}>
+                        {parts.map((part, j) =>
+                          j % 2 === 1
+                            ? <strong key={j} style={{ color: "#fff" }}>{part}</strong>
+                            : part
+                        )}
+                      </p>
+                    );
+                  })}
+                </div>
               </div>
             )}
 

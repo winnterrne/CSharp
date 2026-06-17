@@ -3,7 +3,6 @@ import type { CSSProperties, ReactNode } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { playlistApi } from "../../api/playlistApi";
-import { mediaApi } from "../../api/mediaApi";
 import type { Playlist } from "../../types/playlist";
 import type { Media } from "../../types/media";
 import { ROUTES } from "../../constant/routes";
@@ -47,7 +46,7 @@ const Sidebar = ({
 
   const token = authStore((state) => state.token);
   const isAuthenticated = authStore((state) => state.isAuthenticated);
-
+  const user = authStore((state) => state.user);
   const canUseAuthApi = Boolean(token && isAuthenticated);
 
   const isWide = isExpanded;
@@ -393,6 +392,7 @@ const Sidebar = ({
                 playlist={playlist}
                 active={location.pathname === ROUTES.PLAYLIST(playlistId)}
                 isWide={isWide}
+                currentUsername={user?.username ?? "Người dùng"}
                 onClick={() => handleOpenPlaylist(playlist)}
               />
 
@@ -435,17 +435,18 @@ const PlaylistRow = ({
   playlist,
   active,
   isWide,
+  currentUsername,
   onClick,
 }: {
   playlist: Playlist;
   active: boolean;
   isWide: boolean;
+  currentUsername: string;
   onClick: () => void;
 }) => {
   const [hovered, setHovered] = useState(false);
 
   const playlistName = getPlaylistName(playlist);
-  const trackCount = getPlaylistTrackCount(playlist);
 
   return (
     <div
@@ -496,7 +497,7 @@ const PlaylistRow = ({
             marginTop: "4px",
           }}
         >
-          Danh sách phát • {trackCount} bài
+          Danh sách phát • {currentUsername}
         </div>
       </div>
     </div>

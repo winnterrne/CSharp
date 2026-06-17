@@ -259,7 +259,10 @@ const Header = ({
                 searchResults.map((item) => (
                   <div
                     key={item.id}
-                    onClick={() => onSelectTrack?.(item)}
+                    onClick={() => {
+                      onPlayTrack?.(item);
+                      onSelectTrack?.(item);
+                    }}
                     style={{
                       display: "flex",
                       alignItems: "center",
@@ -326,7 +329,7 @@ const Header = ({
                           textOverflow: "ellipsis",
                         }}
                       >
-                        Bài hát • {item.artist.name}
+                        {item.type === "video" ? "Video" : "Bài hát"} • {item.artist.name}
                       </div>
                     </div>
 
@@ -334,7 +337,8 @@ const Header = ({
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        onPlayTrack?.(item);
+                          onPlayTrack?.(item);
+                          onSelectTrack?.(item);
                       }}
                       title="Phát"
                       style={{
