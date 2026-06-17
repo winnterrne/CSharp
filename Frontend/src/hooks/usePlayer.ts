@@ -11,17 +11,26 @@ export const usePlayer = () => {
     throw new Error("usePlayer phải dùng trong PlayerProvider");
   }
 
-  const playTrackWithHistory = (track: Media) => {
-    ctx.playTrack(track);
-    useHistoryStore.getState().addRecentTrack(track);
+  const playTrackWithHistory = (track: Media, contextId?: string, queue?: Media[]) => {
+    const currentTrack = ctx.currentTrack;
 
-    const mediaId = Number(track.id);
+    // Chỉ add history khi đổi sang bài khác hoặc khác context
+    if (
+      !currentTrack ||
+      String(currentTrack.id) !== String(track.id) ||
+      ctx.playingContextId !== contextId
+    ) {
+      useHistoryStore.getState().addRecentTrack(track, contextId);
 
-    if (mediaId) {
-      interactionApi.recordPlayHistory(mediaId).catch((error: unknown) => {
-        console.error("RECORD PLAY HISTORY ERROR:", error);
-      });
+      const mediaId = Number(track.id);
+      if (mediaId) {
+        interactionApi.recordPlayHistory(mediaId).catch((error: unknown) => {
+          console.error("RECORD PLAY HISTORY ERROR:", error);
+        });
+      }
     }
+
+    ctx.playTrack(track, queue, contextId);
   };
 
   return {

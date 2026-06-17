@@ -15,6 +15,7 @@ public class ArtistController : Controller
     {
         _mediator = mediator;
     }
+
     [HttpGet("{artistId}/profile")]
     public async Task<IActionResult> GetArtistProfile(int artistId)
     {

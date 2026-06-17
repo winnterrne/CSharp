@@ -5,8 +5,8 @@ import { useFavorite } from "../../hooks/useFavorite";
 import AddToPlaylistButton from "../playlist/AddToPlaylistButton";
 import TrackActionMenu from "../common/TrackActionMenu";
 import ShareMediaModal from "../share/ShareModal";
-import { PlayIcon, ShareIcon } from "../common/icons";
-
+import { HeartIcon, MoreHorizIcon, NowPlayingIcon, PlayIcon, ShareIcon } from "../common/icons";
+import { aiApi } from "../../api/aiApi";
 
   type TrackDetailViewProps = {
     track: Media;
@@ -25,17 +25,60 @@ import { PlayIcon, ShareIcon } from "../common/icons";
   const TrackDetailView = ({ track, onOpenArtist }: TrackDetailViewProps) => {
     const [menuOpen, setMenuOpen] = useState(false);
     const [shareOpen, setShareOpen] = useState(false);
-    const { playTrack, setQueue, currentTrack, isPlaying, togglePlay } = usePlayer();
 
-    const isCurrentTrack = currentTrack?.id === track.id;
-    const isThisTrackPlaying = isCurrentTrack && isPlaying;
+     const [aiStatus, setAiStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+    const [aiDescription, setAiDescription] = useState<string | null>(null);
+    const [aiError, setAiError] = useState<string | null>(null);
+
+    const { playTrack, isPlaying, currentTrack, setQueue } = usePlayer();
     const { isFavorite, toggleFavorite } = useFavorite();
 
     const artistName = track.artist?.name ?? "Unknown Artist";
-  const liked = isFavorite(track.id);
+    const liked = isFavorite(track.id);
+    const getMediaId = (media: Media) => {
+    const m = media as any; 
+
+    return m.id ?? m.mediaItemID ?? m.mediaItemId ?? 0;
+  };
+    const isThisTrackPlaying =
+    currentTrack &&
+    Number(getMediaId(currentTrack)) === Number(getMediaId(track));
+
+  const showNowPlaying = Boolean(isThisTrackPlaying && isPlaying);
+
+   const fetchAiDescription = async () => {
+    const mediaId = getMediaId(track);
+    console.log("mediaId =", mediaId);        // ← xem ra bao nhiêu
+    console.log("track object =", track);      // ← xem field id là gì
+
+    if (!mediaId) {
+      setAiError("Không tìm được ID bài hát");
+      setAiStatus("error");
+      return;
+    }
+    setAiStatus("loading");
+    setAiDescription(null);
+    setAiError(null);
+    try {
+      const res = await aiApi.getDescription(mediaId);
+      // Điều chỉnh nếu backend trả về shape khác
+      const desc = res.data?.data ?? "";
+      setAiDescription(desc);
+      setAiStatus("success");
+    } catch (err: any) {
+      setAiError(err?.response?.data?.message ?? "Không thể tải mô tả AI.");
+      setAiStatus("error");
+    }
+  };
 
   return (
     <>
+      <style>{`
+      @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.4; }
+      }
+    `}</style>
       <section
         style={{
           display: "flex",
@@ -137,62 +180,24 @@ import { PlayIcon, ShareIcon } from "../common/icons";
         }}
       >
         <button
-            onClick={() => {
-              if (isCurrentTrack) {
-                togglePlay();
-                return;
-              }
-
-              setQueue([track]);
-              playTrack(track);
-            }}
-            title={isThisTrackPlaying ? "Tạm dừng" : "Phát"}
-            style={{
-              width: "64px",
-              height: "64px",
-              borderRadius: "50%",
-              border: "none",
-              background: "#1DB954",
-              color: "#000",
-              fontSize: "28px",
-              fontWeight: 900,
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-          {isThisTrackPlaying ? (
-            <span
-              style={{
-                display: "flex",
-                gap: "5px",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <span
-                style={{
-                  width: "5px",
-                  height: "22px",
-                  background: "#000",
-                  borderRadius: "2px",
-                  display: "block",
-                }}
-              />
-              <span
-                style={{
-                  width: "5px",
-                  height: "22px",
-                  background: "#000",
-                  borderRadius: "2px",
-                  display: "block",
-                }}
-              />
-            </span>
-          ) : (
-            <PlayIcon />
-        )}
+          onClick={() => {
+            setQueue([track]);
+            playTrack(track);
+          }}
+          title="Phát"
+          style={{
+            width: "64px",
+            height: "64px",
+            borderRadius: "50%",
+            border: "none",
+            background: "#1DB954",
+            color: "#000",
+            fontSize: "24px",
+            fontWeight: 900,
+            cursor: "pointer",
+          }}
+        >
+          {showNowPlaying ? <NowPlayingIcon /> : <PlayIcon />}
         </button>
 
         <button
@@ -206,7 +211,7 @@ import { PlayIcon, ShareIcon } from "../common/icons";
             color: liked ? "#1DB954" : "#b3b3b3",
           }}
         >
-          {liked ? "♥" : "♡"}
+          {<HeartIcon filled={liked} />}
         </button>
 
        <AddToPlaylistButton mediaId={track.id} />
@@ -239,7 +244,7 @@ import { PlayIcon, ShareIcon } from "../common/icons";
               color: "#b3b3b3",
             }}
           >
-            ⋯
+            <MoreHorizIcon/>
           </button>
 
           <TrackActionMenu
@@ -291,6 +296,133 @@ import { PlayIcon, ShareIcon } from "../common/icons";
           </p>
         </div>
       </section>
+
+      <section
+        style={{
+          display: "grid",
+          gridTemplateColumns: "minmax(0,1fr) minmax(280px,400px)",
+          gap: "24px",
+        }}
+      >
+        {/* Thông tin bài hát */}
+        <div style={{ background: "#181818", borderRadius: "14px", padding: "22px" }}>
+          <h2 style={{ color: "#fff", marginBottom: "18px" }}>Thông tin bài hát</h2>
+
+          <InfoRow label="Tên bài" value={track.title} />
+          <InfoRow label="Nghệ sĩ" value={artistName} />
+          <InfoRow label="Thời lượng" value={formatDuration(track.duration)} />
+          <InfoRow label="Thể loại" value={track.genre ?? "Unknown"} />
+          <InfoRow label="Loại" value={track.type} />
+
+          {/* ↓ THÊM PHẦN AI Ở ĐÂY */}
+          <div style={{ marginTop: "20px" }}>
+            {aiStatus === "idle" && (
+              <button
+                onClick={fetchAiDescription}
+                style={{
+                  padding: "8px 18px",
+                  borderRadius: "20px",
+                  border: "1px solid #1DB954",
+                  background: "transparent",
+                  color: "#1DB954",
+                  fontSize: "13px",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                }}
+              >
+                ✨ Tóm tắt bằng AI
+              </button>
+            )}
+
+            {aiStatus === "loading" && (
+              <div>
+                <p style={{ color: "#b3b3b3", fontSize: "13px", marginBottom: "10px" }}>
+                  ✨ Đang tạo mô tả...
+                </p>
+                {/* Skeleton */}
+                {[100, 85, 65].map((w, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      height: "12px",
+                      borderRadius: "4px",
+                      background: "#2a2a2a",
+                      marginBottom: "8px",
+                      width: `${w}%`,
+                      animation: "pulse 1.2s ease-in-out infinite",
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+
+            {aiStatus === "success" && aiDescription && (
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
+                  <span style={{ color: "#1DB954", fontSize: "13px", fontWeight: 700 }}>
+                    ✨ Mô tả AI
+                  </span>
+                  <button
+                    onClick={() => { setAiStatus("idle"); setAiDescription(null); }}
+                    style={{ background: "none", border: "none", color: "#b3b3b3", cursor: "pointer", fontSize: "14px" }}
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div style={{ color: "#b3b3b3", lineHeight: 1.8, fontSize: "14px" }}>
+                  {aiDescription.split("\n").map((line, i) => {
+                    // Dòng trống → khoảng cách
+                    if (line.trim() === "") return <div key={i} style={{ height: "8px" }} />;
+
+                    // Render **text** thành bold
+                    const parts = line.split(/\*\*(.*?)\*\*/g);
+                    return (
+                      <p key={i} style={{ margin: "4px 0" }}>
+                        {parts.map((part, j) =>
+                          j % 2 === 1
+                            ? <strong key={j} style={{ color: "#fff" }}>{part}</strong>
+                            : part
+                        )}
+                      </p>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {aiStatus === "error" && (
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <span style={{ color: "#e74c3c", fontSize: "13px" }}>{aiError}</span>
+                <button
+                  onClick={fetchAiDescription}
+                  style={{
+                    background: "none",
+                    border: "1px solid #e74c3c",
+                    borderRadius: "12px",
+                    color: "#e74c3c",
+                    fontSize: "12px",
+                    padding: "4px 10px",
+                    cursor: "pointer",
+                  }}
+                >
+                  Thử lại
+                </button>
+              </div>
+            )}
+          </div>
+          {/* ↑ HẾT PHẦN AI */}
+        </div>
+
+        {/* Về nghệ sĩ — giữ nguyên */}
+        <div style={{ background: "#181818", borderRadius: "14px", padding: "22px" }}>
+          <h2 style={{ color: "#fff", marginBottom: "16px" }}>Về nghệ sĩ</h2>
+          <p style={{ color: "#b3b3b3", lineHeight: 1.8 }}>
+            {artistName} hiện đang có mặt trên TuneVault...
+          </p>
+        </div>
+      </section>
       <ShareMediaModal
         open={shareOpen}
         onClose={() => setShareOpen(false)}
@@ -298,6 +430,7 @@ import { PlayIcon, ShareIcon } from "../common/icons";
         playlistID={null}
         title={`Chia sẻ ${track.type === "video" ? "video" : "bài hát"}`}
       />
+
     </>
   );
 };

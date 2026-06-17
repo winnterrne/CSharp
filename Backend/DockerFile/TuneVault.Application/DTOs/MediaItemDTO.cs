@@ -45,7 +45,7 @@ public class UploadMediaFormDto
     public IFormFile File { get; set; } = null!; // ← file nằm trong class
 }
 public record MediaStreamInfoDto
-(
+(         
     int MediaItemID,
     string? TitleName,
     string? MediaItemImage,
@@ -75,7 +75,12 @@ public record MediaItemRecommendationDto(
     int MediaItemID,
     string? TitleName,
     string? ArtistName,
-    string? FilePath
+    string? MediaItemImage,
+    string? FilePath,
+    string? MediaItemTag,
+    string? MediaItemType,
+    int? duration,
+    DateTime? UploadAT
 );
 
 public record MediaItemAlbumDto(

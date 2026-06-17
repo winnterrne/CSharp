@@ -4,7 +4,9 @@ import SectionHeader from "./SectionHeader";
 import { useHistoryStore } from "../../store/historyStore";
 import type { Album } from "../../types/album";
 import { albumApi } from "../../api/albumApi";
-import { buildImageUrl, mapAlbumTrackToMedia, type Media } from "../../types/media";
+import { mapAlbumTrackToMedia, type Media } from "../../types/media";
+import type { RecommendationSong } from "../../types/recommendation";
+import { mapRecommendationToMedia } from "../../types/recommendation";
 
 
 type HomeViewProps = {
@@ -13,6 +15,11 @@ type HomeViewProps = {
   forYou: Media[];
   upcoming: Media[];
   albums: Album[];
+
+  aiRecommendations: RecommendationSong[];
+  loadingAI: boolean;
+  onRefreshAI: () => void;
+
   onOpenTrack: (track: Media) => void;
   onOpenAlbum: (track: Media, tracks: Media[], title?: string) => void;
   onShowAll: (mode: "recommended" | "upcoming" | "forYou") => void;
@@ -24,6 +31,11 @@ const HomeView = ({
   forYou,
   upcoming,
   albums,
+
+  aiRecommendations,
+  loadingAI,
+  onRefreshAI,
+
   onOpenTrack,
   onOpenAlbum,
   onShowAll,
@@ -105,6 +117,13 @@ const HomeView = ({
       </div>
     );
   }
+
+  console.log(
+  recentTracks.map(t => ({
+    id: t.id,
+    title: t.title
+  }))
+);
 
   return (
     <>
@@ -356,6 +375,83 @@ const HomeView = ({
             </div>
           ))}
         </div>
+      </section>
+
+      <section style={{ marginBottom: "36px" }}>
+        <SectionHeader title="🤖 Gợi ý bằng AI" />
+          <div style={{ marginBottom: "16px" }}>
+            <button
+              onClick={onRefreshAI}
+              disabled={loadingAI}
+              style={{
+                padding: "8px 14px",
+                borderRadius: "8px",
+                border: "none",
+                cursor: "pointer",
+                fontWeight: 600,
+              }}
+            >
+              🔄 Làm mới gợi ý
+            </button>
+          </div>
+        {loadingAI ? (
+          <div style={{ color: "#b3b3b3" }}>
+            Đang phân tích sở thích...
+          </div>
+        ) : (
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns:
+                "repeat(auto-fill, minmax(170px, 1fr))",
+              gap: "18px",
+            }}
+          >
+            {aiRecommendations.map((song) => (
+              <div
+                key={song.mediaItemID}
+                onClick={() => onOpenTrack(mapRecommendationToMedia(song))}
+                style={{
+                  background: "#181818",
+                  borderRadius: "12px",
+                  padding: "16px",
+                  cursor: "pointer",
+                }}  
+              >
+                <img
+                  src={`http://localhost:5081/media/images/media/${song.mediaItemImage}`}
+                  alt={song.titleName}
+                  style={{
+                    width: "100%",
+                    aspectRatio: "1",
+                    objectFit: "cover",
+                    borderRadius: "8px",
+                    marginBottom: "12px",
+                  }}
+                />
+
+                <div
+                  style={{
+                    color: "#fff",
+                    fontWeight: 700,
+                    marginBottom: "4px",
+                  }}
+                >
+                  {song.titleName}
+                </div>
+
+                <div
+                  style={{
+                    color: "#b3b3b3",
+                    fontSize: "13px",
+                  }}
+                >
+                  {song.artistName}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </section>
 
       <section>
