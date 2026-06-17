@@ -1,20 +1,40 @@
+import { useNavigate } from "react-router-dom";
 import type { Media } from "../../types/media";
 import { usePlayer } from "../../hooks/usePlayer";
 
-const SearchTopResult = ({ item }: { item: Media }) => {
+type SearchTopResultProps = {
+  item: Media;
+};
+
+const SearchTopResult = ({ item }: SearchTopResultProps) => {
+  const navigate = useNavigate();
   const { playTrack, setQueue } = usePlayer();
+
+  const handleOpenTrack = () => {
+    setQueue([item]);
+    playTrack(item);
+
+    navigate(`/track/${item.id}`, {
+      state: {
+        track: item,
+      },
+    });
+  };
 
   return (
     <div
-      onClick={() => {
-        setQueue([item]);
-        playTrack(item);
-      }}
+      onClick={handleOpenTrack}
       style={{
         background: "#181818",
         borderRadius: "12px",
         padding: "20px",
         cursor: "pointer",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.background = "#242424";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.background = "#181818";
       }}
     >
       <h2 style={{ marginBottom: "20px" }}>Kết quả hàng đầu</h2>
@@ -50,15 +70,30 @@ const SearchTopResult = ({ item }: { item: Media }) => {
                 objectFit: "cover",
               }}
             />
+          ) : item.type === "video" ? (
+            "🎬"
           ) : (
             "♪"
           )}
         </div>
 
-        <div>
-          <h1>{item.title}</h1>
+        <div style={{ minWidth: 0 }}>
+          <h1
+            style={{
+              margin: 0,
+              color: "#fff",
+              fontSize: "34px",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              maxWidth: "520px",
+            }}
+          >
+            {item.title}
+          </h1>
 
-          <p style={{ color: "#b3b3b3" }}>
+          <p style={{ color: "#b3b3b3", marginTop: "8px" }}>
+            {item.type === "video" ? "Video" : "Bài hát"} •{" "}
             {item.artist?.name ?? "Unknown Artist"}
           </p>
         </div>

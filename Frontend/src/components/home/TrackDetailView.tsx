@@ -263,47 +263,6 @@ import { aiApi } from "../../api/aiApi";
           gap: "24px",
         }}
       >
-        <div
-          style={{
-            background: "#181818",
-            borderRadius: "14px",
-            padding: "22px",
-          }}
-        >
-          <h2 style={{ color: "#fff", marginBottom: "18px" }}>
-            Thông tin {track.type === "video" ? "video" : "bài hát"}
-          </h2>
-
-          <InfoRow label="Tên bài" value={track.title} />
-          <InfoRow label="Nghệ sĩ" value={artistName} />
-          <InfoRow label="Thời lượng" value={formatDuration(track.duration)} />
-          <InfoRow label="Thể loại" value={track.genre ?? "Unknown"} />
-          <InfoRow label="Loại" value={track.type} />
-        </div>
-
-        <div
-          style={{
-            background: "#181818",
-            borderRadius: "14px",
-            padding: "22px",
-          }}
-        >
-          <h2 style={{ color: "#fff", marginBottom: "16px" }}>Về nghệ sĩ</h2>
-
-          <p style={{ color: "#b3b3b3", lineHeight: 1.8 }}>
-            {artistName} hiện đang có mặt trên TuneVault. Bạn có thể mở trang
-            nghệ sĩ để xem thêm các bài hát liên quan.
-          </p>
-        </div>
-      </section>
-
-      <section
-        style={{
-          display: "grid",
-          gridTemplateColumns: "minmax(0,1fr) minmax(280px,400px)",
-          gap: "24px",
-        }}
-      >
         {/* Thông tin bài hát */}
         <div style={{ background: "#181818", borderRadius: "14px", padding: "22px" }}>
           <h2 style={{ color: "#fff", marginBottom: "18px" }}>Thông tin bài hát</h2>

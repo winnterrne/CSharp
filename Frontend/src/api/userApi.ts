@@ -21,15 +21,6 @@ export interface ApiResponse<T> {
   data: T;
 }
 
-export interface UserSearchResult {
-  userID: string;
-  userName: string;
-  userImage: string | null;
-  email: string;
-  role: string;
-  phone: string;
-}
-
 export interface ApiResponse<T> {
   success: boolean;
   data: T;

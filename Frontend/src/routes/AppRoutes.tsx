@@ -89,8 +89,17 @@ export default function AppRoutes() {
           </MainLayout>
         }
       />
-    </Routes>
 
+    <Route
+      path="/profile/:userId"
+      element={
+        <MainLayout>
+          <ProfilePage />
+        </MainLayout>
+      }
+    />
+    </Routes>
+    
     
   );
 }
