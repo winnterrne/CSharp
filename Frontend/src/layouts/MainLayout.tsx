@@ -29,7 +29,6 @@ const MainLayout = ({ children }: { children: ReactNode }) => {
   const [sidebarSize, setSidebarSize] = useState(DEFAULT_SIDEBAR_WIDTH);
   const [isResizingSidebar, setIsResizingSidebar] = useState(false);
   const [isNowPlayingCollapsed, setIsNowPlayingCollapsed] = useState(false);
-  const [isVideoFullscreen, setIsVideoFullscreen] = useState(false);
 
   const isOverlaySidebar =
     !isSidebarCollapsed &&
@@ -260,7 +259,6 @@ const MainLayout = ({ children }: { children: ReactNode }) => {
             onToggleCollapse={() =>
               setIsNowPlayingCollapsed((prev) => !prev)
             }
-            onFullscreenChange={setIsVideoFullscreen}
           />
         </div>
       </div>
