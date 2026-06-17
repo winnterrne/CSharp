@@ -19,7 +19,7 @@ interface PlayerStore extends PlayerState {
   playingContextId: string | null;
   setPlayingContextId: (id: string | null) => void;
 
-  playTrack: (track: Media, queue?: Media[]) => void;
+  playTrack: (track: Media, queue?: Media[], contextId?: string) => void;
   play: () => void;
   pause: () => void;
   togglePlay: () => void;
@@ -85,13 +85,31 @@ export const playerStore = create<PlayerStore>()(
 
       setPlayingContextId: (id) => set({ playingContextId: id }),
 
-      playTrack: (track, queue) =>
-        set((state) => ({
+      playTrack: (track, queue, contextId) =>
+      set((state) => {
+        const isSameTrack = state.currentTrack?.id === track.id;
+        const isSameContext = state.playingContextId === contextId;
+
+        // Nếu cùng bài nhưng khác context → reset phát lại từ đầu
+        if (isSameTrack && !isSameContext) {
+          return {
+            currentTrack: track,
+            queue: queue && queue.length > 0 ? queue : state.queue,
+            isPlaying: true,
+            position: 0,
+            playingContextId: contextId,
+          };
+        }
+
+        // Mặc định: phát bài mới hoặc cùng context
+        return {
           currentTrack: track,
           queue: queue && queue.length > 0 ? queue : state.queue,
           isPlaying: true,
           position: 0,
-        })),
+          playingContextId: contextId,
+        };
+      }),
 
       play: () => set({ isPlaying: true }),
 

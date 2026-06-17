@@ -15,7 +15,8 @@ import AlbumCardLarge from "../home/AlbumCardLarge";
 import type { Album } from "../../types/album";
 import { albumApi } from "../../api/albumApi";
 import { useAlbumStore } from "../../store/albumStore";
-import { mapAlbumTrackToMedia, buildImageUrl } from "../../types/media";
+import { mapAlbumTrackToMedia } from "../../types/media";
+import { useRecommendationStore } from "../../store/recommendationStore";
 
 
 type ViewMode =
@@ -64,10 +65,9 @@ const MainContent = () => {
   const [forYou, setForYou] = useState<Media[]>([]);
   const [upcoming, setUpcoming] = useState<Media[]>([]);
   const [albums, setAlbums] = useState<Album[]>([]);
-
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
+  const { aiRecommendations, loadingAI, loadAIRecommendations } = useRecommendationStore();
   const selectedAlbumId = useAlbumStore((s) => s.selectedAlbumId);
   const setSelectedAlbumId = useAlbumStore((s) => s.setSelectedAlbumId);
 
@@ -106,7 +106,6 @@ const MainContent = () => {
         }
       } catch (err) {
         console.error("FETCH HOME DATA ERROR:", err);
-
         setRecommended([]);
         setForYou([]);
         setUpcoming([]);
@@ -120,7 +119,12 @@ const MainContent = () => {
     fetchHomeData();
   }, []);
 
-  
+  useEffect(() => {
+  if (aiRecommendations.length === 0) {
+    loadAIRecommendations();
+  }
+}, [aiRecommendations, loadAIRecommendations]);
+    
 
   const allTracks = useMemo(() => {
     return uniqueTracks([...recommended, ...forYou, ...upcoming]);
@@ -189,7 +193,7 @@ const MainContent = () => {
   };
 
   openAlbum();
-}, [selectedAlbumId, albums]);
+}, [selectedAlbumId,  albums]);
 
   const handleOpenArtist = (artistName: string, tracks: Media[] = allTracks) => {
     const artistTracks = tracks.filter(
@@ -301,6 +305,9 @@ const MainContent = () => {
           forYou={forYou}
           upcoming={upcoming}
           albums={albums}
+          aiRecommendations={aiRecommendations}
+          loadingAI={loadingAI}
+          onRefreshAI={loadAIRecommendations}
           onOpenTrack={handleOpenTrack}
           onOpenAlbum={handleOpenAlbum}
           onShowAll={(mode) => {

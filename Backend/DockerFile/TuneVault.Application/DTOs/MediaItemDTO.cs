@@ -75,7 +75,12 @@ public record MediaItemRecommendationDto(
     int MediaItemID,
     string? TitleName,
     string? ArtistName,
-    string? FilePath
+    string? MediaItemImage,
+    string? FilePath,
+    string? MediaItemTag,
+    string? MediaItemType,
+    int? duration,
+    DateTime? UploadAT
 );
 
 public record MediaItemAlbumDto(

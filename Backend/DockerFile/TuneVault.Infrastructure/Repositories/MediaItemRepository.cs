@@ -17,7 +17,7 @@ public class MediaItemRepository : IMediaItemRepository
                      FROM MediaItem m
                      LEFT JOIN Artist a ON m.ArtistID = a.ArtistID
                      LEFT JOIN Album al ON m.AlbumID = al.AlbumID
-                     WHERE MediaItemID = @MediaItemID AND IsDeleted = 0";
+                     WHERE MediaItemID = @MediaItemID AND m.IsDeleted = 0";
         return await _db.LoadDataSingleAsync<MediaItem>(sql, new { MediaItemID = mediaId});
     }
     public async Task<MediaItem> GetMediaByNameAsync(string mediaitemname)

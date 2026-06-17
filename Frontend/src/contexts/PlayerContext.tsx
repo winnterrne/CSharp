@@ -15,8 +15,11 @@ export interface PlayerContextType {
   repeatMode: RepeatMode;
   isLoading: boolean;
 
+  playingContextId: string | null; 
+  setPlayingContextId: (id: string | null) => void; 
+
   // Actions
-  playTrack: (track: Media) => void;
+  playTrack: (track: Media, queue?: Media[], contextId?: string) => void;
   setQueue: (tracks: Media[]) => void;
   togglePlay: () => void;
   play: () => void;

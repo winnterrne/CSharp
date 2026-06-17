@@ -13,6 +13,7 @@ import {
   PlayIcon,
   ShuffleIcon,
 } from "../../components/common/icons";
+import { playerStore } from "../../store/playerStore";
 
 const formatDuration = (seconds?: number) => {
   if (!seconds || Number.isNaN(seconds)) return "0:00";
@@ -294,40 +295,40 @@ const mapAlbumTrackToMedia = (
 
   const thumbnailUrl = image ? buildMediaImageUrl(String(image)) : "";
 
- const genre =
-  getValue(media, [
-    "genre",
-    "Genre",
-    "genreName",
-    "GenreName",
-    "mediaGenre",
-    "MediaGenre",
-    "mediaItemTag",
-    "MediaItemTag",
-    "tag",
-    "Tag",
-    "category",
-    "Category",
-    "categoryName",
-    "CategoryName",
-  ]) ??
-  getValue(item, [
-    "genre",
-    "Genre",
-    "genreName",
-    "GenreName",
-    "mediaGenre",
-    "MediaGenre",
-    "mediaItemTag",
-    "MediaItemTag",
-    "tag",
-    "Tag",
-    "category",
-    "Category",
-    "categoryName",
-    "CategoryName",
-  ]) ??
-  "Unknown";
+  const genre =
+    getValue(media, [
+      "genre",
+      "Genre",
+      "genreName",
+      "GenreName",
+      "mediaGenre",
+      "MediaGenre",
+      "mediaItemTag",
+      "MediaItemTag",
+      "tag",
+      "Tag",
+      "category",
+      "Category",
+      "categoryName",
+      "CategoryName",
+    ]) ??
+    getValue(item, [
+      "genre",
+      "Genre",
+      "genreName",
+      "GenreName",
+      "mediaGenre",
+      "MediaGenre",
+      "mediaItemTag",
+      "MediaItemTag",
+      "tag",
+      "Tag",
+      "category",
+      "Category",
+      "categoryName",
+      "CategoryName",
+    ]) ??
+    "Unknown";
 
   return {
     id,
@@ -381,17 +382,17 @@ const AlbumDetailPage = () => {
 
   const albumImageUrl = getAlbumImageUrl(album);
 
+  const playingContextId = playerStore((state) => state.playingContextId);
+  const setPlayingContextId = playerStore((state) => state.setPlayingContextId);
+
   const currentTrackId = useMemo(() => {
     return Number(getMediaId(currentTrack));
   }, [currentTrack]);
 
   const isCurrentAlbumPlaying = useMemo(() => {
     if (!currentTrack) return false;
-
-    return tracks.some(
-      (track) => Number(getMediaId(track)) === Number(getMediaId(currentTrack))
-    );
-  }, [currentTrack, tracks]);
+    return playingContextId === `album-${id}`;
+  }, [currentTrack, playingContextId, id])
 
   const totalDuration = useMemo(() => {
     const totalSeconds = tracks.reduce(
@@ -481,7 +482,8 @@ const AlbumDetailPage = () => {
     // thì set queue bằng toàn bộ bài trong album và phát bài đầu tiên.
     if (!isCurrentAlbumPlaying) {
       setQueue(tracks);
-      playTrack(tracks[0]);
+      setPlayingContextId(`album-${id}`);
+      playTrack(tracks[0], `album-${id}`, tracks);
       return;
     }
 
@@ -495,6 +497,7 @@ const AlbumDetailPage = () => {
 
   const handlePlayTrack = (track: Media) => {
     setQueue(tracks);
+    setPlayingContextId(`album-${id}`);
     playTrack(track);
   };
 
@@ -503,6 +506,7 @@ const AlbumDetailPage = () => {
       Number(getMediaId(track)) === Number(getMediaId(currentTrack));
 
     setQueue(tracks);
+    setPlayingContextId(`album-${id}`);
 
     if (isThisTrackPlaying) {
       if (isPlaying) {
@@ -707,7 +711,8 @@ const AlbumDetailPage = () => {
 
             {tracks.map((track, index) => {
               const active =
-                Number(getMediaId(track)) === Number(currentTrackId);
+                Number(getMediaId(track)) === Number(currentTrackId) &&
+                playingContextId === `album-${id}`;
 
               return (
                 <AlbumTrackRow

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import type { Media } from "../../types/media";
 import { usePlayer } from "../../hooks/usePlayer";
-import { useHistoryStore } from "../../store/historyStore";
 import { PlayIcon } from "../common/icons";
 
 type Props = {
@@ -14,13 +13,11 @@ const QuickPlayCard = ({ track, tracks, onOpenTrack }: Props) => {
   const [hovered, setHovered] = useState(false);
 
   const { playTrack, setQueue } = usePlayer();
-  const addRecentTrack = useHistoryStore((state) => state.addRecentTrack);
 
   const handlePlay = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
 
     setQueue(tracks);
-    addRecentTrack(track);
     playTrack(track);
   };
 
