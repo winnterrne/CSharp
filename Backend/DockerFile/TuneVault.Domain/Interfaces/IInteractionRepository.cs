@@ -20,5 +20,7 @@ namespace TuneVault.Domain.Interfaces
 
         //
         Task<IEnumerable<Artist>> GetFollowedArtistAsync(string userID);
+        Task<IEnumerable<FollowedUser>> GetFollowedUsersAsync(string userID);
+        
     }
 }

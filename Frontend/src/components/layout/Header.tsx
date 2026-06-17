@@ -10,6 +10,7 @@ import NotificationList from "../notification/NotificationList";
 import { notificationStore } from "../../store/notificationStore";
 import { notificationApi } from "../../api/notificationApi";
 import { startNotificationSignalR } from "../../api/notificationSignalR";
+import { useNavigate } from "react-router-dom";
 
 export interface HeaderUser {
   displayName: string;
@@ -61,7 +62,7 @@ const Header = ({
   onSearchChange,
   onHomeClick,
   onNotificationClick,
-  onAvatarClick,
+  // onAvatarClick,
   onPlayTrack,
   onSelectTrack,
 }: HeaderProps) => {
@@ -83,6 +84,7 @@ const Header = ({
   const recentTracks = useHistoryStore((state) => state.recentTracks);
   const setNotifications = notificationStore((s) => s.setNotifications);
   const unreadCount = notificationStore((state) => state.unreadCount);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadNotifications = async () => {
@@ -488,11 +490,21 @@ const Header = ({
                 zIndex: 9999,
               }}
             >
+              {/* ✅ MENU MỚI */}
+
+              <MenuItem
+                label="Tài khoản"
+                onClick={() => {
+                  setShowAccountMenu(false);
+                  navigate("/account");
+                }}
+              />
+
               <MenuItem
                 label="Hồ sơ"
                 onClick={() => {
                   setShowAccountMenu(false);
-                  onAvatarClick?.();
+                  navigate("/profile");
                 }}
               />
               <MenuItem

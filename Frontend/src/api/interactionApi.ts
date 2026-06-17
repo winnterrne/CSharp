@@ -2,7 +2,7 @@ import api from "./axios";
 
 export const interactionApi = {
   recordPlayHistory: (mediaItemId: number) =>
-  api.post(`/Interaction/playhistory/${mediaItemId}`),
+    api.post(`/Interaction/playhistory/${mediaItemId}`),
 
   getPlayHistory: (limit = 10) =>
     api.get(`/Interaction/playhistory?limit=${limit}`),
@@ -12,4 +12,5 @@ export const interactionApi = {
 
   followUser: (followingUserId: string) =>
     api.post(`/Interaction/follow/user/${followingUserId}`),
+  getFollowedUsers: () => api.get("/Interaction/follow-user"),
 };

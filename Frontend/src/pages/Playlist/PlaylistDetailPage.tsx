@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { playlistApi } from "../../api/playlistApi";
 import AddToPlaylistModal from "../../components/playlist/AddToPlaylistModal";
 import type {
@@ -13,21 +13,24 @@ import { usePlayer } from "../../hooks/usePlayer";
 import { useSearch } from "../../hooks/useSearch";
 import TrackActionMenu from "../../components/common/TrackActionMenu";
 import ShareMediaModal from "../../components/share/ShareModal";
-import { AddToPlaylistIcon, MoreHorizIcon, NowPlayingIcon, PlayIcon, ShareIcon, ShuffleIcon } from "../../components/common/icons";
+import {
+  AddToPlaylistIcon,
+  MoreHorizIcon,
+  NowPlayingIcon,
+  PlayIcon,
+  ShareIcon,
+  ShuffleIcon,
+} from "../../components/common/icons";
 
 const formatDuration = (seconds?: number) => {
-  
   if (!seconds || Number.isNaN(seconds)) return "0:00";
-
   const min = Math.floor(seconds / 60);
   const sec = Math.floor(seconds % 60);
-
   return `${min}:${String(sec).padStart(2, "0")}`;
 };
 
 const getArtistName = (media: Media) => {
   const m = media as any; 
-
   return (
     m.artist?.name ??
     m.artist?.artistName ??
@@ -39,23 +42,21 @@ const getArtistName = (media: Media) => {
 
 const getMediaId = (media: Media) => {
   const m = media as any;
-
   return m.id ?? m.mediaItemID ?? m.mediaItemId ?? 0;
 };
 
 const getPlaylistFromResponse = (responseData: unknown): Playlist => {
-  const wrapper = responseData as {
-    data?: PlaylistDetailDto;
-  };
-
+  const wrapper = responseData as { data?: PlaylistDetailDto };
   const raw = wrapper.data ?? (responseData as PlaylistDetailDto);
-
   return mapPlaylistDetailDtoToPlaylist(raw);
 };
 
 const PlaylistDetailPage = () => {
   const { id } = useParams<{ id: string }>();
-  const { playTrack, pause, isPlaying, currentTrack, play, setQueue } = usePlayer();
+  const navigate = useNavigate();
+
+  const { playTrack, pause, isPlaying, currentTrack, play, setQueue } =
+    usePlayer();
 
   const {
     search,
@@ -67,11 +68,17 @@ const PlaylistDetailPage = () => {
   const [playlist, setPlaylist] = useState<Playlist | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
   const [showAddTrackBar, setShowAddTrackBar] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState("");
   const [addingTrack, setAddingTrack] = useState(false);
   const [addTrackMessage, setAddTrackMessage] = useState("");
+
   const [sharePlaylistOpen, setSharePlaylistOpen] = useState(false);
+
+  // ✅ PLAYLIST MENU: menu 3 chấm playlist
+  const [showPlaylistMenu, setShowPlaylistMenu] = useState(false);
+  const [updatingPlaylist, setUpdatingPlaylist] = useState(false);
 
   const playlistTracks = useMemo<PlaylistTrack[]>(() => {
     return playlist?.tracks ?? [];
@@ -85,20 +92,20 @@ const PlaylistDetailPage = () => {
   if (!currentTrack) return false;
 
   return mediaTracks.some(
-      (track) => Number(getMediaId(track)) === Number(getMediaId(currentTrack))
+      (track) => Number(getMediaId(track)) === Number(getMediaId(currentTrack)),
     );
   }, [currentTrack, mediaTracks]);
+
   const totalDuration = useMemo(() => {
     const totalSeconds = mediaTracks.reduce(
       (sum, track) => sum + (track.duration ?? 0),
-      0
+      0,
     );
 
     const hours = Math.floor(totalSeconds / 3600);
     const mins = Math.floor((totalSeconds % 3600) / 60);
 
     if (hours > 0) return `${hours} giờ ${mins} phút`;
-
     return `${mins} phút`;
   }, [mediaTracks]);
 
@@ -110,12 +117,7 @@ const PlaylistDetailPage = () => {
       setError("");
 
       const res = await playlistApi.getById(Number(id));
-
-      console.log("PLAYLIST DETAIL RAW:", res.data);
-
       const data = getPlaylistFromResponse(res.data);
-
-      console.log("PLAYLIST DETAIL MAPPED:", data);
 
       setPlaylist(data);
     } catch (err) {
@@ -133,19 +135,73 @@ const PlaylistDetailPage = () => {
   const handlePlayPlaylist = () => {
     if (mediaTracks.length === 0) return;
 
-    // Nếu bài đang phát không thuộc playlist hiện tại
-    // thì set queue bằng toàn bộ playlist này và phát bài đầu
     if (!isCurrentPlaylistPlaying) {
       setQueue(mediaTracks);
       playTrack(mediaTracks[0]);
       return;
     }
 
-    // Nếu đang ở đúng playlist này thì nút play chỉ đóng vai trò play/pause
     if (isPlaying) {
       pause();
     } else {
       play();
+    }
+  };
+
+  // ✅ PLAYLIST PUBLIC/PRIVATE: đổi công khai / riêng tư
+  const handleTogglePlaylistPublic = async () => {
+    if (!playlist) return;
+
+    try {
+      setUpdatingPlaylist(true);
+
+      const nextIsPublic = !playlist.isPublic;
+
+      await playlistApi.update(playlist.id, {
+        playlistID: playlist.id,
+        playlistName: playlist.playlistName ?? playlist.name ?? "Playlist",
+        description: playlist.description ?? "",
+        isPublic: nextIsPublic,
+      });
+
+      // ✅ reload lại từ server cho chắc
+      await loadPlaylist();
+
+      setShowPlaylistMenu(false);
+    } catch (error) {
+      console.error("TOGGLE PLAYLIST PUBLIC ERROR:", error);
+      alert("Không đổi được trạng thái playlist");
+    } finally {
+      setUpdatingPlaylist(false);
+    }
+  };
+
+  // ✅ PLAYLIST DELETE
+ const handleDeletePlaylist = async () => {
+  if (!id) return;
+
+  const playlistId = Number(id);
+
+  const ok = window.confirm("Bạn chắc chắn muốn xóa playlist này?");
+  if (!ok) return;
+
+  try {
+    await playlistApi.delete(playlistId);
+
+    // ✅ báo Sidebar xóa ngay
+    window.dispatchEvent(
+      new CustomEvent("tunevault:playlist-deleted", {
+        detail: { playlistId },
+      }),
+    );
+
+    // ✅ báo các chỗ khác reload
+    window.dispatchEvent(new Event("tunevault:playlist-updated"));
+
+    navigate("/");
+  } catch (error) {
+    console.error("DELETE PLAYLIST ERROR:", error);
+    alert("Không xóa được playlist");
     }
   };
 
@@ -166,6 +222,7 @@ const PlaylistDetailPage = () => {
 
     return () => clearTimeout(timer);
   }, [searchKeyword, showAddTrackBar, search]);
+
   const handleAddTrackToCurrentPlaylist = async (mediaItemId: number) => {
     if (!id) return;
 
@@ -244,7 +301,7 @@ const PlaylistDetailPage = () => {
             boxShadow: "0 16px 40px rgba(0,0,0,.45)",
           }}
         >
-          {playlist.coverUrl ? (
+          {playlist.coverUrl ?
             <img
               src={playlist.coverUrl}
               alt={playlist.name || playlist.playlistName}
@@ -254,9 +311,7 @@ const PlaylistDetailPage = () => {
                 objectFit: "cover",
               }}
             />
-          ) : (
-            "♪"
-          )}
+          : "♪"}
         </div>
 
         <div style={{ minWidth: 0 }}>
@@ -268,7 +323,9 @@ const PlaylistDetailPage = () => {
               marginBottom: "8px",
             }}
           >
-            Danh sách phát công khai
+            {playlist.isPublic ?
+              "Danh sách phát công khai"
+            : "Danh sách phát riêng tư"}
           </div>
 
           <h1
@@ -336,7 +393,9 @@ const PlaylistDetailPage = () => {
             justifyContent: "center",
           }}
         >
-          {isCurrentPlaylistPlaying && isPlaying ? <NowPlayingIcon /> : <PlayIcon />}
+          {isCurrentPlaylistPlaying && isPlaying ?
+            <NowPlayingIcon />
+          : <PlayIcon />}
         </button>
 
         <button
@@ -349,7 +408,7 @@ const PlaylistDetailPage = () => {
             fontSize: "30px",
           }}
         >
-          <ShuffleIcon/>
+          <ShuffleIcon />
         </button>
 
         <button
@@ -370,8 +429,9 @@ const PlaylistDetailPage = () => {
             fontWeight: 900,
           }}
         >
-          <AddToPlaylistIcon/>
+          <AddToPlaylistIcon />
         </button>
+
         <button
           title="Chia sẻ playlist"
           onClick={() => setSharePlaylistOpen(true)}
@@ -383,12 +443,14 @@ const PlaylistDetailPage = () => {
             fontSize: "28px",
           }}
         >
-          <ShareIcon/>
-
+          <ShareIcon />
         </button>
 
+        {/* ✅ PLAYLIST MENU: nút 3 chấm */}
+        <div style={{ position: "relative" }}>
         <button
           title="Tùy chọn playlist"
+            onClick={() => setShowPlaylistMenu((prev) => !prev)}
           style={{
             border: "none",
             background: "transparent",
@@ -397,28 +459,71 @@ const PlaylistDetailPage = () => {
             fontSize: "30px",
           }}
         >
-          <MoreHorizIcon/>
+            <MoreHorizIcon />
         </button>
-        </section>
-      {showAddTrackBar && (
-  <section
+
+          {showPlaylistMenu && (
+            <div
     style={{
-      padding: "0 32px 24px",
+                position: "absolute",
+                top: "42px",
+                left: 0,
+                width: "230px",
+                background: "#282828",
+                borderRadius: "8px",
+                padding: "6px",
+                zIndex: 20,
+                boxShadow: "0 12px 30px rgba(0,0,0,.55)",
     }}
   >
+              <button
+                disabled={updatingPlaylist}
+                onClick={handleTogglePlaylistPublic}
+                style={{
+                  ...playlistMenuItemStyle,
+                  opacity: updatingPlaylist ? 0.6 : 1,
+                  cursor: updatingPlaylist ? "not-allowed" : "pointer",
+                }}
+              >
+                {updatingPlaylist ?
+                  "Đang cập nhật..."
+                : playlist.isPublic ?
+                  "Chuyển sang riêng tư"
+                : "Chuyển sang công khai"}
+              </button>
+
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(window.location.href);
+                  setShowPlaylistMenu(false);
+                }}
+                style={playlistMenuItemStyle}
+              >
+                Sao chép link playlist
+              </button>
+
+              <button
+                onClick={handleDeletePlaylist}
+                style={{
+                  ...playlistMenuItemStyle,
+                  color: "#ff7676",
+                }}
+              >
+                Xóa playlist
+              </button>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {showAddTrackBar && (
+        <section style={{ padding: "0 32px 24px" }}>
     <div
       style={{
         background: "#181818",
         border: "1px solid #333",
         borderRadius: "12px",
         padding: "18px",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "12px",
         }}
       >
         <input
@@ -426,7 +531,7 @@ const PlaylistDetailPage = () => {
           onChange={(e) => setSearchKeyword(e.target.value)}
           placeholder="Tìm bài hát để thêm vào playlist..."
           style={{
-            flex: 1,
+                width: "100%",
             height: "44px",
             borderRadius: "999px",
             border: "none",
@@ -438,16 +543,9 @@ const PlaylistDetailPage = () => {
             boxSizing: "border-box",
           }}
         />
-      </div>
 
       {searching && (
-        <div
-          style={{
-            marginTop: "10px",
-            color: "#b3b3b3",
-            fontSize: "14px",
-          }}
-        >
+              <div style={{ marginTop: "10px", color: "#b3b3b3" }}>
           Đang tìm kiếm...
         </div>
       )}
@@ -457,10 +555,9 @@ const PlaylistDetailPage = () => {
           style={{
             marginTop: "10px",
             color:
-              addTrackMessage.includes("Đã") && !searchError
-                ? "#1DB954"
+                    addTrackMessage.includes("Đã") && !searchError ?
+                      "#1DB954"
                 : "#ff4d4f",
-            fontSize: "14px",
           }}
         >
           {searchError || addTrackMessage}
@@ -502,7 +599,7 @@ const PlaylistDetailPage = () => {
                   color: "#b3b3b3",
                 }}
               >
-                {track.thumbnailUrl ? (
+                      {track.thumbnailUrl ?
                   <img
                     src={track.thumbnailUrl}
                     alt={track.title}
@@ -512,9 +609,7 @@ const PlaylistDetailPage = () => {
                       objectFit: "cover",
                     }}
                   />
-                ) : (
-                  "♪"
-                )}
+                      : "♪"}
               </div>
 
               <div style={{ minWidth: 0 }}>
@@ -542,7 +637,9 @@ const PlaylistDetailPage = () => {
               </div>
 
               <button
-                onClick={() => handleAddTrackToCurrentPlaylist(Number(track.id))}
+                      onClick={() =>
+                        handleAddTrackToCurrentPlaylist(Number(track.id))
+                      }
                 disabled={addingTrack}
                 style={{
                   height: "36px",
@@ -564,11 +661,11 @@ const PlaylistDetailPage = () => {
     </div>
   </section>
 )}
+
       <section style={{ padding: "0 32px 32px" }}>
-        {playlistTracks.length === 0 ? (
+        {playlistTracks.length === 0 ?
           <EmptyPlaylist />
-        ) : (
-          <>
+        : <>
             <div
               style={{
                 display: "grid",
@@ -601,8 +698,9 @@ const PlaylistDetailPage = () => {
               />
             ))}
           </>
-        )}
+        }
       </section>
+
       <ShareMediaModal
         open={sharePlaylistOpen}
         onClose={() => setSharePlaylistOpen(false)}
@@ -650,12 +748,8 @@ const PlaylistTrackRow = ({
     setQueue(playlistQueue);
 
     if (isThisTrackPlaying) {
-      if (isPlaying) {
-        pause();
-      } else {
-        play();
-      }
-
+      if (isPlaying) pause();
+      else play();
       return;
     }
 
@@ -676,15 +770,12 @@ const PlaylistTrackRow = ({
         height: "64px",
         padding: "0 8px",
         borderRadius: "8px",
-        background: showNowPlaying
-          ? "rgba(29,185,84,.18)"
-          : hovered
-            ? "#2a2a2a"
+        background:
+          showNowPlaying ? "rgba(29,185,84,.18)"
+          : hovered ? "#2a2a2a"
             : "transparent",
         cursor: "pointer",
         position: "relative",
-        transition: "background 0.15s ease, transform 0.12s ease",
-        transform: hovered ? "translateY(-1px)" : "translateY(0)",
       }}
     >
       <div
@@ -696,7 +787,7 @@ const PlaylistTrackRow = ({
           justifyContent: "center",
         }}
       >
-        {hovered || isThisTrackPlaying ? (
+        {hovered || isThisTrackPlaying ?
           <button
             onClick={handlePlayThisTrack}
             style={{
@@ -712,11 +803,11 @@ const PlaylistTrackRow = ({
               justifyContent: "center",
             }}
           >
-            {showNowPlaying ? <NowPlayingIcon /> : <PlayIcon />}
+            {showNowPlaying ?
+              <NowPlayingIcon />
+            : <PlayIcon />}
           </button>
-        ) : (
-          index + 1
-        )}
+        : index + 1}
       </div>
 
       <div
@@ -740,12 +831,9 @@ const PlaylistTrackRow = ({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            boxShadow: showNowPlaying
-              ? "0 0 0 2px rgba(29,185,84,.7)"
-              : "none",
           }}
         >
-          {media.thumbnailUrl ? (
+          {media.thumbnailUrl ?
             <img
               src={media.thumbnailUrl}
               alt={media.title}
@@ -755,9 +843,7 @@ const PlaylistTrackRow = ({
                 objectFit: "cover",
               }}
             />
-          ) : (
-            "♪"
-          )}
+          : "♪"}
         </div>
 
         <div style={{ minWidth: 0 }}>
@@ -898,5 +984,18 @@ const EmptyPlaylist = () => (
     <p>Hãy thêm bài hát vào playlist của bạn.</p>
   </div>
 );
+
+const playlistMenuItemStyle: React.CSSProperties = {
+  width: "100%",
+  border: "none",
+  background: "transparent",
+  color: "#fff",
+  padding: "11px 12px",
+  textAlign: "left",
+  borderRadius: "6px",
+  cursor: "pointer",
+  fontSize: "14px",
+  fontWeight: 700,
+};
 
 export default PlaylistDetailPage;

@@ -120,11 +120,53 @@ const Sidebar = ({
     })();
   }, [fetchPlaylists, loadFavorites, loadFollowedArtists, canUseAuthApi]);
 
+// ✅ Khi đổi route, reload lại playlist để Sidebar sync DB
+useEffect(() => {
+  if (!canUseAuthApi) return;
+
+  fetchPlaylists();
+}, [location.pathname, canUseAuthApi, fetchPlaylists]);
+
   useEffect(() => {
     albumApi.getAll().then((res) => {
       setAlbums(res.data?.data ?? []);
     });
   }, []);
+ useEffect(() => {
+  const reloadPlaylists = () => {
+    fetchPlaylists();
+  };
+
+  const handleDeleted = (event: Event) => {
+    const custom = event as CustomEvent<{ playlistId: number }>;
+    const deletedId = Number(custom.detail?.playlistId);
+
+    // ✅ Xóa khỏi Sidebar ngay lập tức
+    setPlaylists((prev) =>
+      prev.filter((playlist) => {
+        const currentId =
+          playlist.playlistID ??
+          playlist.id ??
+          0;
+
+        return Number(currentId) !== deletedId;
+      }),
+    );
+
+    // ✅ Reload lại sau một chút để sync DB
+    setTimeout(() => {
+      fetchPlaylists();
+    }, 300);
+  };
+
+  window.addEventListener("tunevault:playlist-updated", reloadPlaylists);
+  window.addEventListener("tunevault:playlist-deleted", handleDeleted);
+
+  return () => {
+    window.removeEventListener("tunevault:playlist-updated", reloadPlaylists);
+    window.removeEventListener("tunevault:playlist-deleted", handleDeleted);
+  };
+}, [fetchPlaylists]);
 
   const handleOpenAlbum = (album: Album) => {
     setSelectedAlbumId(album.albumID);
