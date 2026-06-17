@@ -4,6 +4,7 @@ public record FavoriteDto
     int MediaItemID,
     string? TitleName,
     string? MediaItemImage,
+    string? MediaItemTag,
     int? Artistid,
     string? ArtistName
 );
