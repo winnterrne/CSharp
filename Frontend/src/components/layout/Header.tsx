@@ -8,6 +8,12 @@ import type { UserProfile } from "../../types/profile";
 import { useHistoryStore } from "../../store/historyStore";
 import { PlayIcon } from "../common/icons";
 
+import { artistApi, type ArtistSearchResult } from "../../api/artistApi";
+import {
+  playlistApi,
+  type PlaylistSearchResult,
+} from "../../api/playlistApi";
+
 export interface HeaderUser {
   displayName: string;
   avatarUrl?: string;
@@ -61,6 +67,18 @@ const buildUserImageUrl = (img?: string | null) => {
   return `http://localhost:5081/media/images/users/${img}`;
 };
 
+const buildArtistImageUrl = (img?: string | null) => {
+  if (!img) return undefined;
+
+  if (img.startsWith("http")) return img;
+
+  if (img.startsWith("/")) return `http://localhost:5081${img}`;
+
+  if (img.includes("/")) return `http://localhost:5081/${img}`;
+
+  return `http://localhost:5081/media/images/artist/${img}`;
+};
+
 const Header = ({
   searchValue,
   searchResults,
@@ -84,6 +102,10 @@ const Header = ({
   const [userResults, setUserResults] = useState<UserSearchResult[]>([]);
   const [userSearching, setUserSearching] = useState(false);
 
+  const [artistResults, setArtistResults] = useState<ArtistSearchResult[]>([]);
+  const [playlistResults, setPlaylistResults] = useState<PlaylistSearchResult[]>([]);
+  const [extraSearching, setExtraSearching] = useState(false);
+
   const avatarInitial = user?.displayName?.charAt(0).toUpperCase() ?? "?";
   const avatarBg = user?.avatarColor ?? "#e91429";
   const showDropdown = searchFocused && searchValue.trim().length > 0;
@@ -98,48 +120,89 @@ const Header = ({
   const recentTracks = useHistoryStore((state) => state.recentTracks);
 
   useEffect(() => {
-    const loadProfile = async () => {
-      try {
-        if (!authUser?.id) return;
+  const value = searchValue.trim();
 
-        const res = await userApi.getProfile(authUser.id);
+  if (!value) {
+    setUserResults([]);
+    setArtistResults([]);
+    setPlaylistResults([]);
+    return;
+  }
 
-        setProfile(res.data.data);
-      } catch (error) {
-        console.error("LOAD PROFILE ERROR:", error);
-      }
-    };
+  const timer = setTimeout(async () => {
+    try {
+      setUserSearching(true);
+      setExtraSearching(true);
 
-    loadProfile();
-  }, [authUser?.id]);
+      const [userResult, artistResult, playlistResult] =
+        await Promise.allSettled([
+          userApi.search(value),
+          artistApi.search(value),
+          playlistApi.search(value),
+        ]);
 
-  useEffect(() => {
-    const value = searchValue.trim();
+      // USER
+      if (userResult.status === "fulfilled") {
+        const body = userResult.value.data as any;
 
-    if (!value) {
-      setUserResults([]);
-      return;
-    }
+        const userData =
+          Array.isArray(body) ? body :
+          Array.isArray(body?.data) ? body.data :
+          Array.isArray(body?.data?.items) ? body.data.items :
+          Array.isArray(body?.items) ? body.items :
+          [];
 
-    const timer = setTimeout(async () => {
-      try {
-        setUserSearching(true);
-
-        const res = await userApi.search(value);
-        const data = res.data?.data;
-
-        setUserResults(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error("HEADER SEARCH USER ERROR:", error);
+        console.log("HEADER USER DATA:", userData);
+        setUserResults(userData);
+      } else {
+        console.error("HEADER SEARCH USER ERROR:", userResult.reason);
         setUserResults([]);
-      } finally {
-        setUserSearching(false);
       }
-    }, 300);
 
-    return () => clearTimeout(timer);
-  }, [searchValue]);
+      // ARTIST
+      if (artistResult.status === "fulfilled") {
+        const body = artistResult.value.data as any;
 
+        const artistData =
+            Array.isArray(body) ? body :
+            Array.isArray(body?.data?.artists) ? body.data.artists :
+            Array.isArray(body?.data?.items) ? body.data.items :
+            Array.isArray(body?.data) ? body.data :
+            Array.isArray(body?.artists) ? body.artists :
+            Array.isArray(body?.items) ? body.items :
+            [];
+        console.log("HEADER ARTIST DATA:", artistData);
+        setArtistResults(artistData);
+      } else {
+        console.error("HEADER SEARCH ARTIST ERROR:", artistResult.reason);
+        setArtistResults([]);
+      }
+
+      // PLAYLIST
+      if (playlistResult.status === "fulfilled") {
+        const body = playlistResult.value.data as any;
+
+        const playlistData =
+          Array.isArray(body) ? body :
+          Array.isArray(body?.data) ? body.data :
+          Array.isArray(body?.data?.items) ? body.data.items :
+          Array.isArray(body?.items) ? body.items :
+          [];
+
+        console.log("HEADER PLAYLIST DATA:", playlistData);
+        setPlaylistResults(playlistData);
+      } else {
+        console.error("HEADER SEARCH PLAYLIST ERROR:", playlistResult.reason);
+        setPlaylistResults([]);
+      }
+    } finally {
+      setUserSearching(false);
+      setExtraSearching(false);
+    }
+  }, 300);
+
+  return () => clearTimeout(timer);
+}, [searchValue]);
   return (
     <header
       style={{
@@ -277,7 +340,7 @@ const Header = ({
                 overflowY: "auto",
               }}
             >
-              {(searchLoading || userSearching) && (
+              {(searchLoading || userSearching || extraSearching) && (
                 <div style={{ padding: "12px", color: "#b3b3b3" }}>
                   Đang tìm kiếm...
                 </div>
@@ -289,11 +352,14 @@ const Header = ({
                 </div>
               )}
 
-              {!searchLoading &&
+              { !searchLoading &&
                 !userSearching &&
+                !extraSearching &&
                 !searchError &&
                 searchResults.length === 0 &&
-                userResults.length === 0 && (
+                userResults.length === 0 &&
+                artistResults.length === 0 &&
+                playlistResults.length === 0 && (
                   <div style={{ padding: "12px", color: "#b3b3b3" }}>
                     Không tìm thấy kết quả
                   </div>
@@ -408,6 +474,183 @@ const Header = ({
                     </button>
                   </div>
                 ))}
+
+              {artistResults.length > 0 && (
+  <>
+    <div
+      style={{
+        padding: "12px 8px 6px",
+        color: "#b3b3b3",
+        fontSize: "13px",
+        fontWeight: 800,
+      }}
+    >
+      Nghệ sĩ
+    </div>
+
+    {artistResults.map((artist) => (
+          <div
+            key={artist.artistID}
+            onMouseDown={(e) => {
+              e.preventDefault();
+              setSearchFocused(false);
+              navigate(`/artist/${encodeURIComponent(artist.artistName)}`);
+            }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "12px",
+              padding: "8px",
+              borderRadius: "6px",
+              cursor: "pointer",
+              transition: "background 0.15s",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "#3a3a3a";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "transparent";
+            }}
+          >
+            <div
+              style={{
+                width: "48px",
+                height: "48px",
+                borderRadius: "50%",
+                overflow: "hidden",
+                flexShrink: 0,
+                background: "#444",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#fff",
+                fontWeight: 900,
+              }}
+            >
+              {buildArtistImageUrl(artist.artistImage) ? (
+                <img
+                  src={buildArtistImageUrl(artist.artistImage)}
+                  alt={artist.artistName}
+                  onError={(e) => {
+                    e.currentTarget.style.display = "none";
+                  }}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                  }}
+                />
+              ) : (
+                artist.artistName?.charAt(0).toUpperCase() ?? "?"
+              )}
+            </div>
+            <div style={{ flex: 1, overflow: "hidden" }}>
+              <div
+                style={{
+                  color: "#fff",
+                  fontWeight: 700,
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                {artist.artistName}
+              </div>
+
+              <div
+                style={{
+                  color: "#b3b3b3",
+                  fontSize: "13px",
+                }}
+              >
+                Nghệ sĩ
+              </div>
+            </div>
+          </div>
+        ))}
+      </>
+    )}
+                  {playlistResults.length > 0 && (
+      <>
+        <div
+          style={{
+            padding: "12px 8px 6px",
+            color: "#b3b3b3",
+            fontSize: "13px",
+            fontWeight: 800,
+          }}
+        >
+          Playlist
+        </div>
+
+    {playlistResults.map((playlist) => (
+            <div
+              key={playlist.playlistID}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                setSearchFocused(false);
+                navigate(`/playlist/${playlist.playlistID}`);
+              }}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "12px",
+                padding: "8px",
+                borderRadius: "6px",
+                cursor: "pointer",
+                transition: "background 0.15s",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "#3a3a3a";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "transparent";
+              }}
+            >
+              <div
+                style={{
+                  width: "48px",
+                  height: "48px",
+                  borderRadius: "8px",
+                  flexShrink: 0,
+                  background: "linear-gradient(135deg, #7c3aed, #db2777)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#fff",
+                  fontWeight: 900,
+                  fontSize: "20px",
+                }}
+              >
+                ♫
+              </div>
+
+              <div style={{ flex: 1, overflow: "hidden" }}>
+                <div
+                  style={{
+                    color: "#fff",
+                    fontWeight: 700,
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {playlist.playlistName}
+                </div>
+
+                <div
+                  style={{
+                    color: "#b3b3b3",
+                    fontSize: "13px",
+                  }}
+                >
+                  Playlist
+                </div>
+              </div>
+            </div>
+          ))}
+        </>
+      )}
 
               {userResults.length > 0 && (
                 <>
