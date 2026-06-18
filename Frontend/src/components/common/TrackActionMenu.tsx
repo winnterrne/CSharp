@@ -22,7 +22,7 @@ type TrackActionMenuProps = {
   track: Media;
   open: boolean;
   onClose: () => void;
-  onOpenArtist?: (artistID: number, artistName: string, artistImage: string) => void;
+  onOpenArtist?: (artistID: number, artistName: string,artistImage: string) => void;
 };
 
 type PlaylistResponse = {

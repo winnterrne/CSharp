@@ -10,7 +10,7 @@ import { aiApi } from "../../api/aiApi";
 
   type TrackDetailViewProps = {
     track: Media;
-    onOpenArtist: (artistID: number, artistName: string, artistImage: string) => void; 
+    onOpenArtist: (artistName: string) => void; 
   };
 
   const formatDuration = (seconds?: number) => {
@@ -33,9 +33,7 @@ import { aiApi } from "../../api/aiApi";
     const { playTrack, isPlaying, currentTrack, setQueue } = usePlayer();
     const { isFavorite, toggleFavorite } = useFavorite();
 
-    const artistID = track.artist?.id;
     const artistName = track.artist?.name ?? "Unknown Artist";
-    const artistImage = track.artist?.avatarUrl ?? "";
     const liked = isFavorite(track.id);
     const getMediaId = (media: Media) => {
     const m = media as any;
@@ -147,7 +145,7 @@ import { aiApi } from "../../api/aiApi";
             }}
           >
             <span
-              onClick={() => onOpenArtist(artistID, artistName, artistImage)}
+              onClick={() => onOpenArtist(artistName)}
               style={{
                 color: "#fff",
                 cursor: "pointer",
