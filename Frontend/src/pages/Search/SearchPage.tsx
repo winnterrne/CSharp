@@ -5,10 +5,17 @@ import { useSearch } from "../../hooks/useSearch";
 import SearchTopResult from "./SearchTopResult";
 import SearchResultCard from "./SearchResultCard";
 import SearchUserSection from "./SearchUserSection";
+import SearchArtistSection from "./SearchArtistSection";
+import SearchPlaylistCard from "./SearchPlaylistCard";
 
 import { userApi, type UserSearchResult } from "../../api/userApi";
+import { artistApi, type ArtistSearchResult } from "../../api/artistApi";
+import {
+  playlistApi,
+  type PlaylistSearchResult,
+} from "../../api/playlistApi";
 
-type SearchFilter = "all" | "song" | "artist" | "album" | "user";
+type SearchFilter = "all" | "song" | "artist" | "user" | "playlist";
 
 const tabs: {
   key: SearchFilter;
@@ -17,9 +24,39 @@ const tabs: {
   { key: "all", label: "Tất cả" },
   { key: "song", label: "Bài hát" },
   { key: "artist", label: "Nghệ sĩ" },
-  { key: "album", label: "Album" },
+  { key: "playlist", label: "Playlist" },
   { key: "user", label: "Người dùng" },
 ];
+
+type RawUserSearchResult = Partial<UserSearchResult> & {
+  UserID?: string;
+  UserName?: string;
+  UserImage?: string | null;
+  Email?: string;
+  Role?: string;
+  Phone?: string;
+  id?: string;
+  username?: string;
+  avatarUrl?: string | null;
+  imageUrl?: string | null;
+};
+
+const normalizeUser = (user: RawUserSearchResult): UserSearchResult => {
+  return {
+    userID: user.userID ?? user.UserID ?? user.id ?? "",
+    userName:
+      user.userName ?? user.UserName ?? user.username ?? "Unknown User",
+    userImage:
+      user.userImage ??
+      user.UserImage ??
+      user.avatarUrl ??
+      user.imageUrl ??
+      null,
+    email: user.email ?? user.Email ?? "",
+    role: user.role ?? user.Role ?? "User",
+    phone: user.phone ?? user.Phone ?? "",
+  };
+};
 
 const SearchPage = () => {
   const [params] = useSearchParams();
@@ -30,52 +67,88 @@ const SearchPage = () => {
   const { search, searchResults, isLoading, error } = useSearch();
 
   const [users, setUsers] = useState<UserSearchResult[]>([]);
-  const [userLoading, setUserLoading] = useState(false);
-  const [userError, setUserError] = useState("");
+  const [artists, setArtists] = useState<ArtistSearchResult[]>([]);
+  const [playlists, setPlaylists] = useState<PlaylistSearchResult[]>([]);
+
+  const [extraLoading, setExtraLoading] = useState(false);
+  const [extraError, setExtraError] = useState("");
 
   useEffect(() => {
-    if (!query.trim()) {
+    const value = query.trim();
+
+    if (!value) {
       setUsers([]);
-      setUserError("");
+      setArtists([]);
+      setPlaylists([]);
+      setExtraError("");
       return;
     }
 
-    search(query);
+    search(value);
 
-    const loadUsers = async () => {
+    const loadExtraSearch = async () => {
       try {
-        setUserLoading(true);
-        setUserError("");
+        setExtraLoading(true);
+        setExtraError("");
 
-        const res = await userApi.search(query);
+        const [userRes, artistRes, playlistRes] = await Promise.all([
+          userApi.search(value),
+          artistApi.search(value),
+          playlistApi.search(value),
+        ]);
 
-        console.log("SEARCH USER RESPONSE:", res.data);
+        const userBody = userRes.data as any;
 
-        const body = res.data as any;
-
-        const data =
-          Array.isArray(body) ? body :
-          Array.isArray(body?.data) ? body.data :
-          Array.isArray(body?.data?.items) ? body.data.items :
-          Array.isArray(body?.items) ? body.items :
+        const rawUsers: RawUserSearchResult[] =
+          Array.isArray(userBody) ? userBody :
+          Array.isArray(userBody?.data) ? userBody.data :
+          Array.isArray(userBody?.data?.items) ? userBody.data.items :
+          Array.isArray(userBody?.items) ? userBody.items :
           [];
 
-        console.log("SEARCH USER DATA:", data);
+        const normalizedUsers: UserSearchResult[] = rawUsers
+          .map((item: RawUserSearchResult) => normalizeUser(item))
+          .filter((user: UserSearchResult) => Boolean(user.userID));
 
-        setUsers(data);
-      } catch (err: any) {
-        console.error("SEARCH USER ERROR:", err);
-        console.error("STATUS:", err.response?.status);
-        console.error("DATA:", err.response?.data);
+        const artistBody = artistRes.data as any;
+
+        const artistItems =
+          Array.isArray(artistBody) ? artistBody :
+          Array.isArray(artistBody?.data?.artists) ? artistBody.data.artists :
+          Array.isArray(artistBody?.data?.Artists) ? artistBody.data.Artists :
+          Array.isArray(artistBody?.data?.items) ? artistBody.data.items :
+          Array.isArray(artistBody?.data?.Items) ? artistBody.data.Items :
+          Array.isArray(artistBody?.data) ? artistBody.data :
+          Array.isArray(artistBody?.artists) ? artistBody.artists :
+          Array.isArray(artistBody?.Artists) ? artistBody.Artists :
+          Array.isArray(artistBody?.items) ? artistBody.items :
+          Array.isArray(artistBody?.Items) ? artistBody.Items :
+          [];
+
+        const playlistItems = Array.isArray(playlistRes.data?.data)
+          ? playlistRes.data.data
+          : [];
+
+        console.log("SEARCH USERS:", normalizedUsers);
+        console.log("SEARCH ARTISTS:", artistItems);
+        console.log("SEARCH PLAYLISTS:", playlistItems);
+
+        setUsers(normalizedUsers);
+        setArtists(artistItems);
+        setPlaylists(playlistItems);
+      } catch (err) {
+        console.error("SEARCH EXTRA ERROR:", err);
 
         setUsers([]);
-        setUserError("Không tìm được người dùng.");
+        setArtists([]);
+        setPlaylists([]);
+        setExtraError("Không tìm được user, nghệ sĩ hoặc playlist.");
       } finally {
-        setUserLoading(false);
+        setExtraLoading(false);
       }
     };
 
-    loadUsers();
+    loadExtraSearch();
   }, [query, search]);
 
   const filteredResults = useMemo(() => {
@@ -94,16 +167,31 @@ const SearchPage = () => {
     });
   }, [filter, searchResults]);
 
-  const showMediaSection = filter === "all" || filter !== "user";
-  const showUserSection = filter === "all" || filter === "user";
-
   const hasMediaResults = filteredResults.length > 0;
   const hasUserResults = users.length > 0;
+  const hasArtistResults = artists.length > 0;
+  const hasPlaylistResults = playlists.length > 0;
+
+  const loading = isLoading || extraLoading;
 
   const hasAnyResult =
-    filter === "user" ? hasUserResults
-    : filter === "all" ? hasMediaResults || hasUserResults
-    : hasMediaResults;
+    filter === "user"
+      ? hasUserResults
+      : filter === "artist"
+        ? hasArtistResults || hasMediaResults
+        : filter === "playlist"
+          ? hasPlaylistResults
+          : filter === "all"
+            ? hasMediaResults ||
+              hasUserResults ||
+              hasArtistResults ||
+              hasPlaylistResults
+            : hasMediaResults;
+
+  const showMediaSection = filter === "all" || filter === "song";
+  const showArtistSection = filter === "all" || filter === "artist";
+  const showPlaylistSection = filter === "all" || filter === "playlist";
+  const showUserSection = filter === "all" || filter === "user";
 
   return (
     <main
@@ -155,7 +243,7 @@ const SearchPage = () => {
         ))}
       </div>
 
-      {(isLoading || userLoading) && (
+      {loading && (
         <p
           style={{
             color: "#b3b3b3",
@@ -175,17 +263,17 @@ const SearchPage = () => {
         </p>
       )}
 
-      {userError && filter === "user" && (
+      {extraError && (
         <p
           style={{
             color: "#ff4d4f",
           }}
         >
-          {userError}
+          {extraError}
         </p>
       )}
 
-      {!isLoading && !userLoading && query.trim() && !hasAnyResult && (
+      {!loading && query.trim() && !hasAnyResult && (
         <div
           style={{
             color: "#b3b3b3",
@@ -196,7 +284,7 @@ const SearchPage = () => {
         </div>
       )}
 
-      {!isLoading && !userLoading && hasAnyResult && (
+      {!loading && hasAnyResult && (
         <>
           {filter === "all" && hasMediaResults && (
             <section style={{ marginBottom: "36px" }}>
@@ -212,9 +300,7 @@ const SearchPage = () => {
                   marginBottom: "16px",
                 }}
               >
-                {filter === "all" ?
-                  "Bài hát"
-                : tabs.find((t) => t.key === filter)?.label}
+                Bài hát
               </h2>
 
               <div
@@ -229,9 +315,42 @@ const SearchPage = () => {
               </div>
             </section>
           )}
-        {showUserSection && hasUserResults && (
-          <SearchUserSection users={users} />
-        )}
+
+          {showArtistSection && hasArtistResults && (
+            <SearchArtistSection artists={artists} />
+          )}
+
+          {showPlaylistSection && hasPlaylistResults && (
+            <section style={{ marginBottom: "38px" }}>
+              <h2
+                style={{
+                  fontSize: "24px",
+                  marginBottom: "16px",
+                }}
+              >
+                Playlist
+              </h2>
+
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
+                  gap: "14px",
+                }}
+              >
+                {playlists.map((playlist) => (
+                  <SearchPlaylistCard
+                    key={playlist.playlistID}
+                    playlist={playlist}
+                  />
+                ))}
+              </div>
+            </section>
+          )}
+
+          {showUserSection && hasUserResults && (
+            <SearchUserSection users={users} />
+          )}
         </>
       )}
     </main>

@@ -11,7 +11,7 @@ let connection: signalR.HubConnection | null = null;
 export const startNotificationSignalR = async () => {
   if (connection?.state === signalR.HubConnectionState.Connected) {
     return connection;
-  }
+  }          
 
   const token = localStorage.getItem("token");
 

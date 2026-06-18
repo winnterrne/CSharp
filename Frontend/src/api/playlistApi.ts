@@ -1,6 +1,20 @@
 import api from "./axios";
 import type { CreatePlaylistDto } from "../types/playlist";
 
+export interface PlaylistSearchResult {
+  playlistID: number;
+  playlistName: string;
+  userID: string;
+}
+
+export interface PlaylistSearchResponse {
+  success: boolean;
+  message?: string;
+  data: PlaylistSearchResult[];
+  totalCount?: number;
+  totalPages?: number;
+}
+
 export const playlistApi = {
   getMyPlaylists: () => api.get("/Playlist/my-playlist"),
 
@@ -12,6 +26,7 @@ export const playlistApi = {
       description: data.Description ?? "",
       isPublic: data.IsPublic,
     }),
+
   update: (
     id: number,
     data: {
@@ -29,4 +44,13 @@ export const playlistApi = {
 
   removeTrack: (playlistId: number, mediaItemId: number) =>
     api.delete(`/Playlist/${playlistId}/tracks/${mediaItemId}`),
+
+  search: (keyword: string) =>
+    api.get<PlaylistSearchResponse>("/Playlist/search", {
+      params: {
+        KeyWord: keyword,
+        PageNumber: 1,
+        PageSize: 10,
+      },
+    }),
 };

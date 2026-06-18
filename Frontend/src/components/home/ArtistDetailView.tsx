@@ -1,7 +1,7 @@
 import type { Media } from "../../types/media";
 import { usePlayer } from "../../hooks/usePlayer";
 import AlbumCardLarge from "./AlbumCardLarge";
-import { PlayIcon } from "../common/icons";
+import { NowPlayingIcon, PlayIcon } from "../common/icons";
 import { useFollowStore } from "../../store/followStore";
 import { useEffect, useState } from "react";
 import { artistApi } from "../../api/artistApi";
@@ -167,7 +167,7 @@ useEffect(() => {
             fontWeight: 800,
           }}
         >
-          {isArtistPlaying ? "⏸" : <PlayIcon />}
+          {isArtistPlaying ? <NowPlayingIcon/> : <PlayIcon />}
         </button>
 
         {/* FOLLOW */}

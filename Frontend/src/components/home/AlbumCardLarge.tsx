@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { Media } from "../../types/media";
 import { usePlayer } from "../../hooks/usePlayer";
-import { PlayIcon } from "../common/icons";
+import { NowPlayingIcon, PlayIcon } from "../common/icons";
 
 type Props = {
   track: Media;
@@ -111,7 +111,7 @@ const AlbumCardLarge = ({ track, tracks, onOpenAlbum }: Props) => {
               fontSize: "17px",
             }}
           >
-            {isThisPlaying ? "⏸" : <PlayIcon />}
+            {isThisPlaying ? <NowPlayingIcon/> : <PlayIcon />}
           </button>
         )}
       </div>

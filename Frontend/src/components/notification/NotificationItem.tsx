@@ -47,19 +47,22 @@ const NotificationItem = ({
           ? "Đã bắt đầu theo dõi bạn"
           : "";
 
-  const userImageBaseUrl = "http://localhost:5081/media/images/users/";
-
   const imageUrl = (() => {
-    const raw =
-      data.imageUrl ??
-      data.senderAvatar ??
-      data.followerAvatar ??
-      "";
+  const raw =
+    data.imageUrl ??
+    data.senderAvatar ??
+    data.followerAvatar ??
+    "";
 
-    return raw && !raw.startsWith("http")
-      ? `${userImageBaseUrl}${raw}`
-      : raw;
-  })();
+  if (!raw || raw.startsWith("http")) return raw;
+
+  // Song thumbnail → /media/images/media/...
+  // Avatar         → /media/images/users/...
+  const isAvatar = notification.type === "follow" || (!data.imageUrl && data.senderAvatar);
+  const folder = isAvatar ? "users" : "media";
+
+  return `http://localhost:5081/media/images/${folder}/${raw}`;
+})();
 
   return (
     <div
