@@ -8,8 +8,6 @@ import { useHistoryStore } from "../../store/historyStore";
 import { PlayIcon } from "../common/icons";
 import NotificationList from "../notification/NotificationList";
 import { notificationStore } from "../../store/notificationStore";
-import { notificationApi } from "../../api/notificationApi";
-import { startNotificationSignalR } from "../../api/notificationSignalR";
 
 import { artistApi, type ArtistSearchResult } from "../../api/artistApi";
 import {
@@ -123,18 +121,6 @@ const Header = ({
   const setNotifications = notificationStore((s) => s.setNotifications);
   const unreadCount = notificationStore((state) => state.unreadCount);
 
-  useEffect(() => {
-    const loadNotifications = async () => {
-      try {
-        const data = await notificationApi.getAll();
-        setNotifications(data);
-      } catch (error) {
-        console.error("LOAD HEADER NOTIFICATIONS ERROR:", error);
-      }
-    };
-
-    loadNotifications();
-  }, [setNotifications]);
   const [showNotificationList, setShowNotificationList] = useState(false);
 
   useEffect(() => {
@@ -152,12 +138,6 @@ const Header = ({
 
     loadProfile();
   }, [authUser?.id]);
-  // ✅ NOTIFICATION FLOW: bật SignalR để badge tăng realtime
-  useEffect(() => {
-    startNotificationSignalR().catch((error) => {
-      console.error("START NOTIFICATION SIGNALR ERROR:", error);
-    });
-  }, []);
 
   useEffect(() => {
     const value = searchValue.trim();
@@ -815,7 +795,6 @@ const Header = ({
             title="Thông báo"
             onClick={() => {
               setShowNotificationList((prev) => !prev);
-              onNotificationClick?.();
             }}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">

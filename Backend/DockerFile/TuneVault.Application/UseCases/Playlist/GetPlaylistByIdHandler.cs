@@ -36,6 +36,7 @@ public class GetPlaylistByIdHandler
                 x.Description,
                 x.ArtistID,
                 x.ArtistName,
+                x.ArtistImage,
                 x.AlbumID,
                 x.AlbumName,
                 x.UserID,

@@ -15,7 +15,7 @@ namespace TuneVault.Infrastructure.Repositories
         {
             _db = db;
         }
-    // Chức năng 9: Yêu thích (Favorite)
+        // Chức năng 9: Yêu thích (Favorite)
         // Thêm yêu thích
         public async Task<int> AddFavoriteAsync(Favorite favorite)
         {
@@ -30,7 +30,7 @@ namespace TuneVault.Infrastructure.Repositories
         {
             string sql = @"DELETE FROM Favorite
                             WHERE UserID= @UserID AND MediaItemID = @MediaItemID";
-            return await _db.ExecuteDataAsync(sql, new {UserID = userId, MediaItemID = mediaItemId });
+            return await _db.ExecuteDataAsync(sql, new { UserID = userId, MediaItemID = mediaItemId });
         }
         // Lấy danh sách yêu thích của người dùng
         public async Task<IEnumerable<MediaItem>> GetUserFavoritesAsync(string userId)
@@ -43,10 +43,10 @@ namespace TuneVault.Infrastructure.Repositories
                         LEFT JOIN Artist a ON m.ArtistID = a.ArtistID 
                         WHERE f.UserID = @UserID";
 
-            return await _db.LoadAllDataSingleAsync<MediaItem>(sql, new {UserID = userId});
+            return await _db.LoadAllDataSingleAsync<MediaItem>(sql, new { UserID = userId });
         }
 
-    //Chức năng 10: Lịch sử
+        //Chức năng 10: Lịch sử
         //Ghi lại lịch sử nghe nhạc của người dùng
         public async Task<int> RecordPlayHistoryAsync(PlayHistory history)
         {
@@ -54,11 +54,11 @@ namespace TuneVault.Infrastructure.Repositories
                             INSERT INTO PlayHistory (UserID, MediaItemID, PlayedAt)
                             OUTPUT INSERTED.HistoryID 
                             VALUES (@UserID, @MediaItemID, @PlayedAt)";
-            return await _db.ExecuteScalarAsync<int>(sql, new 
-            { 
-                UserID = history.UserID,         
-                MediaItemID = history.MediaItemID, 
-                PlayedAt = history.PlayedAt 
+            return await _db.ExecuteScalarAsync<int>(sql, new
+            {
+                UserID = history.UserID,
+                MediaItemID = history.MediaItemID,
+                PlayedAt = history.PlayedAt
             });
         }
         //Lấy 10 bài mới nhất trong lịch sử nghe nhạc của người dùng
@@ -70,7 +70,7 @@ namespace TuneVault.Infrastructure.Repositories
                         WHERE p.UserID = @UserID
                         ORDER BY p.PlayedAt DESC";
             using var con = _db.CreateConnection();
-            var result = await con.QueryAsync<PlayHistory, MediaItem, PlayHistory>(sql, (history, media) => 
+            var result = await con.QueryAsync<PlayHistory, MediaItem, PlayHistory>(sql, (history, media) =>
             {
                 history.MediaItem = media;
                 return history;
@@ -78,7 +78,7 @@ namespace TuneVault.Infrastructure.Repositories
             return result;
         }
 
-    // Chức năng: Theo dõi (Follow)
+        // Chức năng: Theo dõi (Follow)
         //Theo dõi nghệ sĩ hoặc người dùng khác
         public async Task<int> FollowAsync(Follow follow)
         {
@@ -96,7 +96,7 @@ namespace TuneVault.Infrastructure.Repositories
             return await _db.ExecuteScalarAsync<int>(sql, follow);
         }
         //Hủy theo dõi nghệ sĩ hoặc người dùng khác
-            // 1. Hàm hủy theo dõi User
+        // 1. Hàm hủy theo dõi User
         public async Task<int> UnfollowUserAsync(string followerId, string followingUserId)
         {
             string sql = @"DELETE FROM Follow 
@@ -104,12 +104,49 @@ namespace TuneVault.Infrastructure.Repositories
             return await _db.ExecuteDataAsync(sql, new { FollowerID = followerId, FollowingUserID = followingUserId });
         }
 
-            // 2. Hàm hủy theo dõi Artist
+        // 2. Hàm hủy theo dõi Artist
         public async Task<int> UnfollowArtistAsync(string followerId, int followingArtistId)
         {
             string sql = @"DELETE FROM Follow 
                         WHERE FollowerID = @FollowerID AND FollowingArtistID = @FollowingArtistId";
             return await _db.ExecuteDataAsync(sql, new { FollowerID = followerId, FollowingArtistId = followingArtistId });
+        }
+        //
+        public async Task<IEnumerable<Artist>> GetFollowedArtistAsync(string userID)
+        {
+            string sql = @"
+                SELECT 
+                    a.ArtistID,
+                    a.ArtistName,
+                    a.ArtistImage
+                FROM Follow f
+                INNER JOIN Artist a
+                    ON f.FollowingArtistID = a.ArtistID
+                WHERE f.FollowerID = @UserID
+            ";
+            return await _db.LoadAllDataSingleAsync<Artist>(sql, new { UserID = userID });
+        }
+        public async Task<IEnumerable<FollowedUser>> GetFollowedUsersAsync(string userID)
+        {
+            string sql = @"
+        SELECT 
+            u.UserID,
+            u.UserName,
+            u.UserImage,
+            u.Email,
+            u.Role,
+            u.Phone
+        FROM Follow f
+        INNER JOIN AspNetUsers u
+            ON f.FollowingUserID = u.UserID
+        WHERE f.FollowerID = @UserID
+          AND f.FollowingUserID IS NOT NULL
+    ";
+
+            return await _db.LoadAllDataSingleAsync<FollowedUser>(
+                sql,
+                new { UserID = userID }
+            );
         }
     }
 }

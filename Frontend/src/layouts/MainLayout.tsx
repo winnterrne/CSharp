@@ -11,6 +11,8 @@ import { usePlayer } from "../hooks/usePlayer";
 import { useAuth } from "../hooks/useAuth";
 import { useSearch } from "../hooks/useSearch";
 
+import NotificationSignalRListener from "../pages/Notification/NotificationSignalRListener";
+
 const MIN_SIDEBAR_WIDTH = 80;
 const DEFAULT_SIDEBAR_WIDTH = 300;
 const MAX_SIDEBAR_WIDTH = 620;
@@ -21,8 +23,15 @@ const MainLayout = ({ children }: { children: ReactNode }) => {
   const navigate = useNavigate();
 
   const { user } = useAuth();
-  const { query, setQuery, search, searchResults, isLoading, error } =
-    useSearch();
+
+  const {
+    query,
+    setQuery,
+    search,
+    searchResults,
+    isLoading,
+    error,
+  } = useSearch();
 
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
@@ -35,14 +44,18 @@ const MainLayout = ({ children }: { children: ReactNode }) => {
     (isSidebarExpanded || sidebarSize > OVERLAY_TRIGGER_WIDTH);
 
   const sidebarGridWidth =
-    isSidebarCollapsed ? `${MIN_SIDEBAR_WIDTH}px`
-    : isOverlaySidebar ? `${NORMAL_GRID_SIDEBAR_WIDTH}px`
-    : `${sidebarSize}px`;
+    isSidebarCollapsed
+      ? `${MIN_SIDEBAR_WIDTH}px`
+      : isOverlaySidebar
+        ? `${NORMAL_GRID_SIDEBAR_WIDTH}px`
+        : `${sidebarSize}px`;
 
   const sidebarActualWidth =
-    isSidebarCollapsed ? `${MIN_SIDEBAR_WIDTH}px`
-    : isOverlaySidebar ? `${Math.max(sidebarSize, 520)}px`
-    : `${sidebarSize}px`;
+    isSidebarCollapsed
+      ? `${MIN_SIDEBAR_WIDTH}px`
+      : isOverlaySidebar
+        ? `${Math.max(sidebarSize, 520)}px`
+        : `${sidebarSize}px`;
 
   const {
     currentTrack,
@@ -63,7 +76,7 @@ const MainLayout = ({ children }: { children: ReactNode }) => {
     toggleRepeatMode,
     playTrack,
   } = usePlayer();
-  
+
   const handleSelectSearchTrack = (track: Media) => {
     navigate(`/track/${track.id}`, {
       state: {
@@ -76,6 +89,7 @@ const MainLayout = ({ children }: { children: ReactNode }) => {
     if (!query.trim()) return;
 
     search(query);
+
     navigate(`/search?q=${encodeURIComponent(query)}`);
   };
 
@@ -151,6 +165,17 @@ const MainLayout = ({ children }: { children: ReactNode }) => {
         flexDirection: "column",
       }}
     >
+      {/* 
+        ✅ Quan trọng:
+        Chỉ mount listener khi đã có user.
+        Nếu mount quá sớm lúc chưa có token/user thì SignalR không connect.
+      */}
+      {user && (
+        <NotificationSignalRListener
+          key={user.id ?? user.username}
+        />
+      )}
+
       <div style={{ flexShrink: 0 }}>
         <Header
           searchValue={query}
@@ -158,12 +183,12 @@ const MainLayout = ({ children }: { children: ReactNode }) => {
           searchLoading={isLoading}
           searchError={error}
           user={
-            user ?
-              {
-                displayName: user.username,
-                avatarUrl: user.avatarUrl,
-              }
-            : null
+            user
+              ? {
+                  displayName: user.username,
+                  avatarUrl: user.avatarUrl,
+                }
+              : null
           }
           onSearchChange={setQuery}
           onSearch={handleSearch}
@@ -174,7 +199,7 @@ const MainLayout = ({ children }: { children: ReactNode }) => {
           onNotificationClick={() => navigate("/notifications")}
           onAvatarClick={() => navigate("/profile")}
           onPlayTrack={(track) => playTrack(track)}
-          onSelectTrack={handleSelectSearchTrack} 
+          onSelectTrack={handleSelectSearchTrack}
         />
       </div>
 
@@ -223,14 +248,16 @@ const MainLayout = ({ children }: { children: ReactNode }) => {
             style={{
               position: "absolute",
               top: 0,
-              right:
-                isOverlaySidebar ? `calc(${sidebarActualWidth} - 4px)` : "-4px",
+              right: isOverlaySidebar
+                ? `calc(${sidebarActualWidth} - 4px)`
+                : "-4px",
               width: "8px",
               height: "100%",
               cursor: "col-resize",
               zIndex: 1000,
-              background:
-                isResizingSidebar ? "rgba(255,255,255,0.18)" : "transparent",
+              background: isResizingSidebar
+                ? "rgba(255,255,255,0.18)"
+                : "transparent",
             }}
           />
         </div>
@@ -255,31 +282,33 @@ const MainLayout = ({ children }: { children: ReactNode }) => {
         >
           <NowPlaying
             isCollapsed={isNowPlayingCollapsed}
-            onToggleCollapse={() => setIsNowPlayingCollapsed((prev) => !prev)}
+            onToggleCollapse={() =>
+              setIsNowPlayingCollapsed((prev) => !prev)
+            }
           />
         </div>
       </div>
 
       <div style={{ flexShrink: 0 }}>
-      <PlayerBar
-        currentTrack={currentTrack}
-        isPlaying={isPlaying}
-        position={position}
-        duration={duration}
-        volume={volume}
-        isShuffle={isShuffle}
-        repeatMode={repeatMode}
-        isMuted={isMuted}
-        onTogglePlay={togglePlay}
-        onPrev={previous}
-        onNext={next}
-        onSeek={seek}
-        onVolumeChange={setVolume}
-        onToggleShuffle={toggleShuffle}
-        onToggleRepeatMode={toggleRepeatMode}
-        onToggleMuted={() => setMuted(!isMuted)}
-      />
-    </div>
+        <PlayerBar
+          currentTrack={currentTrack}
+          isPlaying={isPlaying}
+          position={position}
+          duration={duration}
+          volume={volume}
+          isShuffle={isShuffle}
+          repeatMode={repeatMode}
+          isMuted={isMuted}
+          onTogglePlay={togglePlay}
+          onPrev={previous}
+          onNext={next}
+          onSeek={seek}
+          onVolumeChange={setVolume}
+          onToggleShuffle={toggleShuffle}
+          onToggleRepeatMode={toggleRepeatMode}
+          onToggleMuted={() => setMuted(!isMuted)}
+        />
+      </div>
     </div>
   );
 };

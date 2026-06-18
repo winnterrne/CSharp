@@ -17,5 +17,10 @@ namespace TuneVault.Domain.Interfaces
         Task<int> FollowAsync(Follow follow);
         Task<int> UnfollowUserAsync(string followerId, string followingUserId);
         Task<int> UnfollowArtistAsync(string followerId, int followingArtistId);
+
+        //
+        Task<IEnumerable<Artist>> GetFollowedArtistAsync(string userID);
+        Task<IEnumerable<FollowedUser>> GetFollowedUsersAsync(string userID);
+        
     }
 }
