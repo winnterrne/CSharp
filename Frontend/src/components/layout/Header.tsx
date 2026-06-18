@@ -89,8 +89,6 @@ const Header = ({
   onSearch,
   onSearchChange,
   onHomeClick,
-  onNotificationClick,
-  // onAvatarClick,
   onPlayTrack,
   onSelectTrack,
 }: HeaderProps) => {
@@ -821,6 +819,7 @@ const Header = ({
                 border: "2px solid #111",
                 boxShadow: "0 0 0 1px rgba(255,255,255,.12)",
                 transform: "translate(35%, -25%)",
+                pointerEvents: "none",
               }}
             >
               {unreadCount > 99 ? "99+" : unreadCount}
@@ -828,10 +827,15 @@ const Header = ({
           )}
 
           {showNotificationList && (
-            <NotificationList onClose={() => setShowNotificationList(false)} />
+            <NotificationList
+              onClose={() => setShowNotificationList(false)}
+              onViewAll={() => {
+                setShowNotificationList(false);
+                navigate("/notifications");
+              }}
+            />
           )}
         </div>
-
         <div style={{ position: "relative" }}>
           <button
             onClick={() => setShowAccountMenu(!showAccountMenu)}

@@ -13,9 +13,10 @@ import { mapMediaItemDtoToMedia } from "../../types/media";
 
 type Props = {
   onClose?: () => void;
+  onViewAll?: () => void;
 };
 
-const NotificationList = ({ onClose }: Props) => {
+const NotificationList = ({ onClose, onViewAll }: Props) => {
   const navigate = useNavigate();
 
   const notifications = notificationStore((s) => s.notifications);
@@ -157,7 +158,22 @@ const NotificationList = ({ onClose }: Props) => {
         }}
       >
         <div>
-          <h3 style={{ margin: 0, fontSize: "18px" }}>Thông báo</h3>
+          <button
+            onClick={onViewAll}
+            style={{
+              margin: 0,
+              padding: 0,
+              border: "none",
+              background: "transparent",
+              color: "#fff",
+              fontSize: "18px",
+              fontWeight: 800,
+              cursor: "pointer",
+              textAlign: "left",
+            }}
+          >
+            Thông báo
+          </button>
 
           <p
             style={{
@@ -166,9 +182,9 @@ const NotificationList = ({ onClose }: Props) => {
               fontSize: "13px",
             }}
           >
-            {unreadCount > 0 ?
-              `${unreadCount} thông báo chưa đọc`
-            : "Bạn đã đọc hết thông báo"}
+            {unreadCount > 0
+              ? `${unreadCount} thông báo chưa đọc`
+              : "Bạn đã đọc hết thông báo"}
           </p>
         </div>
 
@@ -242,6 +258,26 @@ const NotificationList = ({ onClose }: Props) => {
               onOpen={handleOpenNotification}
             />
           ))}
+
+        {!isLoading && sortedNotifications.length > 0 && (
+          <button
+            onClick={onViewAll}
+            style={{
+              width: "100%",
+              marginTop: "10px",
+              border: "none",
+              background: "#2a2a2a",
+              color: "#fff",
+              borderRadius: "999px",
+              padding: "10px 12px",
+              fontSize: "13px",
+              fontWeight: 800,
+              cursor: "pointer",
+            }}
+          >
+            Xem tất cả thông báo
+          </button>
+        )}
       </div>
     </div>
   );
