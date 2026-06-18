@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
 import type { Media } from "../../types/media";
 import { authStore } from "../../store/authStore";
 import { userApi, type UserSearchResult } from "../../api/userApi";
 import type { UserProfile } from "../../types/profile";
 import { useHistoryStore } from "../../store/historyStore";
 import { PlayIcon } from "../common/icons";
+import NotificationList from "../notification/NotificationList";
+import { notificationStore } from "../../store/notificationStore";
+import { notificationApi } from "../../api/notificationApi";
+import { startNotificationSignalR } from "../../api/notificationSignalR";
 
 import { artistApi, type ArtistSearchResult } from "../../api/artistApi";
 import {
@@ -89,8 +92,7 @@ const Header = ({
   onSearchChange,
   onHomeClick,
   onNotificationClick,
-  onFriendsClick,
-  onAvatarClick,
+  // onAvatarClick,
   onPlayTrack,
   onSelectTrack,
 }: HeaderProps) => {
@@ -102,7 +104,7 @@ const Header = ({
   const [userResults, setUserResults] = useState<UserSearchResult[]>([]);
   const [userSearching, setUserSearching] = useState(false);
 
-  const [artistResults, setArtistResults] = useState<ArtistSearchResult[]>([]);
+   const [artistResults, setArtistResults] = useState<ArtistSearchResult[]>([]);
   const [playlistResults, setPlaylistResults] = useState<PlaylistSearchResult[]>([]);
   const [extraSearching, setExtraSearching] = useState(false);
 
@@ -118,91 +120,130 @@ const Header = ({
 
   const [showRecentModal, setShowRecentModal] = useState(false);
   const recentTracks = useHistoryStore((state) => state.recentTracks);
+  const setNotifications = notificationStore((s) => s.setNotifications);
+  const unreadCount = notificationStore((state) => state.unreadCount);
 
   useEffect(() => {
-  const value = searchValue.trim();
-
-  if (!value) {
-    setUserResults([]);
-    setArtistResults([]);
-    setPlaylistResults([]);
-    return;
-  }
-
-  const timer = setTimeout(async () => {
-    try {
-      setUserSearching(true);
-      setExtraSearching(true);
-
-      const [userResult, artistResult, playlistResult] =
-        await Promise.allSettled([
-          userApi.search(value),
-          artistApi.search(value),
-          playlistApi.search(value),
-        ]);
-
-      // USER
-      if (userResult.status === "fulfilled") {
-        const body = userResult.value.data as any;
-
-        const userData =
-          Array.isArray(body) ? body :
-          Array.isArray(body?.data) ? body.data :
-          Array.isArray(body?.data?.items) ? body.data.items :
-          Array.isArray(body?.items) ? body.items :
-          [];
-
-        console.log("HEADER USER DATA:", userData);
-        setUserResults(userData);
-      } else {
-        console.error("HEADER SEARCH USER ERROR:", userResult.reason);
-        setUserResults([]);
+    const loadNotifications = async () => {
+      try {
+        const data = await notificationApi.getAll();
+        setNotifications(data);
+      } catch (error) {
+        console.error("LOAD HEADER NOTIFICATIONS ERROR:", error);
       }
+    };
 
-      // ARTIST
-      if (artistResult.status === "fulfilled") {
-        const body = artistResult.value.data as any;
+    loadNotifications();
+  }, [setNotifications]);
+  const [showNotificationList, setShowNotificationList] = useState(false);
 
-        const artistData =
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        if (!authUser?.id) return;
+
+        const res = await userApi.getProfile(authUser.id);
+
+        setProfile(res.data.data);
+      } catch (error) {
+        console.error("LOAD PROFILE ERROR:", error);
+      }
+    };
+
+    loadProfile();
+  }, [authUser?.id]);
+  // ✅ NOTIFICATION FLOW: bật SignalR để badge tăng realtime
+  useEffect(() => {
+    startNotificationSignalR().catch((error) => {
+      console.error("START NOTIFICATION SIGNALR ERROR:", error);
+    });
+  }, []);
+
+  useEffect(() => {
+    const value = searchValue.trim();
+
+    if (!value) {
+      setUserResults([]);
+      setArtistResults([]);
+      setPlaylistResults([]);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      try {
+        setUserSearching(true);
+        setExtraSearching(true);
+
+        const [userResult, artistResult, playlistResult] =
+          await Promise.allSettled([
+            userApi.search(value),
+            artistApi.search(value),
+            playlistApi.search(value),
+          ]);
+
+        // USER
+        if (userResult.status === "fulfilled") {
+          const body = userResult.value.data as any;
+
+          const userData =
             Array.isArray(body) ? body :
-            Array.isArray(body?.data?.artists) ? body.data.artists :
-            Array.isArray(body?.data?.items) ? body.data.items :
             Array.isArray(body?.data) ? body.data :
-            Array.isArray(body?.artists) ? body.artists :
+            Array.isArray(body?.data?.items) ? body.data.items :
             Array.isArray(body?.items) ? body.items :
             [];
-        console.log("HEADER ARTIST DATA:", artistData);
-        setArtistResults(artistData);
-      } else {
-        console.error("HEADER SEARCH ARTIST ERROR:", artistResult.reason);
-        setArtistResults([]);
+
+          console.log("HEADER USER DATA:", userData);
+          setUserResults(userData);
+        } else {
+          console.error("HEADER SEARCH USER ERROR:", userResult.reason);
+          setUserResults([]);
+        }
+
+        // ARTIST
+        if (artistResult.status === "fulfilled") {
+          const body = artistResult.value.data as any;
+
+          const artistData =
+              Array.isArray(body) ? body :
+              Array.isArray(body?.data?.artists) ? body.data.artists :
+              Array.isArray(body?.data?.items) ? body.data.items :
+              Array.isArray(body?.data) ? body.data :
+              Array.isArray(body?.artists) ? body.artists :
+              Array.isArray(body?.items) ? body.items :
+              [];
+          console.log("HEADER ARTIST DATA:", artistData);
+          setArtistResults(artistData);
+        } else {
+          console.error("HEADER SEARCH ARTIST ERROR:", artistResult.reason);
+          setArtistResults([]);
+        }
+
+        // PLAYLIST
+        if (playlistResult.status === "fulfilled") {
+          const body = playlistResult.value.data as any;
+
+          const playlistData =
+            Array.isArray(body) ? body :
+            Array.isArray(body?.data) ? body.data :
+            Array.isArray(body?.data?.items) ? body.data.items :
+            Array.isArray(body?.items) ? body.items :
+            [];
+
+          console.log("HEADER PLAYLIST DATA:", playlistData);
+          setPlaylistResults(playlistData);
+        } else {
+          console.error("HEADER SEARCH PLAYLIST ERROR:", playlistResult.reason);
+          setPlaylistResults([]);
+        }
+      } finally {
+        setUserSearching(false);
+        setExtraSearching(false);
       }
+    }, 300);
 
-      // PLAYLIST
-      if (playlistResult.status === "fulfilled") {
-        const body = playlistResult.value.data as any;
+    return () => clearTimeout(timer);
+  }, [searchValue]);
 
-        const playlistData =
-          Array.isArray(body) ? body :
-          Array.isArray(body?.data) ? body.data :
-          Array.isArray(body?.data?.items) ? body.data.items :
-          Array.isArray(body?.items) ? body.items :
-          [];
-
-        console.log("HEADER PLAYLIST DATA:", playlistData);
-        setPlaylistResults(playlistData);
-      } else {
-        console.error("HEADER SEARCH PLAYLIST ERROR:", playlistResult.reason);
-        setPlaylistResults([]);
-      }
-    } finally {
-      setUserSearching(false);
-      setExtraSearching(false);
-    }
-  }, 300);
-
-  return () => clearTimeout(timer);
-}, [searchValue]);
   return (
     <header
       style={{
@@ -217,7 +258,7 @@ const Header = ({
         zIndex: 100,
         minHeight: "64px",
         fontFamily:
-          "'Circular', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+          "'Circular', 'Helvetica Neue', Helvetica, Arial, sans-serif",           
       }}
     >
       {/* Logo */}
@@ -241,7 +282,7 @@ const Header = ({
           onClick={onHomeClick}
           title="Trang chủ"
           style={{
-            background: "#2a2a2a",
+            background: "#787878",
             border: "none",
             borderRadius: "50%",
             width: "48px",
@@ -259,11 +300,11 @@ const Header = ({
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.transform = "scale(1)";
-            e.currentTarget.style.background = "#aa1389";
+            e.currentTarget.style.background = "#787878";
           }}
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
-            <path d="M12.5 3.247a1 1 0 0 0-1 0L4 7.577V20h4.5v-6a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v6H20V7.577l-7.5-4.33zm-2-1.732a3 3 0 0 1 3 0l7.5 4.33a2 2 0 0 1 1 1.732V21a1 1 0 0 1-1 1h-6.5a1 1 0 0 1-1-1v-6h-3v6a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7.577a2 2 0 0 1 1-1.732l7.5-4.33z" />
+          <svg viewBox="0 0 24 24" width="30" height="30 " fill="currentColor">
+            <path d="M12 3.54 3 10v10a1 1 0 0 0 1 1h5v-6h6v6h5a1 1 0 0 0 1-1V10l-9-6.46z" />
           </svg>
         </button>
 
@@ -340,7 +381,7 @@ const Header = ({
                 overflowY: "auto",
               }}
             >
-              {(searchLoading || userSearching || extraSearching) && (
+              {(searchLoading || userSearching) && (
                 <div style={{ padding: "12px", color: "#b3b3b3" }}>
                   Đang tìm kiếm...
                 </div>
@@ -352,14 +393,11 @@ const Header = ({
                 </div>
               )}
 
-              { !searchLoading &&
+              {!searchLoading &&
                 !userSearching &&
-                !extraSearching &&
                 !searchError &&
                 searchResults.length === 0 &&
-                userResults.length === 0 &&
-                artistResults.length === 0 &&
-                playlistResults.length === 0 && (
+                userResults.length === 0 && (
                   <div style={{ padding: "12px", color: "#b3b3b3" }}>
                     Không tìm thấy kết quả
                   </div>
@@ -475,182 +513,181 @@ const Header = ({
                   </div>
                 ))}
 
-              {artistResults.length > 0 && (
-  <>
-    <div
-      style={{
-        padding: "12px 8px 6px",
-        color: "#b3b3b3",
-        fontSize: "13px",
-        fontWeight: 800,
-      }}
-    >
-      Nghệ sĩ
-    </div>
+                {artistResults.length > 0 && (
+                <>
+                  <div
+                    style={{
+                      padding: "12px 8px 6px",
+                      color: "#b3b3b3",
+                      fontSize: "13px",
+                      fontWeight: 800,
+                    }}
+                  >
+                    Nghệ sĩ
+                  </div>
+                {artistResults.map((artist) => (
+                  <div
+                    key={artist.artistID}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      setSearchFocused(false);
+                      navigate(`/artist/${encodeURIComponent(artist.artistName)}`);
+                    }}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "12px",
+                      padding: "8px",
+                      borderRadius: "6px",
+                      cursor: "pointer",
+                      transition: "background 0.15s",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = "#3a3a3a";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = "transparent";
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: "48px",
+                        height: "48px",
+                        borderRadius: "50%",
+                        overflow: "hidden",
+                        flexShrink: 0,
+                        background: "#444",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "#fff",
+                        fontWeight: 900,
+                      }}
+                    >
+                      {buildArtistImageUrl(artist.artistImage) ? (
+                        <img
+                          src={buildArtistImageUrl(artist.artistImage)}
+                          alt={artist.artistName}
+                          onError={(e) => {
+                            e.currentTarget.style.display = "none";
+                          }}
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                          }}
+                        />
+                      ) : (
+                        artist.artistName?.charAt(0).toUpperCase() ?? "?"
+                      )}
+                    </div>
+                    <div style={{ flex: 1, overflow: "hidden" }}>
+                      <div
+                        style={{
+                          color: "#fff",
+                          fontWeight: 700,
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                        }}
+                      >
+                        {artist.artistName}
+                      </div>
 
-    {artistResults.map((artist) => (
-          <div
-            key={artist.artistID}
-            onMouseDown={(e) => {
-              e.preventDefault();
-              setSearchFocused(false);
-              navigate(`/artist/${encodeURIComponent(artist.artistName)}`);
-            }}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "12px",
-              padding: "8px",
-              borderRadius: "6px",
-              cursor: "pointer",
-              transition: "background 0.15s",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = "#3a3a3a";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = "transparent";
-            }}
-          >
-            <div
-              style={{
-                width: "48px",
-                height: "48px",
-                borderRadius: "50%",
-                overflow: "hidden",
-                flexShrink: 0,
-                background: "#444",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#fff",
-                fontWeight: 900,
-              }}
-            >
-              {buildArtistImageUrl(artist.artistImage) ? (
-                <img
-                  src={buildArtistImageUrl(artist.artistImage)}
-                  alt={artist.artistName}
-                  onError={(e) => {
-                    e.currentTarget.style.display = "none";
-                  }}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                  }}
-                />
-              ) : (
-                artist.artistName?.charAt(0).toUpperCase() ?? "?"
-              )}
-            </div>
-            <div style={{ flex: 1, overflow: "hidden" }}>
-              <div
-                style={{
-                  color: "#fff",
-                  fontWeight: 700,
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                }}
-              >
-                {artist.artistName}
-              </div>
+                      <div
+                        style={{
+                          color: "#b3b3b3",
+                          fontSize: "13px",
+                        }}
+                      >
+                        Nghệ sĩ
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
+              {playlistResults.length > 0 && (
+                <>
+                  <div
+                    style={{
+                      padding: "12px 8px 6px",
+                      color: "#b3b3b3",
+                      fontSize: "13px",
+                      fontWeight: 800,
+                    }}
+                  >
+                    Playlist
+                  </div>
 
-              <div
-                style={{
-                  color: "#b3b3b3",
-                  fontSize: "13px",
-                }}
-              >
-                Nghệ sĩ
-              </div>
-            </div>
-          </div>
-        ))}
-      </>
-    )}
-                  {playlistResults.length > 0 && (
-      <>
-        <div
-          style={{
-            padding: "12px 8px 6px",
-            color: "#b3b3b3",
-            fontSize: "13px",
-            fontWeight: 800,
-          }}
-        >
-          Playlist
-        </div>
-
-    {playlistResults.map((playlist) => (
-            <div
-              key={playlist.playlistID}
-              onMouseDown={(e) => {
-                e.preventDefault();
-                setSearchFocused(false);
-                navigate(`/playlist/${playlist.playlistID}`);
-              }}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "12px",
-                padding: "8px",
-                borderRadius: "6px",
-                cursor: "pointer",
-                transition: "background 0.15s",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = "#3a3a3a";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = "transparent";
-              }}
-            >
-              <div
-                style={{
-                  width: "48px",
-                  height: "48px",
-                  borderRadius: "8px",
-                  flexShrink: 0,
-                  background: "linear-gradient(135deg, #7c3aed, #db2777)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "#fff",
-                  fontWeight: 900,
-                  fontSize: "20px",
-                }}
-              >
-                ♫
-              </div>
-
-              <div style={{ flex: 1, overflow: "hidden" }}>
+              {playlistResults.map((playlist) => (
                 <div
+                  key={playlist.playlistID}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    setSearchFocused(false);
+                    navigate(`/playlist/${playlist.playlistID}`);
+                  }}
                   style={{
-                    color: "#fff",
-                    fontWeight: 700,
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "12px",
+                    padding: "8px",
+                    borderRadius: "6px",
+                    cursor: "pointer",
+                    transition: "background 0.15s",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = "#3a3a3a";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = "transparent";
                   }}
                 >
-                  {playlist.playlistName}
-                </div>
+                  <div
+                    style={{
+                      width: "48px",
+                      height: "48px",
+                      borderRadius: "8px",
+                      flexShrink: 0,
+                      background: "linear-gradient(135deg, #7c3aed, #db2777)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "#fff",
+                      fontWeight: 900,
+                      fontSize: "20px",
+                    }}
+                  >
+                    ♫
+                  </div>
 
-                <div
-                  style={{
-                    color: "#b3b3b3",
-                    fontSize: "13px",
-                  }}
-                >
-                  Playlist
+                  <div style={{ flex: 1, overflow: "hidden" }}>
+                    <div
+                      style={{
+                        color: "#fff",
+                        fontWeight: 700,
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      {playlist.playlistName}
+                    </div>
+
+                    <div
+                      style={{
+                        color: "#b3b3b3",
+                        fontSize: "13px",
+                      }}
+                    >
+                      Playlist
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          ))}
-        </>
-      )}
+              ))}
+            </>
+          )}
 
               {userResults.length > 0 && (
                 <>
@@ -773,17 +810,48 @@ const Header = ({
           flexShrink: 0,
         }}
       >
-        <IconActionBtn title="Thông báo" onClick={onNotificationClick}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6V11c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
-          </svg>
-        </IconActionBtn>
+        <div style={{ position: "relative" }}>
+          <IconActionBtn
+            title="Thông báo"
+            onClick={() => {
+              setShowNotificationList((prev) => !prev);
+              onNotificationClick?.();
+            }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6V11c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
+            </svg>
+          </IconActionBtn>
 
-        <IconActionBtn title="Bạn bè" onClick={onFriendsClick}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
-          </svg>
-        </IconActionBtn>
+          {unreadCount > 0 && (
+            <span
+              style={{
+                position: "absolute",
+                top: "-2px",
+                right: "-2px",
+                minWidth: "17px",
+                height: "17px",
+                padding: "0 5px",
+                borderRadius: "999px",
+                background: "#ff2b45",
+                color: "#fff",
+                fontSize: "10px",
+                fontWeight: 800,
+                lineHeight: "17px",
+                textAlign: "center",
+                border: "2px solid #111",
+                boxShadow: "0 0 0 1px rgba(255,255,255,.12)",
+                transform: "translate(35%, -25%)",
+              }}
+            >
+              {unreadCount > 99 ? "99+" : unreadCount}
+            </span>
+          )}
+
+          {showNotificationList && (
+            <NotificationList onClose={() => setShowNotificationList(false)} />
+          )}
+        </div>
 
         <div style={{ position: "relative" }}>
           <button
@@ -836,11 +904,21 @@ const Header = ({
                 zIndex: 9999,
               }}
             >
+              {/* ✅ MENU MỚI */}
+
+              <MenuItem
+                label="Tài khoản"
+                onClick={() => {
+                  setShowAccountMenu(false);
+                  navigate("/account");
+                }}
+              />
+
               <MenuItem
                 label="Hồ sơ"
                 onClick={() => {
                   setShowAccountMenu(false);
-                  onAvatarClick?.();
+                  navigate("/profile");
                 }}
               />
 
@@ -953,10 +1031,9 @@ const Header = ({
           >
             <h2 style={{ margin: "0 0 16px", fontSize: "22px" }}>Gần đây</h2>
 
-            {recentTracks.length === 0 ? (
+            {recentTracks.length === 0 ?
               <p style={{ color: "#b3b3b3" }}>Chưa có bài hát nào gần đây.</p>
-            ) : (
-              <div style={{ overflowY: "auto", flex: 1 }}>
+            : <div style={{ overflowY: "auto", flex: 1 }}>
                 {recentTracks.map((track) => (
                   <RecentTrackRow
                     key={track.id}
@@ -968,7 +1045,7 @@ const Header = ({
                   />
                 ))}
               </div>
-            )}
+            }
 
             <button
               onClick={() => setShowRecentModal(false)}
@@ -993,6 +1070,7 @@ const Header = ({
   );
 };
 
+// ─── Sub-components ────────────────────────────────────────────────────────────
 const IconActionBtn = ({
   children,
   title,
@@ -1052,7 +1130,6 @@ const MenuItem = ({
     {label}
   </button>
 );
-
 const ProfileRow = ({ label, value }: { label: string; value: string }) => (
   <div
     style={{
@@ -1062,7 +1139,14 @@ const ProfileRow = ({ label, value }: { label: string; value: string }) => (
       borderBottom: "1px solid #2f2f2f",
     }}
   >
-    <span style={{ color: "#b3b3b3" }}>{label}</span>
+    <span
+      style={{ 
+        color: "#b3b3b3",
+      }}
+    >
+      {label}
+    </span>
+
     <span>{value}</span>
   </div>
 );
@@ -1104,15 +1188,13 @@ const RecentTrackRow = ({
           color: "#b3b3b3",
         }}
       >
-        {track.thumbnailUrl ? (
+        {track.thumbnailUrl ?
           <img
             src={track.thumbnailUrl}
             alt={track.title}
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
-        ) : (
-          "🎵"
-        )}
+        : "🎵"}
       </div>
 
       <div style={{ minWidth: 0, flex: 1 }}>
@@ -1128,7 +1210,6 @@ const RecentTrackRow = ({
         >
           {track.title}
         </div>
-
         <div
           style={{
             color: "#b3b3b3",
@@ -1148,6 +1229,7 @@ const RecentTrackRow = ({
         </div>
       </div>
 
+      {/* Nút play hiện khi hover row */}
       <button
         onClick={() => onPlay(track)}
         title="Phát"
@@ -1172,5 +1254,4 @@ const RecentTrackRow = ({
     </div>
   );
 };
-
 export default Header;

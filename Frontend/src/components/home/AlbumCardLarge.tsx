@@ -1,19 +1,39 @@
 import { useState } from "react";
 import type { Media } from "../../types/media";
 import { usePlayer } from "../../hooks/usePlayer";
-import { PlayIcon } from "../common/icons";
+import { NowPlayingIcon, PlayIcon } from "../common/icons";
 
 type Props = {
   track: Media;
   tracks: Media[];
-
-  // NEW: click card mở view album/playlist
   onOpenAlbum: (track: Media, tracks: Media[]) => void;
 };
 
 const AlbumCardLarge = ({ track, tracks, onOpenAlbum }: Props) => {
   const [hovered, setHovered] = useState(false);
-  const { playTrack, setQueue } = usePlayer();
+
+  const {
+    currentTrack,
+    isPlaying,
+    playTrack,
+    setQueue,
+    togglePlay,
+  } = usePlayer();
+
+  const isCurrentTrack = String(currentTrack?.id) === String(track.id);
+  const isThisPlaying = isCurrentTrack && isPlaying;
+
+  const handlePlay = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+
+    if (isCurrentTrack) {
+      togglePlay();
+      return;
+    }
+
+    setQueue(tracks);
+    playTrack(track);
+  };
 
   return (
     <div
@@ -68,14 +88,10 @@ const AlbumCardLarge = ({ track, tracks, onOpenAlbum }: Props) => {
           </div>
         )}
 
-        {hovered && (
+        {(hovered || isCurrentTrack) && (
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setQueue(tracks);
-              playTrack(track);
-            }}
-            title="Phát"
+            onClick={handlePlay}
+            title={isThisPlaying ? "Tạm dừng" : "Phát"}
             style={{
               position: "absolute",
               bottom: "10px",
@@ -89,16 +105,20 @@ const AlbumCardLarge = ({ track, tracks, onOpenAlbum }: Props) => {
               cursor: "pointer",
               fontWeight: 900,
               boxShadow: "0 8px 20px rgba(0,0,0,.35)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "17px",
             }}
           >
-            <PlayIcon/>
+            {isThisPlaying ? <NowPlayingIcon/> : <PlayIcon />}
           </button>
         )}
       </div>
 
       <div
         style={{
-          color: "#fff",
+          color: isCurrentTrack ? "#1DB954" : "#fff",
           fontSize: "15px",
           fontWeight: 700,
           marginBottom: "5px",
@@ -119,7 +139,7 @@ const AlbumCardLarge = ({ track, tracks, onOpenAlbum }: Props) => {
           textOverflow: "ellipsis",
         }}
       >
-        {track.artist.name}
+        {track.artist?.name ?? "Unknown Artist"}
       </div>
     </div>
   );

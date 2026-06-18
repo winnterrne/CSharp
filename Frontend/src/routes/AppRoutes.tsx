@@ -1,10 +1,12 @@
 import { Routes, Route } from "react-router-dom";
 import MainLayout from "../layouts/MainLayout";
 import ProtectedRoute from "./ProtectedRoute";
+
 import HomePage from "../pages/Home/HomePage";
 import LoginPage from "../pages/Auth/LoginPage";
 import RegisterPage from "../pages/Auth/RegisterPage";
 import ProfilePage from "../pages/Profile/ProfilePage";
+import AccountPage from "../pages/Profile/AccountPage";
 import SearchPage from "../pages/Search/SearchPage";
 import PlaylistDetailPage from "../pages/Playlist/PlaylistDetailPage";
 import NotificationPage from "../pages/Notification/NotificationPage";
@@ -29,6 +31,19 @@ export default function AppRoutes() {
         }
       />
 
+      {/* ✅ ACCOUNT: trang tài khoản / hồ sơ thật */}
+      <Route
+        path="/account"
+        element={
+          <ProtectedRoute>
+            <MainLayout>
+              <AccountPage />
+            </MainLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* ✅ PROFILE: đổi thành trang Playlist của tôi */}
       <Route
         path="/profile"
         element={
@@ -39,6 +54,7 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       />
+
       <Route
         path="/search"
         element={
@@ -49,28 +65,37 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       />
+
       <Route
         path="/playlist/:id"
         element={
-          <MainLayout>
-            <PlaylistDetailPage />
-          </MainLayout>
+          <ProtectedRoute>
+            <MainLayout>
+              <PlaylistDetailPage />
+            </MainLayout>
+          </ProtectedRoute>
         }
       />
+
       <Route
         path="/notifications"
         element={
-          <MainLayout>
-            <NotificationPage />
-          </MainLayout>
+          <ProtectedRoute>
+            <MainLayout>
+              <NotificationPage />
+            </MainLayout>
+          </ProtectedRoute>
         }
       />
+
       <Route
         path="/album/:id"
         element={
-          <MainLayout>
-            <AlbumDetailPage />
-          </MainLayout>
+          <ProtectedRoute>
+            <MainLayout>
+              <AlbumDetailPage />
+            </MainLayout>
+          </ProtectedRoute>
         }
       />
       <Route 

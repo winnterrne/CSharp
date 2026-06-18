@@ -1,7 +1,8 @@
 import { useState } from "react";
 import type { Media } from "../../types/media";
 import { usePlayer } from "../../hooks/usePlayer";
-import { PlayIcon } from "../common/icons";
+import { useHistoryStore } from "../../store/historyStore";
+import { NowPlayingIcon, PlayIcon } from "../common/icons";
 
 type Props = {
   track: Media;
@@ -12,12 +13,29 @@ type Props = {
 const QuickPlayCard = ({ track, tracks, onOpenTrack }: Props) => {
   const [hovered, setHovered] = useState(false);
 
-  const { playTrack, setQueue } = usePlayer();
+  const {
+    currentTrack,
+    isPlaying,
+    playTrack,
+    setQueue,
+    togglePlay,
+  } = usePlayer();
+
+  const addRecentTrack = useHistoryStore((state) => state.addRecentTrack);
+
+  const isCurrentTrack = String(currentTrack?.id) === String(track.id);
+  const isThisPlaying = isCurrentTrack && isPlaying;
 
   const handlePlay = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
 
+    if (isCurrentTrack) {
+      togglePlay();
+      return;
+    }
+
     setQueue(tracks);
+    addRecentTrack(track);
     playTrack(track);
   };
 
@@ -52,8 +70,7 @@ const QuickPlayCard = ({ track, tracks, onOpenTrack }: Props) => {
           fontSize: "26px",
         }}
       >
-        {track.thumbnailUrl ?
-        
+        {track.thumbnailUrl ? (
           <img
             src={track.thumbnailUrl}
             alt={track.title}
@@ -63,7 +80,9 @@ const QuickPlayCard = ({ track, tracks, onOpenTrack }: Props) => {
               objectFit: "cover",
             }}
           />
-        : "🎵"}
+        ) : (
+          "🎵"
+        )}
       </div>
 
       <div
@@ -75,7 +94,7 @@ const QuickPlayCard = ({ track, tracks, onOpenTrack }: Props) => {
       >
         <div
           style={{
-            color: "#fff",
+            color: isCurrentTrack ? "#1DB954" : "#fff",
             fontSize: "14px",
             fontWeight: 700,
             whiteSpace: "nowrap",
@@ -102,10 +121,10 @@ const QuickPlayCard = ({ track, tracks, onOpenTrack }: Props) => {
         </div>
       </div>
 
-      {hovered && (
+      {(hovered || isCurrentTrack) && (
         <button
           onClick={handlePlay}
-          title="Phát"
+          title={isThisPlaying ? "Tạm dừng" : "Phát"}
           style={{
             width: "44px",
             height: "44px",
@@ -121,11 +140,10 @@ const QuickPlayCard = ({ track, tracks, onOpenTrack }: Props) => {
             alignItems: "center",
             justifyContent: "center",
             fontSize: "17px",
-            transform: hovered ? "scale(1)" : "scale(.95)",
             transition: ".18s ease",
           }}
         >
-          <PlayIcon/>
+          {isThisPlaying ? <NowPlayingIcon/> : <PlayIcon />}
         </button>
       )}
     </div>
