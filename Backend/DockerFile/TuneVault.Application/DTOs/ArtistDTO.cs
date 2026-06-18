@@ -18,7 +18,6 @@ public record SearchArtistResultDto(
     IEnumerable<ArtistProfileDto> Artists,
     int TotalPages);
 
-    
 public record ArtistFollowerDto(
     int ArtistID,
     string? ArtistName,

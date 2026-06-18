@@ -1,59 +1,71 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+
 import { authApi } from "../../api/authApi";
+import { userApi } from "../../api/userApi";
 import { useAuth } from "../../hooks/useAuth";
+
 import AuthCard from "./components/AuthCard";
 import AuthInput from "./components/AuthInput";
 import AuthButton from "./components/AuthButton";
-import { userApi } from "../../api/userApi";
 
 const LoginPage = () => {
   const navigate = useNavigate();
+
   const { login, setLoading, isLoading } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
   const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     setError("");
     setLoading(true);
 
     try {
       // BE trả: { success: true, data: { userID, userName, email, role, token } }
       const res = await authApi.login(email, password);
+
       console.log("LOGIN RESPONSE", res.data);
-      const authData = res.data.data;
 
+      const authData = res.data?.data;
+
+      if (!authData?.token) {
+        setError("Đăng nhập thành công nhưng không nhận được token");
+        console.error("LOGIN TOKEN NOT FOUND:", res.data);
+        return;
+      }
+
+      // ✅ QUAN TRỌNG: lưu token để SignalR lấy được
+      localStorage.setItem("token", authData.token);
+
+      let userImage: string | undefined = undefined;
+
+      // ✅ Fetch profile để lấy userImage, lỗi thì bỏ qua
+      try {
+        const profileRes = await userApi.getProfile(authData.userID);
+        const profile = profileRes.data?.data;
+
+        userImage = profile?.userImage ?? undefined;
+      } catch (profileError) {
+        console.warn("GET PROFILE AFTER LOGIN ERROR:", profileError);
+      }
+
+      // ✅ Lưu user vào auth store
       login(
         {
           id: authData.userID,
           username: authData.userName,
           email: authData.email,
           role: authData.role,
+          userImage,
         },
         authData.token,
       );
-      // ✅ Fetch profile để lấy userImage
-    try {
-      const profileRes = await userApi.getProfile(authData.userID);
-      const profile = profileRes.data.data;
 
-      // Cập nhật lại user với userImage
-      login(
-        {
-          id: authData.userID,
-          username: authData.userName,
-          email: authData.email,
-          role: authData.role,
-          userImage: profile.userImage ?? undefined,
-        },
-        authData.token,
-      );
-    } catch {
-      // Không lấy được profile thì vẫn login bình thường
-    }
       navigate("/");
     } catch (err) {
       console.error("LOGIN ERROR:", err);
@@ -65,12 +77,22 @@ const LoginPage = () => {
 
   return (
     <AuthCard>
-      <h1 style={{ color: "#fff", textAlign: "center", marginBottom: "8px" }}>
+      <h1
+        style={{
+          color: "#fff",
+          textAlign: "center",
+          marginBottom: "8px",
+        }}
+      >
         TuneVault
       </h1>
 
       <p
-        style={{ color: "#b3b3b3", textAlign: "center", marginBottom: "28px" }}
+        style={{
+          color: "#b3b3b3",
+          textAlign: "center",
+          marginBottom: "28px",
+        }}
       >
         Đăng nhập để nghe nhạc 🎧
       </p>
@@ -97,9 +119,21 @@ const LoginPage = () => {
         <AuthButton loading={isLoading}>Đăng nhập</AuthButton>
       </form>
 
-      <p style={{ color: "#b3b3b3", textAlign: "center", marginTop: "22px" }}>
+      <p
+        style={{
+          color: "#b3b3b3",
+          textAlign: "center",
+          marginTop: "22px",
+        }}
+      >
         Chưa có tài khoản?{" "}
-        <Link to="/register" style={{ color: "#1DB954", fontWeight: 700 }}>
+        <Link
+          to="/register"
+          style={{
+            color: "#1DB954",
+            fontWeight: 700,
+          }}
+        >
           Đăng ký
         </Link>
       </p>

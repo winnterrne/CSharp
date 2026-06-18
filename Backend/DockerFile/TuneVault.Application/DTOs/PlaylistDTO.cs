@@ -17,7 +17,7 @@ public record MyPlaylistDto (
 public record PlaylistSongDto (
     int MediaItemID,
     string TitleName,
-    string ArtistID,
+    int ArtistID,
     string? AlbumID,
     int Duration,
     string FilePath

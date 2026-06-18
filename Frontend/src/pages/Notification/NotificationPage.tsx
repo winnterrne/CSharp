@@ -1,9 +1,7 @@
-import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import NotificationItem from "../../components/notification/NotificationItem";
 import { useNotification } from "../../hooks/useNotification";
-// import { notificationApi } from "../../api/notificationApi";
 import { mediaApi } from "../../api/mediaApi";
 import { mapMediaItemDtoToMedia } from "../../types/media";
 import {
@@ -21,13 +19,7 @@ const NotificationPage = () => {
     error,
     markAsRead,
     markAllAsRead,
-    fetchNotifications,
   } = useNotification();
-
-  // ✅ NOTIFICATION FLOW: refresh lại khi mở page lớn
-  useEffect(() => {
-    fetchNotifications();
-  }, [fetchNotifications]);
 
   const markReadIfNeeded = async (notification: Notification) => {
     if (notification.isRead) return;
@@ -56,9 +48,7 @@ const NotificationPage = () => {
     }, 80);
   };
 
-  const handleOpenNotification = async (
-    notification: Notification,
-  ) => {
+  const handleOpenNotification = async (notification: Notification) => {
     const data = parseNotificationPayload(notification.payload);
 
     await markReadIfNeeded(notification);
@@ -78,10 +68,6 @@ const NotificationPage = () => {
 
     if (isSharePlaylist && data.playlistID) {
       navigate(`/playlist/${data.playlistID}`);
-      return;
-    }
-
-    if (notification.type === "follow") {
       return;
     }
   };
