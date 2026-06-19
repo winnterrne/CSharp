@@ -25,6 +25,7 @@ type ArtistProfile = {
 
 
 const ArtistDetailView = ({
+  
   artistId,
   artistName,
   artistImage = "",
@@ -32,6 +33,7 @@ const ArtistDetailView = ({
   onOpenAlbum,
   onOpenTrack,
 }: ArtistDetailViewProps) => {
+  
   const { currentTrack, isPlaying, playTrack, setQueue, togglePlay } =
     usePlayer();
 
@@ -84,9 +86,15 @@ const [profile, setProfile] =
   useState<ArtistProfile | null>(null);
 
 useEffect(() => {
+  console.log("ARTIST DETAIL RECEIVED:", {
+    artistId,
+    artistName,
+    tracksCount: tracks.length,
+  });
   const loadProfile = async () => {
     try {
       const res = await artistApi.getProfile(artistId);
+      console.log("PROFILE RESPONSE:", res.data);
 
       setProfile(res.data);
     } catch (err) {

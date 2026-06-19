@@ -202,10 +202,18 @@ const MainContent = () => {
     artistName: string,
     artistImage: string,
     tracks: Media[] = allTracks,
+    
   ) => {
+    console.log("HANDLE OPEN ARTIST", {
+      artistID,
+      artistName,
+      artistImage,
+      allTracksCount: allTracks.length,
+    });
     const artistTracks = tracks.filter(
       (track) => track.artist?.id === artistID,
     );
+    console.log("ARTIST TRACKS", artistTracks);
 
     setSelectedArtist({
       id: artistID,
