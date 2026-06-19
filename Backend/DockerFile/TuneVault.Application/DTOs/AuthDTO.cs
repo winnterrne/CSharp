@@ -26,11 +26,13 @@ public record UserProfileDto (
     string? UserImage,
     string? Email, 
     string? Role,
-    string? Phone
+    string? Phone,
+    string? Bio
 );
 
 public record UpdateProfileDto (
     string? UserName,
     string? UserImage,
-    string? Phone
+    string? Phone,
+    string? Bio
 );

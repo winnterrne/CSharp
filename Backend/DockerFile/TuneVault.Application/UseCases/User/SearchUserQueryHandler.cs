@@ -32,7 +32,8 @@ public class SearchUsersHandler : IRequestHandler<SearchUserQuery, IEnumerable<U
             u.UserImage,
             u.Email,
             u.Role,
-            u.Phone
+            u.Phone,
+            u.Bio
         ));
     }
 }

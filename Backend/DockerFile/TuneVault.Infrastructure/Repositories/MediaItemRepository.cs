@@ -104,9 +104,11 @@ public class MediaItemRepository : IMediaItemRepository
             END,
 
             CASE
-                WHEN @filePath IS NULL THEN NULL
-                ELSE RIGHT(@filePath,
-                    CHARINDEX('/', REVERSE(REPLACE(@filePath, '\', '/'))) - 1)
+                WHEN @filePath IS NULL OR @filePath = '' THEN NULL
+                ELSE RIGHT(
+                    REPLACE(@filePath, '', '/'),
+                    CHARINDEX('/', REVERSE(REPLACE(@filePath, '', '/')) + '/') - 1
+                )
             END,
 
             @MediaItemTag,

@@ -38,7 +38,8 @@ public class UserController : ControllerBase
             id, 
             dto.UserName,
             dto.UserImage,
-            dto.Phone
+            dto.Phone,
+            dto.Bio
         );
 
         var result = await _mediator.Send(command);

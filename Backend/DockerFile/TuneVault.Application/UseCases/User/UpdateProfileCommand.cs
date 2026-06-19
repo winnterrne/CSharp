@@ -8,5 +8,6 @@ public record UpdateProfileCommand (
     string UserID, 
     string? UserName,
     string? UserImage,
-    string? Phone
+    string? Phone,
+    string? Bio
 ) : IRequest<UserProfileDto>;
