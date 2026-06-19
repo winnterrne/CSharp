@@ -41,7 +41,8 @@ namespace TuneVault.API.Controllers
                 form.ArtistID,
                 form.AlbumID,
                 userID,
-                form.File
+                form.File,
+                form.Thumbnail
             );
 
             var result = await _mediator.Send(command);

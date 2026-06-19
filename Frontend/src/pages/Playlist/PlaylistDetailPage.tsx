@@ -730,11 +730,12 @@ const PlaylistTrackRow = ({
   const [hovered, setHovered] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [addModalOpen, setAddModalOpen] = useState(false);
-
   const { playTrack, pause, play, setQueue } = usePlayer();
+  const navigate = useNavigate();
 
   const media = item.media;
   const artistName = getArtistName(media);
+  
 
   const isThisTrackPlaying =
     currentTrack &&
@@ -904,12 +905,17 @@ const PlaylistTrackRow = ({
       </div>
 
       <div
+        onClick={(e) => {
+          e.stopPropagation();
+          navigate(`/artist/${encodeURIComponent(artistName)}`);
+        }}
         style={{
           color: hovered || showNowPlaying ? "#fff" : "#b3b3b3",
           fontSize: "14px",
           whiteSpace: "nowrap",
           overflow: "hidden",
           textOverflow: "ellipsis",
+          cursor: "pointer",
         }}
       >
         {artistName}

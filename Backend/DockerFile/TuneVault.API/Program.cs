@@ -64,32 +64,21 @@ builder.Services
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],
-
             IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)
-            ),
-
-            // ✅ Quan trọng để Hub lấy được UserID bằng ClaimTypes.NameIdentifier
-            NameClaimType = System.Security.Claims.ClaimTypes.NameIdentifier,
-            RoleClaimType = System.Security.Claims.ClaimTypes.Role
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
         };
 
         opt.Events = new JwtBearerEvents
         {
             OnMessageReceived = context =>
             {
-                var accessToken = context.Request.Query["access_token"];
+                var token = context.Request.Query["token"];
 
-                var path = context.HttpContext.Request.Path;
-
-                // ✅ SignalR gửi token qua access_token
-                if (!string.IsNullOrEmpty(accessToken) &&
-                    path.StartsWithSegments("/notificationHub"))
+                if (!string.IsNullOrEmpty(token))
                 {
-                    context.Token = accessToken;
+                    context.Token = token;
                 }
 
                 return Task.CompletedTask;

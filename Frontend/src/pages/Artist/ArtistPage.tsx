@@ -33,6 +33,7 @@ const ArtistPage = () => {
   const [tracks, setTracks] = useState<Media[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [artistId, setArtistId] = useState(0);
 
   useEffect(() => {
     const loadArtistData = async () => {
@@ -50,12 +51,15 @@ const ArtistPage = () => {
 
         const artistTracks = mediaList.filter(
           (track) =>
-            track.artist?.name?.toLowerCase() ===
-            decodedArtistName.toLowerCase()
+            track.artist?.name?.toLowerCase() === decodedArtistName.toLowerCase()
         );
 
         setTracks(artistTracks);
-
+        if (artistTracks.length > 0) {  // ← THÊM ĐOẠN NÀY
+          const id = Number(artistTracks[0].artist?.id || 0);
+          setArtistId(id);
+          console.log("artistId from tracks:", id, "artist:", artistTracks[0].artist);
+        }
         if (artistTracks.length === 0) {
           setError("Không tìm thấy bài hát/video của nghệ sĩ này.");
         }
@@ -156,7 +160,9 @@ const ArtistPage = () => {
       )}
 
       <ArtistDetailView
+        artistId={artistId}
         artistName={decodedArtistName}
+        artistImage=""
         tracks={tracks}
         onOpenTrack={handleOpenTrack}
         onOpenAlbum={handleOpenAlbum}

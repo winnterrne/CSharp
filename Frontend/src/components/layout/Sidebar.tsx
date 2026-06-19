@@ -18,6 +18,7 @@ import { albumApi } from "../../api/albumApi";
 import type { Album } from "../../types/album";
 import { useAlbumStore } from "../../store/albumStore";
 import { useFollowStore } from "../../store/followStore";
+import UploadMediaModal from "../media/UploadMediaModal";
 
 type FilterTab = "playlist" | "favorite" | "following" | "album";
 
@@ -60,6 +61,7 @@ const Sidebar = ({
   const [loading, setLoading] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showRecent, setShowRecent] = useState(false);
+  const [showCreateMenu, setShowCreateMenu] = useState(false);
 
   const recentTracks = useHistoryStore((state) => state.recentTracks);
   const { favoriteTracks, loadFavorites } = useFavorite();
@@ -68,6 +70,8 @@ const Sidebar = ({
 
   const [albums, setAlbums] = useState<Album[]>([]);
   const setSelectedAlbumId = useAlbumStore((s) => s.setSelectedAlbumId);
+  const [menuPos, setMenuPos] = useState({ top: 0, left: 0 });
+  const [showUploadModal, setShowUploadModal] = useState(false);
 
   const fetchPlaylists = useCallback(async () => {
     if (!canUseAuthApi) {
@@ -124,7 +128,11 @@ const Sidebar = ({
 useEffect(() => {
   if (!canUseAuthApi) return;
 
-  fetchPlaylists();
+  const loadPlaylists = async () => {
+    await fetchPlaylists(); // bên trong fetchPlaylists có setState
+  };
+
+  loadPlaylists();
 }, [location.pathname, canUseAuthApi, fetchPlaylists]);
 
   useEffect(() => {
@@ -168,6 +176,13 @@ useEffect(() => {
   };
 }, [fetchPlaylists]);
 
+useEffect(() => {
+  if (!showCreateMenu) return;
+  const close = () => setShowCreateMenu(false);
+  window.addEventListener("click", close);
+  return () => window.removeEventListener("click", close);
+}, [showCreateMenu]);
+
   const handleOpenAlbum = (album: Album) => {
     setSelectedAlbumId(album.albumID);
     navigate(`/album/${album.albumID}`);
@@ -190,6 +205,7 @@ useEffect(() => {
   };
 
   const handleCreatePlaylist = () => {
+    
     if (!canUseAuthApi) {
       navigate("/login");
       return;
@@ -216,9 +232,49 @@ useEffect(() => {
           <LibraryIcon />
         </IconBtn>
 
-        <IconBtn title="Tạo playlist" onClick={handleCreatePlaylist}>
+        <IconBtn title="Tạo mới" onClick={(e) => {
+          e.stopPropagation();
+          const rect = e.currentTarget.getBoundingClientRect();
+          setMenuPos({ top: rect.bottom + 8, left: rect.left });
+          setShowCreateMenu(prev => !prev);
+        }}>
           <PlusIcon />
         </IconBtn>
+        {showCreateMenu && (
+          <div style={{
+            position: "fixed",
+            top: `${menuPos.top}px`,
+            left: `${menuPos.left}px`,
+            background: "#282828",
+            borderRadius: "8px",
+            padding: "4px",
+            zIndex: 99999,
+            boxShadow: "0 8px 24px rgba(0,0,0,0.5)",
+            minWidth: "80px", 
+          }}>
+            <button onClick={() => { setShowCreateMenu(false); handleCreatePlaylist(); }}
+              style={{ width: "100%", background: "transparent", border: "none", color: "#fff",
+                padding: "16px 12px", textAlign: "left", borderRadius: "4px", cursor: "pointer",
+                fontSize: "14px", fontWeight: 600, whiteSpace: "nowrap" }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "#3e3e3e")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}>
+              🎵 Tạo playlist
+            </button>
+            <button 
+              onClick={() => {
+                setShowCreateMenu(false);
+                if (!canUseAuthApi) { navigate("/login"); return; }
+                setShowUploadModal(true);
+              }}
+              style={{ width: "100%", background: "transparent", border: "none", color: "#fff",
+                padding: "16px 12px", textAlign: "left", borderRadius: "4px", cursor: "pointer",
+                fontSize: "14px", fontWeight: 600, whiteSpace: "nowrap" }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "#3e3e3e")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}>
+              ⬆️ Upload nhạc
+            </button>
+          </div>
+        )}
 
         <IconBtn
           title={isExpanded ? "Thu về bình thường" : "Phóng to thư viện"}
@@ -266,6 +322,13 @@ useEffect(() => {
           onClose={() => setShowCreateModal(false)}
           onCreated={fetchPlaylists}
         />
+        <UploadMediaModal
+          open={showUploadModal}
+          onClose={() => setShowUploadModal(false)}
+          onUploaded={() => {
+            //có thể dispatch event hoặc để trống
+          }}
+        />
       </aside>
     );
   }
@@ -291,9 +354,49 @@ useEffect(() => {
           </div>
 
           <div style={actionGroupStyle}>
-            <IconBtn title="Tạo playlist" onClick={handleCreatePlaylist}>
+            <IconBtn title="Tạo mới" onClick={(e) => {
+              e.stopPropagation();
+              const rect = e.currentTarget.getBoundingClientRect();
+              setMenuPos({ top: rect.bottom + 8, left: rect.left });
+              setShowCreateMenu(prev => !prev);
+            }}>
               <PlusIcon />
             </IconBtn>
+            {showCreateMenu && (
+              <div style={{
+                position: "fixed",
+                top: `${menuPos.top}px`,
+                left: `${menuPos.left}px`,
+                background: "#282828",
+                borderRadius: "8px",
+                padding: "4px",
+                zIndex: 99999,
+                boxShadow: "0 8px 24px rgba(0,0,0,0.5)",
+                minWidth: "80px",
+              }}>
+                <button onClick={() => { setShowCreateMenu(false); handleCreatePlaylist(); }}
+                  style={{ width: "100%", background: "transparent", border: "none", color: "#fff",
+                    padding: "16px 12px", textAlign: "left", borderRadius: "4px", cursor: "pointer",
+                    fontSize: "14px", fontWeight: 600, whiteSpace: "nowrap" }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = "#3e3e3e")}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}>
+                  🎵 Tạo playlist
+                </button>
+                <button 
+                  onClick={() => {
+                    setShowCreateMenu(false);
+                    if (!canUseAuthApi) { navigate("/login"); return; }
+                    setShowUploadModal(true);
+                  }}
+                  style={{ width: "100%", background: "transparent", border: "none", color: "#fff",
+                    padding: "16px 12px", textAlign: "left", borderRadius: "4px", cursor: "pointer",
+                    fontSize: "14px", fontWeight: 600, whiteSpace: "nowrap" }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = "#3e3e3e")}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}>
+                  ⬆️ Upload nhạc
+                </button>
+              </div>
+            )}
             <IconBtn
               title={isWide ? "Thu về bình thường" : "Phóng to thư viện"}
               onClick={onToggleExpand}
@@ -413,6 +516,7 @@ useEffect(() => {
                 key={artist.artistID}
                 artist={artist}
                 isWide={isWide}
+                onClick={() => navigate(`/artist/${encodeURIComponent(artist.artistName)}`)}
               />
             ))
 
@@ -464,6 +568,12 @@ useEffect(() => {
         open={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         onCreated={fetchPlaylists}
+      />
+      
+      <UploadMediaModal
+        open={showUploadModal}
+        onClose={() => setShowUploadModal(false)}
+        onUploaded={() => {}}
       />
     </aside>
   );
@@ -706,14 +816,17 @@ type FollowedArtist = {
 const ArtistRow = ({
   artist,
   isWide,
+  onClick,
 }: {
   artist: FollowedArtist;
   isWide: boolean;
+  onClick?: () => void;
 }) => {
   const [hovered, setHovered] = useState(false);
 
   return (
     <div
+      onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
@@ -729,7 +842,7 @@ const ArtistRow = ({
       <CoverBox size={isWide ? 56 : 48}>
         {artist.artistImage ?
           <img
-            src={artist.artistImage}
+            src={`http://localhost:5081/media/images/artist/${artist.artistImage}`}
             alt={artist.artistName}
             style={imgFullStyle}
           />
@@ -855,7 +968,7 @@ const IconBtn = ({
   children,
 }: {
   title: string;
-  onClick: () => void;
+  onClick: (e: React.MouseEvent) => void;
   children: ReactNode;
 }) => (
   <button

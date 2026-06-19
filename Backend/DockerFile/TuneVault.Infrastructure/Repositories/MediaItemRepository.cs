@@ -87,12 +87,13 @@ public class MediaItemRepository : IMediaItemRepository
         (
             @TitleName, 
             @MediaItemImage, 
-            CASE 
-                WHEN @filePath LIKE '%_%' THEN 
-                    RIGHT(@filePath, CHARINDEX('_', REVERSE(@filePath)) - 1)
-                ELSE 
-                    RIGHT(@filePath, CHARINDEX('/', REVERSE(REPLACE(@filePath, '\', '/'))) - 1)
-            END, 
+            CASE
+                WHEN @filePath IS NULL OR @filePath = '' THEN NULL
+                ELSE RIGHT(
+                    REPLACE(@filePath, '\', '/'),
+                    CHARINDEX('/', REVERSE(REPLACE(@filePath, '\', '/')) + '/') - 1
+                )
+            END,
             @MediaItemTag, 
             @MediaItemType, 
             @Duration, 

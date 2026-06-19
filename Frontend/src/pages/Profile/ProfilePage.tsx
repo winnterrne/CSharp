@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams} from "react-router-dom";
 
 import { playlistApi } from "../../api/playlistApi";
 import { interactionApi } from "../../api/interactionApi";
 import type { Playlist, PlaylistDetailDto } from "../../types/playlist";
 import { mapPlaylistDetailDtoToPlaylist } from "../../types/playlist";
+import { userApi } from "../../api/userApi";
 
 interface FollowedUser {
   userID?: string;
@@ -62,10 +63,16 @@ const mapBasicPlaylist = (item: any): Playlist => {
 
 const ProfilePage = () => {
   const navigate = useNavigate();
+   const { userId } = useParams<{  userId?: string }>();
+   const isOwnProfile = !userId;
+
+  const [profileUser, setProfileUser] = useState<{
+    userName?: string;
+    userImage?: string | null;
+  } | null>(null);
 
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [followedUsers, setFollowedUsers] = useState<FollowedUser[]>([]);
-
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -85,69 +92,98 @@ const ProfilePage = () => {
         setLoading(true);
         setError("");
 
-        const [playlistRes, followedRes] = await Promise.all([
-          playlistApi.getMyPlaylists(),
-          interactionApi.getFollowedUsers(),
-        ]);
+        if (isOwnProfile) {
+          // === PROFILE CỦA MÌNH: giữ nguyên logic cũ ===
+            const [playlistRes, followedRes] = await Promise.all([
+              playlistApi.getMyPlaylists(),
+              interactionApi.getFollowedUsers(),
+            ])
 
-        const rawPlaylists =
-          Array.isArray(playlistRes.data?.data)
-            ? playlistRes.data.data
-            : Array.isArray(playlistRes.data?.data?.playlists)
-              ? playlistRes.data.data.playlists
-              : Array.isArray(playlistRes.data?.playlists)
-                ? playlistRes.data.playlists
+            const rawPlaylists =
+              Array.isArray(playlistRes.data?.data)
+                ? playlistRes.data.data
+                : Array.isArray(playlistRes.data?.data?.playlists)
+                  ? playlistRes.data.data.playlists
+                  : Array.isArray(playlistRes.data?.playlists)
+                    ? playlistRes.data.playlists
+                    : Array.isArray(playlistRes.data)
+                      ? playlistRes.data
+                      : [];
+
+            const basicPlaylists = rawPlaylists.map(mapBasicPlaylist);
+
+            // ✅ FIX: lấy lại detail từng playlist để isPublic luôn mới nhất
+            const playlistsWithLatestStatus = await Promise.all(
+              basicPlaylists.map(async (playlist) => {
+                try {
+                  const detailRes = await playlistApi.getById(playlist.id);
+
+                  const detailRaw = detailRes.data?.data ?? detailRes.data;
+
+                  const detail = mapPlaylistDetailDtoToPlaylist(
+                    detailRaw as PlaylistDetailDto,
+                  );
+
+                  return {
+                    ...playlist,
+                    ...detail,
+                    id: playlist.id,
+                    playlistID: playlist.id,
+                    trackCount: detail.trackCount ?? playlist.trackCount ?? 0,
+                  };
+                } catch (error) {
+                  console.error("LOAD PLAYLIST DETAIL IN PROFILE ERROR:", error);
+                  return playlist;
+                }
+              }),
+            );
+
+            const rawFollowedUsers =
+              Array.isArray(followedRes.data?.data)
+                ? followedRes.data.data
+                : Array.isArray(followedRes.data)
+                  ? followedRes.data
+                  : [];
+
+            setPlaylists(playlistsWithLatestStatus);
+            setFollowedUsers(rawFollowedUsers);
+          } else {
+              // === PROFILE NGƯỜI KHÁC: fetch theo id ===
+            const [userRes, playlistRes] = await Promise.all([
+              userApi.getProfile(userId!),
+              playlistApi.getPublicByUserId(userId!),
+            ]);
+
+            const userData = userRes.data?.data ?? userRes.data;
+            setProfileUser(userData);
+
+            const rawPlaylists =
+              Array.isArray(playlistRes.data?.data)
+                ? playlistRes.data.data
                 : Array.isArray(playlistRes.data)
                   ? playlistRes.data
                   : [];
 
-        const basicPlaylists = rawPlaylists.map(mapBasicPlaylist);
-
-        // ✅ FIX: lấy lại detail từng playlist để isPublic luôn mới nhất
-        const playlistsWithLatestStatus = await Promise.all(
-          basicPlaylists.map(async (playlist) => {
-            try {
-              const detailRes = await playlistApi.getById(playlist.id);
-
-              const detailRaw = detailRes.data?.data ?? detailRes.data;
-
-              const detail = mapPlaylistDetailDtoToPlaylist(
-                detailRaw as PlaylistDetailDto,
-              );
-
-              return {
-                ...playlist,
-                ...detail,
-                id: playlist.id,
-                playlistID: playlist.id,
-                trackCount: detail.trackCount ?? playlist.trackCount ?? 0,
-              };
-            } catch (error) {
-              console.error("LOAD PLAYLIST DETAIL IN PROFILE ERROR:", error);
-              return playlist;
-            }
-          }),
-        );
-
-        const rawFollowedUsers =
-          Array.isArray(followedRes.data?.data)
-            ? followedRes.data.data
-            : Array.isArray(followedRes.data)
-              ? followedRes.data
-              : [];
-
-        setPlaylists(playlistsWithLatestStatus);
-        setFollowedUsers(rawFollowedUsers);
-      } catch (err) {
-        console.error("LOAD PROFILE PAGE DATA ERROR:", err);
-        setError("Không tải được dữ liệu hồ sơ.");
+            setPlaylists(rawPlaylists.map(mapBasicPlaylist));
+            setFollowedUsers([]);
+          }
+          
+        } catch (err : any) {
+          console.error("CHI TIẾT LỖI:", {
+            message: err?.message,
+            status: err?.response?.status,
+            data: err?.response?.data,
+            isOwnProfile,
+            userId,
+          });
+          setError("Không tải được dữ liệu hồ sơ.");
       } finally {
         setLoading(false);
       }
     };
 
     loadProfilePageData();
-  }, []);
+  }, [userId]);
 
   return (
     <main
@@ -173,39 +209,20 @@ const ProfilePage = () => {
         }}
       >
         <div>
-          <div
-            style={{
-              color: "#fff",
-              fontSize: "14px",
-              fontWeight: 700,
-              marginBottom: "10px",
-            }}
-          >
+          <div style={{ color: "#fff", fontSize: "14px", fontWeight: 700, marginBottom: "10px" }}>
             Hồ sơ
           </div>
 
-          <h1
-            style={{
-              fontSize: "clamp(42px, 7vw, 82px)",
-              lineHeight: 1,
-              margin: 0,
-              fontWeight: 900,
-              letterSpacing: "-0.04em",
-            }}
-          >
-            Playlist của tôi
+          <h1 style={{ fontSize: "clamp(42px, 7vw, 82px)", lineHeight: 1, margin: 0, fontWeight: 900 }}>
+            {isOwnProfile
+              ? "Playlist của tôi"
+              : profileUser?.userName ?? "Người dùng"}
           </h1>
 
-          <p
-            style={{
-              color: "#b3b3b3",
-              marginTop: "16px",
-              fontSize: "15px",
-            }}
-          >
-            {playlists.length} playlist • {publicPlaylists.length} công khai •{" "}
-            {privatePlaylists.length} riêng tư • {followedUsers.length} đang
-            theo dõi
+          <p style={{ color: "#b3b3b3", marginTop: "16px", fontSize: "15px" }}>
+            {isOwnProfile
+              ? `${playlists.length} playlist • ${publicPlaylists.length} công khai • ${privatePlaylists.length} riêng tư • ${followedUsers.length} đang theo dõi`
+              : "Hồ sơ người dùng"}
           </p>
         </div>
       </section>
@@ -217,42 +234,110 @@ const ProfilePage = () => {
 
         {!loading && !error && (
           <>
-            <FollowedUsersSection users={followedUsers} />
-
-            {playlists.length === 0 ? (
-              <div
-                style={{
-                  minHeight: "300px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexDirection: "column",
-                  color: "#b3b3b3",
-                  textAlign: "center",
-                }}
-              >
-                <div style={{ fontSize: "64px", marginBottom: "14px" }}>
-                  🎵
-                </div>
-
-                <h2 style={{ color: "#fff" }}>Bạn chưa có playlist nào</h2>
-
-                <p>Hãy tạo playlist từ Sidebar để bắt đầu lưu nhạc.</p>
-              </div>
-            ) : (
+            {isOwnProfile ? (
               <>
-                <PlaylistSection
-                  title="Playlist công khai"
-                  playlists={publicPlaylists}
-                  onOpen={(id) => navigate(`/playlist/${id}`)}
-                />
+                <FollowedUsersSection users={followedUsers} />
 
-                <PlaylistSection
-                  title="Playlist riêng tư"
-                  playlists={privatePlaylists}
-                  onOpen={(id) => navigate(`/playlist/${id}`)}
-                />
+                {playlists.length === 0 ? (
+                  <div
+                    style={{
+                      minHeight: "300px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexDirection: "column",
+                      color: "#b3b3b3",
+                      textAlign: "center",
+                    }}
+                  >
+                    <div style={{ fontSize: "64px", marginBottom: "14px" }}>🎵</div>
+                    <h2 style={{ color: "#fff" }}>Bạn chưa có playlist nào</h2>
+                    <p>Hãy tạo playlist từ Sidebar để bắt đầu lưu nhạc.</p>
+                  </div>
+                ) : (
+                  <>
+                    <PlaylistSection
+                      title="Playlist công khai"
+                      playlists={publicPlaylists}
+                      onOpen={(id) => navigate(`/playlist/${id}`)}
+                    />
+                    <PlaylistSection
+                      title="Playlist riêng tư"
+                      playlists={privatePlaylists}
+                      onOpen={(id) => navigate(`/playlist/${id}`)}
+                    />
+                  </>
+                )}
               </>
+            ) : (
+              // profile người khác
+              <div style={{ paddingTop: "20px" }}>
+                {profileUser ? (
+                  <>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "20px",
+                        marginBottom: "36px",
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: "80px",
+                          height: "80px",
+                          borderRadius: "50%",
+                          background: "#282828",
+                          overflow: "hidden",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: "40px",
+                          flexShrink: 0,
+                        }}
+                      >
+                        {profileUser.userImage ? (
+                          <img
+                            src={
+                              profileUser.userImage.startsWith("http")
+                                ? profileUser.userImage
+                                : `http://localhost:5081/media/images/users/${profileUser.userImage}`
+                            }
+                            alt={profileUser.userName}
+                            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                          />
+                        ) : (
+                          "👤"
+                        )}
+                      </div>
+                      <div>
+                        <p style={{ color: "#fff", fontSize: "18px", fontWeight: 700, margin: 0 }}>
+                          {profileUser.userName}
+                        </p>
+                        <p style={{ color: "#b3b3b3", fontSize: "14px", margin: "4px 0 0" }}>
+                          {playlists.length} playlist công khai
+                        </p>
+                      </div>
+                    </div>
+
+                    {playlists.length > 0 && (
+                      <PlaylistSection
+                        title="Playlist công khai"
+                        playlists={playlists}
+                        onOpen={(id) => navigate(`/playlist/${id}`)}
+                      />
+                    )}
+
+                    {playlists.length === 0 && (
+                      <div style={{ color: "#b3b3b3" }}>
+                        Người dùng này chưa có playlist công khai nào.
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <p style={{ color: "#b3b3b3" }}>Không tìm thấy người dùng.</p>
+                )}
+              </div>
             )}
           </>
         )}

@@ -20,6 +20,11 @@ export const mediaApi = {
       },
     }),
 
+  upload: (formData: FormData) =>
+    api.post("/media/upload", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    }),
+
   getStreamUrl: (id: number | string) =>
     `http://localhost:5081/api/media/${id}/stream?t=${Date.now()}`,
 };

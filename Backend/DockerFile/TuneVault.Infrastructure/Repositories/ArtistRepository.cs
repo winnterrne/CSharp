@@ -47,7 +47,7 @@ namespace TuneVault.Infrastructure.Repositories
                            
             return await _db.ExecuteDataAsync(sql, artist);
         }
-        public async Task<int> DeleteArtistAsync(string artistId)
+        public async Task<int> DeleteArtistAsync(int artistId)
         {
             string sql = @"UPDATE Artist 
                            SET IsDeleted = 1

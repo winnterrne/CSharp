@@ -13,5 +13,7 @@ public record UploadMediaCommand(
     int? ArtistID,
     int? AlbumID,
     string UserID,          // lấy từ JWT token
-    IFormFile File          // file mp3/mp4
+    IFormFile File,      // file mp3/mp4
+    IFormFile? Thumbnail
+
 ) : IRequest<MediaItemDto>;

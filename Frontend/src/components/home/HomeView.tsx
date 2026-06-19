@@ -1,5 +1,4 @@
 import QuickPlayCard from "./QuickPlayCard";
-import AlbumCardLarge from "./AlbumCardLarge";
 import SectionHeader from "./SectionHeader";
 import { useHistoryStore } from "../../store/historyStore";
 import type { Album } from "../../types/album";
@@ -8,22 +7,20 @@ import { mapAlbumTrackToMedia, type Media } from "../../types/media";
 import type { RecommendationSong } from "../../types/recommendation";
 import { mapRecommendationToMedia } from "../../types/recommendation";
 
-import { useAuth } from "../../hooks/useAuth";
-
 type HomeViewProps = {
   loading: boolean;
   recommended: Media[];
   forYou: Media[];
   upcoming: Media[];
   albums: Album[];
+  allTracks: Media[];
 
   aiRecommendations: RecommendationSong[];
   loadingAI: boolean;
   onRefreshAI: () => void;
-
   onOpenTrack: (track: Media) => void;
   onOpenAlbum: (track: Media, tracks: Media[], title?: string) => void;
-  onShowAll: (mode: "recommended" | "upcoming" | "forYou") => void;
+  onShowAll: (mode: "recommended" | "upcoming" | "forYou" | "all") => void;
 };
 
 const HomeView = ({
@@ -31,7 +28,8 @@ const HomeView = ({
   recommended,
   forYou,
   upcoming,
-  albums,
+  albums, 
+  allTracks,
 
   aiRecommendations,
   loadingAI,
@@ -41,13 +39,6 @@ const HomeView = ({
   onOpenAlbum,
   onShowAll,
 }: HomeViewProps) => {
-  const { user } = useAuth();
-
-  const displayName =
-    user?.username ||
-    user?.email ||
-    "bạn";
-
   const recentTracks = useHistoryStore((state) => state.recentTracks);
   const clearHistory = useHistoryStore((state) => state.clearHistory);
 
@@ -224,33 +215,6 @@ const HomeView = ({
       </section>
 
       <section style={{ marginBottom: "36px" }}>
-        <SectionHeader
-          label="Dành cho"
-          title={displayName}
-          onShowAll={() => onShowAll("forYou")}
-        />
-
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(170px, 1fr))",
-            gap: "18px",
-          }}
-        >
-          {forYou.slice(0, 6).map((track) => (
-            <AlbumCardLarge
-              key={track.id}
-              track={track}
-              tracks={forYou}
-              onOpenAlbum={(cover, tracks) =>
-                onOpenAlbum(cover, tracks, "Dành cho bạn")
-              }
-            />
-          ))}
-        </div>
-      </section>
-
-      <section style={{ marginBottom: "36px" }}>
         <SectionHeader title="Album nổi bật" />
 
         <div
@@ -384,10 +348,10 @@ const HomeView = ({
         )}
       </section>
 
-      <section>
+      <section style={{ marginBottom: "36px" }}>
         <SectionHeader
-          title="Được đề xuất cho hôm nay"
-          onShowAll={() => onShowAll("upcoming")}
+          title="Tất cả bài hát"
+          onShowAll={() => onShowAll("all")} // ← dùng mode "all"
         />
 
         <div
@@ -397,15 +361,53 @@ const HomeView = ({
             gap: "18px",
           }}
         >
-          {upcoming.slice(0, 6).map((track) => (
-            <AlbumCardLarge
+          {allTracks.slice(0, 12).map((track) => ( // ← slice 12 để preview
+            <div
               key={track.id}
-              track={track}
-              tracks={upcoming}
-              onOpenAlbum={(cover, tracks) =>
-                onOpenAlbum(cover, tracks, "Được đề xuất cho hôm nay")
-              }
-            />
+              onClick={() => onOpenTrack(track)}
+              style={{
+                background: "#181818",
+                borderRadius: "12px",
+                padding: "16px",
+                cursor: "pointer",
+                transition: "background .2s",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "#282828")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "#181818")}
+            >
+              <div
+                style={{
+                  width: "100%",
+                  aspectRatio: "1",
+                  borderRadius: "8px",
+                  overflow: "hidden",
+                  marginBottom: "12px",
+                  background: "#282828",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "48px",
+                }}
+              >
+                {track.thumbnailUrl ? (
+                  <img
+                    src={track.thumbnailUrl}
+                    alt={track.title}
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  />
+                ) : "🎵"}
+              </div>
+
+              <div style={{ color: "#fff", fontWeight: 700, marginBottom: "4px",
+                whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                {track.title}
+              </div>
+
+              <div style={{ color: "#b3b3b3", fontSize: "13px",
+                whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                {track.artist?.name ?? "Unknown Artist"}
+              </div>
+            </div>
           ))}
         </div>
       </section>

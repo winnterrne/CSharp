@@ -61,6 +61,38 @@ public class PlaylistRepository : IPlaylistRepository
         return (playlist, songs);
     }
 
+    public async Task<(IEnumerable<Playlist> Playlists, Dictionary<int, int> TrackCounts)> GetPublicUserPlaylistsAsync(string userId)
+    {
+        string sql = @"
+            SELECT *
+            FROM Playlist
+            WHERE UserID = @UserID
+            AND IsPublic = 1
+            AND IsDeleted = 0
+            ORDER BY PlaylistID DESC;
+        ";
+
+        string countSql = @"
+            SELECT 
+                p.PlaylistID,
+                COUNT(pt.MediaItemID) AS TrackCount
+            FROM Playlist p
+            LEFT JOIN PlaylistTrack pt ON pt.PlaylistID = p.PlaylistID
+            WHERE p.UserID = @UserID
+            AND p.IsPublic = 1
+            AND p.IsDeleted = 0
+            GROUP BY p.PlaylistID;
+        ";
+
+        var parameters = new { UserID = userId };
+
+        var playlists = await _db.LoadAllDataSingleAsync<Playlist>(sql, parameters);
+        var counts = await _db.LoadAllDataSingleAsync<PlaylistTrackCountDto>(countSql, parameters);
+        var trackCounts = counts.ToDictionary(x => x.PlaylistID, x => x.TrackCount);
+
+        return (playlists, trackCounts);
+    }
+
     public async Task<(IEnumerable<Playlist> Playlists, Dictionary<int, int> TrackCounts)> GetUserPlaylistsAsync(string userId)
     {
         string sql = @"

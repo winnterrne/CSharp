@@ -59,7 +59,7 @@ const TrackPage = () => {
 
       <TrackDetailView
         track={track}
-        onOpenArtist={(artistName) => {
+        onOpenArtist={(_artistID, artistName, _artistImage) => {
           navigate(`/artist/${encodeURIComponent(artistName)}`);
         }}
       />

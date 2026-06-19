@@ -12,7 +12,7 @@ namespace TuneVault.Domain.Interfaces
         Task<IEnumerable<Artist>> GetAllArtistsAsync();
         Task<int> CreateArtistAsync(Artist artist);
         Task<int> UpdateArtistAsync(Artist artist);
-        Task<int> DeleteArtistAsync(string artistId);
+        Task<int> DeleteArtistAsync(int artistId);
         Task<(IEnumerable<Artist> Artists, int TotalCount)> SearchAsync(string keyword, int skip, int take);
         Task<Artist?> GetArtistProfileByIdAsync(int artistId);
     }

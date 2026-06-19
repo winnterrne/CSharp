@@ -14,6 +14,7 @@ import {
   ShuffleIcon,
 } from "../../components/common/icons";
 import { playerStore } from "../../store/playerStore";
+import { useNavigate } from "react-router-dom";
 
 const formatDuration = (seconds?: number) => {
   if (!seconds || Number.isNaN(seconds)) return "0:00";
@@ -140,7 +141,8 @@ const buildStreamUrl = (mediaId: number | string) => {
 
 const mapAlbumTrackToMedia = (
   item: any,
-  fallbackArtistName = "Unknown Artist"
+  fallbackArtistName = "Unknown Artist",
+  fallbackArtistId = 0
 ): Media => {
   const media =
     item.media ??
@@ -339,7 +341,7 @@ const mapAlbumTrackToMedia = (
     genre,
     type,
     artist: {
-      id: artistId,
+      id: artistId || fallbackArtistId,
       name: artistName,
     },
   } as Media;
@@ -435,6 +437,7 @@ const AlbumDetailPage = () => {
           (item: any) =>
             Number(item.albumID ?? item.albumId ?? item.id) === albumId
         ) ?? null;
+      console.log("FOUND ALBUM", foundAlbum);
 
       if (!foundAlbum) {
         setError("Không tìm thấy album");
@@ -444,6 +447,7 @@ const AlbumDetailPage = () => {
       }
 
         const mappedAlbum = mapAlbum(foundAlbum, albumId);
+        console.log(mappedAlbum.artistID);
         setAlbum(mappedAlbum);
 
         const trackRes = await albumApi.getTracks(albumId);
@@ -458,8 +462,13 @@ const AlbumDetailPage = () => {
             : [];
 
         const mappedTracks = rawTracks.map((item: any) =>
-             mapAlbumTrackToMedia(item, mappedAlbum.artistName ?? "Unknown Artist")
+          mapAlbumTrackToMedia(
+            item,
+            mappedAlbum.artistName ?? "Unknown Artist", 
+            mappedAlbum.artistID
+          )
         );
+      console.log(mappedTracks);
       setTracks(mappedTracks);
     } catch (err) {
       console.error("LOAD ALBUM DETAIL ERROR:", err);
@@ -521,8 +530,13 @@ const AlbumDetailPage = () => {
     playTrack(track);
   };
 
+  const navigate = useNavigate();
   const handleOpenArtist = (artistId?: number | string) => {
-    console.log("OPEN ARTIST:", artistId);
+    if (!artistId) return;
+    const track = tracks.find(t => Number(getArtistId(t)) === Number(artistId));
+    const artistName = track ? getArtistName(track) : "";
+    if (!artistName) return;
+    navigate(`/artist/${encodeURIComponent(artistName)}`); // → /artist/GREY%20D
   };
 
   if (loading) {
@@ -615,9 +629,15 @@ const AlbumDetailPage = () => {
               fontSize: "14px",
             }}
           >
-            <strong style={{ color: "#fff" }}>
+            <strong
+              onClick={() => {
+                const artistName = getAlbumArtistName(album);
+                navigate(`/artist/${encodeURIComponent(artistName)}`);
+              }}
+              style={{ color: "#fff", cursor: "pointer", textDecoration: "underline" }}
+            >
               {getAlbumArtistName(album)}
-            </strong>{" "}
+            </strong>
             • {tracks.length} bài hát • {totalDuration}
           </div>
         </div>
