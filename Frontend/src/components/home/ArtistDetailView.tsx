@@ -5,6 +5,8 @@ import { NowPlayingIcon, PlayIcon } from "../common/icons";
 import { useFollowStore } from "../../store/followStore";
 import { useEffect, useState } from "react";
 import { artistApi } from "../../api/artistApi";
+import { mediaApi } from "../../api/mediaApi";
+import { mapMediaItemDtoToMedia } from "../../types/media";
 
 type ArtistDetailViewProps = {
   artistId: number;
@@ -37,7 +39,6 @@ const ArtistDetailView = ({
   const { currentTrack, isPlaying, playTrack, setQueue, togglePlay } =
     usePlayer();
 
-
   const {
     toggleFollow,
     isFollowing,
@@ -50,6 +51,23 @@ const ArtistDetailView = ({
   const isArtistPlaying = isCurrentArtistTrack && isPlaying;
 
   const isFollowed = isFollowing(artistId);
+
+  const [allArtistTracks, setAllArtistTracks] = useState<Media[]>(tracks);
+
+  useEffect(() => {
+  const load = async () => {
+    try {
+      const res = await mediaApi.getAll();
+      const mediaDtos = Array.isArray(res.data?.data) ? res.data.data : [];
+      const all = mediaDtos.map(mapMediaItemDtoToMedia);
+      const filtered = all.filter(t => Number(t.artist?.id) === Number(artistId));
+      setAllArtistTracks(filtered);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  if (artistId) load();
+}, [artistId]);
 
   const handlePlayArtist = () => {
     if (tracks.length === 0) return;
@@ -347,31 +365,7 @@ useEffect(() => {
       {profile?.bio ?? "Chưa có thông tin nghệ sĩ."}
     </p>
   </div>
-</section>
-
-      {/* ================= ALBUM ================= */}
-      <section>
-        <h2 style={{ color: "#fff", fontSize: "22px", marginBottom: "16px" }}>
-          Album / Playlist
-        </h2>
-
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
-            gap: "18px",
-          }}
-        >
-          {tracks.slice(0, 6).map((track) => (
-            <AlbumCardLarge
-              key={track.id}
-              track={track}
-              tracks={tracks}
-              onOpenAlbum={onOpenAlbum}
-            />
-          ))}
-        </div>
-      </section>
+</section>  
 
       {!firstTrack && (
         <p style={{ color: "#b3b3b3" }}>

@@ -4,6 +4,8 @@ import type { CreatePlaylistDto } from "../types/playlist";
 export const playlistApi = {
   getMyPlaylists: () => api.get("/Playlist/my-playlist"),
 
+  getUserPlaylists: (userId: string) => api.get("/Playlist/")
+
   getById: (id: number) => api.get(`/Playlist/${id}`),
 
   create: (data: CreatePlaylistDto) =>

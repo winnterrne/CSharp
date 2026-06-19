@@ -18,6 +18,9 @@ export interface PlaylistSearchResponse {
 export const playlistApi = {
   getMyPlaylists: () => api.get("/Playlist/my-playlist"),
 
+  getPublicByUserId: (userId: string) =>
+    api.get(`/Playlist/users/${userId}/playlists`),
+
   getById: (id: number) => api.get(`/Playlist/${id}`),
 
   create: (data: CreatePlaylistDto) =>

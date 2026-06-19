@@ -16,35 +16,44 @@ public class PlaylistController : Controller
     {
         _mediator = mediator;
     }
-// Lay id playlist
-[HttpGet("{id}")]
-public async Task<IActionResult> GetPlaylistById(int id)
+    // Lay id playlist
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetPlaylistById(int id)
     {
         var query = new GetPlaylistByIdQuery(id);
         var result = await _mediator.Send(query);
-        if(result == null)
+        if (result == null)
         {
-            return NotFound(new {succes = false, message = "Playlist not found"});
+            return NotFound(new { succes = false, message = "Playlist not found" });
         }
-        return Ok(new {succes = true, data = result});
+        return Ok(new { succes = true, data = result });
     }
-// Layplaylist cua ng dung
-[Authorize]
-[HttpGet("my-playlist")]
-public async Task<IActionResult> GetUserPlaylist()
+    // Layplaylist cua ng dung
+    [Authorize]
+    [HttpGet("my-playlist")]
+    public async Task<IActionResult> GetUserPlaylist()
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if(userId == null) return Unauthorized();
+        if (userId == null) return Unauthorized();
         var result = await _mediator.Send(new GetUserPlaylistQuery(userId));
-        return Ok(new {succes = true, data = result});
+        return Ok(new { success = true, data = result });
     }
-// Tao 1 playlist
-[Authorize]
-[HttpPost]
-public async Task<IActionResult> CreatePlaylist([FromBody] CreatePlaylistDto dto)
+
+    [Authorize]
+    [HttpGet("users/{userId}/playlists")]
+    public async Task<IActionResult> GetUserPlaylists(string userId)
+    {
+        var result = await _mediator.Send(new GetUserPlaylistQuery(userId));
+        return Ok(new { success = true, data = result });
+    }       
+
+    // Tao 1 playlist
+    [Authorize]
+    [HttpPost]
+    public async Task<IActionResult> CreatePlaylist([FromBody] CreatePlaylistDto dto)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if(userId == null) return Unauthorized();
+        if (userId == null) return Unauthorized();
         var command = new CreatePlaylistCommand(
             dto.PlaylistName,
             dto.IsPublic,
@@ -52,63 +61,63 @@ public async Task<IActionResult> CreatePlaylist([FromBody] CreatePlaylistDto dto
             userId
         );
         var result = await _mediator.Send(command);
-        return Ok(new {success = true, message = "Playlist created successfully", result});
+        return Ok(new { success = true, message = "Playlist created successfully", result });
     }
-// xoa 1 playlist
-[HttpDelete("{id}")]
-public async Task<IActionResult> DeletePlaylist(int id)
+    // xoa 1 playlist
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeletePlaylist(int id)
     {
         var result = await _mediator.Send(new DeletePlaylistCommand(id));
-        if(result <= 0) return NotFound(new {success = false, message = "Playlist not found"});
-        return Ok(new {success = true, message = "Playlist deleted successfully"});
+        if (result <= 0) return NotFound(new { success = false, message = "Playlist not found" });
+        return Ok(new { success = true, message = "Playlist deleted successfully" });
     }
-// cap nhat playlist
-[HttpPut("{id}")]
-public async Task<IActionResult> UpdatePlaylist(int id, [FromBody] UpdatePlaylistCommand request)
+    // cap nhat playlist
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdatePlaylist(int id, [FromBody] UpdatePlaylistCommand request)
     {
-        if(id != request.PlaylistID) return BadRequest(new {success = false, message = "Playlist ID mismatch"});
+        if (id != request.PlaylistID) return BadRequest(new { success = false, message = "Playlist ID mismatch" });
         var result = await _mediator.Send(request);
-        if(result <= 0) return NotFound(new {success = false, message = "Playlist not found"});
-        return Ok(new {success = true, message = "Playlist updated successfully"});
+        if (result <= 0) return NotFound(new { success = false, message = "Playlist not found" });
+        return Ok(new { success = true, message = "Playlist updated successfully" });
     }
 
-// Add Track To List
-[HttpPost("{playlistId}/tracks/{mediaItemId}")]
-public async Task<IActionResult> AddTrackToLisst(int playlistId, int mediaItemId)
+    // Add Track To List
+    [HttpPost("{playlistId}/tracks/{mediaItemId}")]
+    public async Task<IActionResult> AddTrackToLisst(int playlistId, int mediaItemId)
     {
         var result = await _mediator.Send(new AddTrackToPlaylistCommand(playlistId, mediaItemId));
-        if(result <= 0) return NotFound(new {success = false, message = "Playlist or Media Item not found"});
-        return Ok(new {success = true, message = "Track added to playlist successfully"});
+        if (result <= 0) return NotFound(new { success = false, message = "Playlist or Media Item not found" });
+        return Ok(new { success = true, message = "Track added to playlist successfully" });
     }
-    
-// Remove Track From List
-[HttpDelete("{playlistId}/tracks/{mediaItemId}")]
-public async Task<IActionResult> RemoveTrack(
-    int playlistId,
-    int mediaItemId)
-{
-    var result = await _mediator.Send(
-        new RemoveTrackFromPlaylistCommand(
-            playlistId,
-            mediaItemId
-        ));
 
-    if(result <= 0) return NotFound(new {success = false, message = "Playlist or Media Item not found"});
-    return Ok(new {success = true, message = "Track removed from playlist successfully"});
-}
-[HttpGet("search")]
-public async Task<IActionResult> SearchPlaylist([FromQuery] SearchPlaylistQuery query)
-{
-    var result = await _mediator.Send(query);
-
-    return Ok(new
+    // Remove Track From List
+    [HttpDelete("{playlistId}/tracks/{mediaItemId}")]
+    public async Task<IActionResult> RemoveTrack(
+        int playlistId,
+        int mediaItemId)
     {
-        success = true,
-        message = "Search success",
-        data = result.Playlists,
-        totalCount = result.TotalCount,
-        totalPages = result.TotalPages
-    });
-}
+        var result = await _mediator.Send(
+            new RemoveTrackFromPlaylistCommand(
+                playlistId,
+                mediaItemId
+            ));
+
+        if (result <= 0) return NotFound(new { success = false, message = "Playlist or Media Item not found" });
+        return Ok(new { success = true, message = "Track removed from playlist successfully" });
+    }
+    [HttpGet("search")]
+    public async Task<IActionResult> SearchPlaylist([FromQuery] SearchPlaylistQuery query)
+    {
+        var result = await _mediator.Send(query);
+
+        return Ok(new
+        {
+            success = true,
+            message = "Search success",
+            data = result.Playlists,
+            totalCount = result.TotalCount,
+            totalPages = result.TotalPages
+        });
+    }
 
 }

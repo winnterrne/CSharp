@@ -493,6 +493,7 @@ useEffect(() => {
                 key={artist.artistID}
                 artist={artist}
                 isWide={isWide}
+                onClick={() => navigate(`/artist/${encodeURIComponent(artist.artistName)}`)}
               />
             ))
 
@@ -786,14 +787,17 @@ type FollowedArtist = {
 const ArtistRow = ({
   artist,
   isWide,
+  onClick,
 }: {
   artist: FollowedArtist;
   isWide: boolean;
+  onClick?: () => void;
 }) => {
   const [hovered, setHovered] = useState(false);
 
   return (
     <div
+      onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
@@ -809,7 +813,7 @@ const ArtistRow = ({
       <CoverBox size={isWide ? 56 : 48}>
         {artist.artistImage ?
           <img
-            src={artist.artistImage}
+            src={`http://localhost:5081/media/images/artist/${artist.artistImage}`}
             alt={artist.artistName}
             style={imgFullStyle}
           />

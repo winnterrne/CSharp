@@ -112,7 +112,7 @@ const ArtistPage = () => {
       </main>
     );
   }
-  console.log("ArtistPage params:", { artistName, decodedArtistName, artistId });
+
   return (
     <main
       style={{

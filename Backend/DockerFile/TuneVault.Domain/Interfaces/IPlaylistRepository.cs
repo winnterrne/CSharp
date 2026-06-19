@@ -9,6 +9,7 @@ namespace TuneVault.Domain.Interfaces
     {
         Task<(Playlist Playlist, IEnumerable<MediaItem> Songs)> GetPlaylistByIdAsync(int playlistID);
         Task<(IEnumerable<Playlist> Playlists, Dictionary<int, int> TrackCounts)> GetUserPlaylistsAsync(string userId);
+        Task<(IEnumerable<Playlist> Playlists, Dictionary<int, int> TrackCounts)> GetPublicUserPlaylistsAsync(string userId);
         Task<int> CreatePlaylistAsync(Playlist playlist);
         Task<int> UpdatePlaylistAsync(Playlist playlist);
         Task<int> DeletePlaylistAsync(int playlistId);
