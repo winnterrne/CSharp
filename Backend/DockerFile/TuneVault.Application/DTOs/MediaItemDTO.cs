@@ -44,6 +44,7 @@ public class UploadMediaFormDto
     public int? ArtistID { get; set; }
     public int? AlbumID { get; set; }
     public IFormFile File { get; set; } = null!; // ← file nằm trong class
+    public IFormFile? Thumbnail { get; set; }
 }
 public record MediaStreamInfoDto
 (         

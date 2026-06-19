@@ -77,31 +77,47 @@ public class MediaItemRepository : IMediaItemRepository
     public async Task<int> CreateMediaAsync(MediaItem media)
     {
         string sql = @"
-        INSERT INTO MediaItem 
+        INSERT INTO MediaItem
         (
-            TitleName, MediaItemImage, filePath, MediaItemTag, MediaItemType, 
-            Duration, UploadAT, Description, ArtistID, AlbumID, UserID, IsDeleted 
+            TitleName,
+            MediaItemImage,
+            filePath,
+            MediaItemTag,
+            MediaItemType,
+            Duration,
+            UploadAT,
+            Description,
+            ArtistID,
+            AlbumID,
+            UserID,
+            IsDeleted
         )
-        OUTPUT INSERTED.MediaItemID   
-        VALUES 
+        OUTPUT INSERTED.MediaItemID
+        VALUES
         (
-            @TitleName, 
-            @MediaItemImage, 
-            CASE 
-                WHEN @filePath LIKE '%_%' THEN 
-                    RIGHT(@filePath, CHARINDEX('_', REVERSE(@filePath)) - 1)
-                ELSE 
-                    RIGHT(@filePath, CHARINDEX('/', REVERSE(REPLACE(@filePath, '\', '/'))) - 1)
-            END, 
-            @MediaItemTag, 
-            @MediaItemType, 
-            @Duration, 
-            @UploadAt, 
-            @Description, 
-            @ArtistID, 
-            @AlbumID, 
+            @TitleName,
+
+            CASE
+                WHEN @MediaItemImage IS NULL THEN NULL
+                ELSE RIGHT(@MediaItemImage,
+                    CHARINDEX('/', REVERSE(REPLACE(@MediaItemImage, '\', '/'))) - 1)
+            END,
+
+            CASE
+                WHEN @filePath IS NULL THEN NULL
+                ELSE RIGHT(@filePath,
+                    CHARINDEX('/', REVERSE(REPLACE(@filePath, '\', '/'))) - 1)
+            END,
+
+            @MediaItemTag,
+            @MediaItemType,
+            @Duration,
+            @UploadAt,
+            @Description,
+            @ArtistID,
+            @AlbumID,
             @UserID,
-            0 
+            0
         )";
         return await _db.ExecuteScalarAsync<int>(sql, media);
     }

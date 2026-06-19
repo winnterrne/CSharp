@@ -21,7 +21,7 @@ export const mediaApi = {
     }),
 
   upload: (formData: FormData) =>
-    api.post("/api/media/upload", formData, {
+    api.post("/media/upload", formData, {
       headers: { "Content-Type": "multipart/form-data" },
     }),
 
