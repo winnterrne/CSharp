@@ -69,6 +69,7 @@ const Sidebar = ({
 
   const [albums, setAlbums] = useState<Album[]>([]);
   const setSelectedAlbumId = useAlbumStore((s) => s.setSelectedAlbumId);
+  const [menuPos, setMenuPos] = useState({ top: 0, left: 0 });
 
   const fetchPlaylists = useCallback(async () => {
     if (!canUseAuthApi) {
@@ -169,6 +170,13 @@ useEffect(() => {
   };
 }, [fetchPlaylists]);
 
+useEffect(() => {
+  if (!showCreateMenu) return;
+  const close = () => setShowCreateMenu(false);
+  window.addEventListener("click", close);
+  return () => window.removeEventListener("click", close);
+}, [showCreateMenu]);
+
   const handleOpenAlbum = (album: Album) => {
     setSelectedAlbumId(album.albumID);
     navigate(`/album/${album.albumID}`);
@@ -218,9 +226,44 @@ useEffect(() => {
           <LibraryIcon />
         </IconBtn>
 
-        <IconBtn title="Tạo playlist" onClick={handleCreatePlaylist}>
+        <IconBtn title="Tạo mới" onClick={(e) => {
+          e.stopPropagation();
+          const rect = e.currentTarget.getBoundingClientRect();
+          setMenuPos({ top: rect.bottom + 8, left: rect.left });
+          setShowCreateMenu(prev => !prev);
+        }}>
           <PlusIcon />
         </IconBtn>
+        {showCreateMenu && (
+          <div style={{
+            position: "fixed",
+            top: `${menuPos.top}px`,
+            left: `${menuPos.left}px`,
+            background: "#282828",
+            borderRadius: "8px",
+            padding: "4px",
+            zIndex: 99999,
+            boxShadow: "0 8px 24px rgba(0,0,0,0.5)",
+            minWidth: "80px", 
+          }}>
+            <button onClick={() => { setShowCreateMenu(false); handleCreatePlaylist(); }}
+              style={{ width: "100%", background: "transparent", border: "none", color: "#fff",
+                padding: "16px 12px", textAlign: "left", borderRadius: "4px", cursor: "pointer",
+                fontSize: "14px", fontWeight: 600, whiteSpace: "nowrap" }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "#3e3e3e")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}>
+              🎵 Tạo playlist
+            </button>
+            <button onClick={() => { setShowCreateMenu(false); }}
+              style={{ width: "100%", background: "transparent", border: "none", color: "#fff",
+                padding: "16px 12px", textAlign: "left", borderRadius: "4px", cursor: "pointer",
+                fontSize: "14px", fontWeight: 600, whiteSpace: "nowrap" }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "#3e3e3e")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}>
+              ⬆️ Upload nhạc
+            </button>
+          </div>
+        )}
 
         <IconBtn
           title={isExpanded ? "Thu về bình thường" : "Phóng to thư viện"}
@@ -293,9 +336,44 @@ useEffect(() => {
           </div>
 
           <div style={actionGroupStyle}>
-            <IconBtn title="Tạo playlist" onClick={handleCreatePlaylist}>
+            <IconBtn title="Tạo mới" onClick={(e) => {
+              e.stopPropagation();
+              const rect = e.currentTarget.getBoundingClientRect();
+              setMenuPos({ top: rect.bottom + 8, left: rect.left });
+              setShowCreateMenu(prev => !prev);
+            }}>
               <PlusIcon />
             </IconBtn>
+            {showCreateMenu && (
+              <div style={{
+                position: "fixed",
+                top: `${menuPos.top}px`,
+                left: `${menuPos.left}px`,
+                background: "#282828",
+                borderRadius: "8px",
+                padding: "4px",
+                zIndex: 99999,
+                boxShadow: "0 8px 24px rgba(0,0,0,0.5)",
+                minWidth: "80px",
+              }}>
+                <button onClick={() => { setShowCreateMenu(false); handleCreatePlaylist(); }}
+                  style={{ width: "100%", background: "transparent", border: "none", color: "#fff",
+                    padding: "16px 12px", textAlign: "left", borderRadius: "4px", cursor: "pointer",
+                    fontSize: "14px", fontWeight: 600, whiteSpace: "nowrap" }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = "#3e3e3e")}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}>
+                  🎵 Tạo playlist
+                </button>
+                <button onClick={() => { setShowCreateMenu(false); }}
+                  style={{ width: "100%", background: "transparent", border: "none", color: "#fff",
+                    padding: "16px 12px", textAlign: "left", borderRadius: "4px", cursor: "pointer",
+                    fontSize: "14px", fontWeight: 600, whiteSpace: "nowrap" }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = "#3e3e3e")}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}>
+                  ⬆️ Upload nhạc
+                </button>
+              </div>
+            )}
             <IconBtn
               title={isWide ? "Thu về bình thường" : "Phóng to thư viện"}
               onClick={onToggleExpand}
@@ -857,7 +935,7 @@ const IconBtn = ({
   children,
 }: {
   title: string;
-  onClick: () => void;
+  onClick: (e: React.MouseEvent) => void;
   children: ReactNode;
 }) => (
   <button
