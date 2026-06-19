@@ -18,6 +18,7 @@ import { albumApi } from "../../api/albumApi";
 import type { Album } from "../../types/album";
 import { useAlbumStore } from "../../store/albumStore";
 import { useFollowStore } from "../../store/followStore";
+import UploadMediaModal from "../media/UploadMediaModal";
 
 type FilterTab = "playlist" | "favorite" | "following" | "album";
 
@@ -70,6 +71,7 @@ const Sidebar = ({
   const [albums, setAlbums] = useState<Album[]>([]);
   const setSelectedAlbumId = useAlbumStore((s) => s.setSelectedAlbumId);
   const [menuPos, setMenuPos] = useState({ top: 0, left: 0 });
+  const [showUploadModal, setShowUploadModal] = useState(false);
 
   const fetchPlaylists = useCallback(async () => {
     if (!canUseAuthApi) {
@@ -126,7 +128,11 @@ const Sidebar = ({
 useEffect(() => {
   if (!canUseAuthApi) return;
 
-  fetchPlaylists();
+  const loadPlaylists = async () => {
+    await fetchPlaylists(); // bên trong fetchPlaylists có setState
+  };
+
+  loadPlaylists();
 }, [location.pathname, canUseAuthApi, fetchPlaylists]);
 
   useEffect(() => {
@@ -254,7 +260,12 @@ useEffect(() => {
               onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}>
               🎵 Tạo playlist
             </button>
-            <button onClick={() => { setShowCreateMenu(false); }}
+            <button 
+              onClick={() => {
+                setShowCreateMenu(false);
+                if (!canUseAuthApi) { navigate("/login"); return; }
+                setShowUploadModal(true);
+              }}
               style={{ width: "100%", background: "transparent", border: "none", color: "#fff",
                 padding: "16px 12px", textAlign: "left", borderRadius: "4px", cursor: "pointer",
                 fontSize: "14px", fontWeight: 600, whiteSpace: "nowrap" }}
@@ -311,6 +322,13 @@ useEffect(() => {
           onClose={() => setShowCreateModal(false)}
           onCreated={fetchPlaylists}
         />
+        <UploadMediaModal
+          open={showUploadModal}
+          onClose={() => setShowUploadModal(false)}
+          onUploaded={() => {
+            //có thể dispatch event hoặc để trống
+          }}
+        />
       </aside>
     );
   }
@@ -364,7 +382,12 @@ useEffect(() => {
                   onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}>
                   🎵 Tạo playlist
                 </button>
-                <button onClick={() => { setShowCreateMenu(false); }}
+                <button 
+                  onClick={() => {
+                    setShowCreateMenu(false);
+                    if (!canUseAuthApi) { navigate("/login"); return; }
+                    setShowUploadModal(true);
+                  }}
                   style={{ width: "100%", background: "transparent", border: "none", color: "#fff",
                     padding: "16px 12px", textAlign: "left", borderRadius: "4px", cursor: "pointer",
                     fontSize: "14px", fontWeight: 600, whiteSpace: "nowrap" }}
@@ -545,6 +568,12 @@ useEffect(() => {
         open={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         onCreated={fetchPlaylists}
+      />
+      
+      <UploadMediaModal
+        open={showUploadModal}
+        onClose={() => setShowUploadModal(false)}
+        onUploaded={() => {}}
       />
     </aside>
   );
