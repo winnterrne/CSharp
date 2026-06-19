@@ -60,6 +60,7 @@ const Sidebar = ({
   const [loading, setLoading] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showRecent, setShowRecent] = useState(false);
+  const [showCreateMenu, setShowCreateMenu] = useState(false);
 
   const recentTracks = useHistoryStore((state) => state.recentTracks);
   const { favoriteTracks, loadFavorites } = useFavorite();
@@ -190,6 +191,7 @@ useEffect(() => {
   };
 
   const handleCreatePlaylist = () => {
+    
     if (!canUseAuthApi) {
       navigate("/login");
       return;

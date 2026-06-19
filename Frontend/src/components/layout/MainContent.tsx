@@ -21,7 +21,8 @@ type ViewMode =
   | "upcoming"
   | "forYou"
   | "track"
-  | "artist";
+  | "artist"
+  | "all";
 
 const uniqueTracks = (tracks: Media[]) => {
   const map = new Map<string, Media>();
@@ -51,6 +52,7 @@ const MainContent = () => {
 
   const [viewMode, setViewMode] = useState<ViewMode>("home");
   const [selectedTrack, setSelectedTrack] = useState<Media | null>(null);
+  const [allMediaTracks, setAllMediaTracks] = useState<Media[]>([]);
 
   const [selectedArtist, setSelectedArtist] = useState<{
     id: number;
@@ -85,10 +87,13 @@ const MainContent = () => {
 
         const mediaList = uniqueTracks(mediaDtos.map(mapMediaItemDtoToMedia));
 
+        console.log("mediaList length:", mediaList.length);
+
         setRecommended(mediaList.slice(0, 12));
         setForYou(mediaList.slice(4, 16));
         setUpcoming(mediaList.slice(8, 20));
         setAlbums(albumRes.data?.data ?? []);
+        setAllMediaTracks(mediaList);
 
         const albumList =
           Array.isArray(albumRes.data?.data) ? albumRes.data.data
@@ -311,6 +316,10 @@ useEffect(() => {
           tracks: upcoming,
         };
 
+      case "all":
+        console.log("allMediaTracks:", allMediaTracks.length);
+        return { title: "Tất cả bài hát", tracks: allMediaTracks };
+
       default:
         return {
           title: "",
@@ -381,6 +390,7 @@ useEffect(() => {
           forYou={forYou}
           upcoming={upcoming}
           albums={albums}
+          allTracks={allMediaTracks}
           aiRecommendations={aiRecommendations}
           loadingAI={loadingAI}
           onRefreshAI={loadAIRecommendations}
@@ -390,41 +400,71 @@ useEffect(() => {
             if (mode === "recommended") setViewMode("recommended");
             if (mode === "forYou") setViewMode("forYou");
             if (mode === "upcoming") setViewMode("upcoming");
+            if (mode == "all") setViewMode("all");
           }}
         />
       )}
 
       {(viewMode === "recommended" ||
         viewMode === "forYou" ||
-        viewMode === "upcoming") && (
+        viewMode === "upcoming" ||
+        viewMode === "all") && (
         <section>
-          <h1
-            style={{
-              color: "#fff",
-              fontSize: "38px",
-              marginBottom: "24px",
-            }}
-          >
+          <h1 style={{ color: "#fff", fontSize: "38px", marginBottom: "24px" }}>
             {showAllData.title}
           </h1>
 
           {showAllData.tracks.length === 0 && !loading ?
             <p style={{ color: "#b3b3b3" }}>Chưa có bài hát nào.</p>
-          : <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(170px, 1fr))",
-                gap: "20px",
-              }}
-            >
-              {showAllData.tracks.map((track) => (
-                <AlbumCardLarge
-                  key={track.id}
-                  track={track}
-                  tracks={showAllData.tracks}
-                  onOpenAlbum={handleOpenAlbum}
-                />
-              ))}
+          : <div style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(170px, 1fr))",
+              gap: "20px",
+            }}>
+              {showAllData.tracks.map((track) =>
+                viewMode === "all" ? (
+                  <div
+                    key={track.id}
+                    onClick={() => handleOpenTrack(track)}
+                    style={{
+                      background: "#181818",
+                      borderRadius: "12px",
+                      padding: "16px",
+                      cursor: "pointer",
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = "#282828")}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = "#181818")}
+                  >
+                    <div style={{
+                      width: "100%", aspectRatio: "1", borderRadius: "8px",
+                      overflow: "hidden", marginBottom: "12px", background: "#282828",
+                    }}>
+                      {track.thumbnailUrl ? (
+                        <img src={track.thumbnailUrl} alt={track.title}
+                          style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      ) : (
+                        <div style={{ width: "100%", height: "100%", display: "flex",
+                          alignItems: "center", justifyContent: "center", fontSize: "48px" }}>🎵</div>
+                      )}
+                    </div>
+                    <div style={{ color: "#fff", fontWeight: 700, marginBottom: "4px",
+                      whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      {track.title}
+                    </div>
+                    <div style={{ color: "#b3b3b3", fontSize: "13px",
+                      whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      {track.artist?.name ?? "Unknown Artist"}
+                    </div>
+                  </div>
+                ) : (
+                  <AlbumCardLarge
+                    key={track.id}
+                    track={track}
+                    tracks={showAllData.tracks}
+                    onOpenAlbum={handleOpenAlbum}
+                  />
+                )
+              )}
             </div>
           }
         </section>

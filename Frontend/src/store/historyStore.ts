@@ -22,7 +22,7 @@ export const useHistoryStore = create<HistoryState>()(
       addRecentTrack: (track, contextId) =>
         set((state) => {
           const filtered = state.recentTracks.filter(
-            (t) => !(t.id === track.id && t.contextId === contextId)
+            (t) => String(t.id) !== String(track.id)
           );
 
           return {
