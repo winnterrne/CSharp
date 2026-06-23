@@ -21,8 +21,9 @@ const AccountPage = () => {
   const [profile, setProfile] = useState<UserProfileDto | null>(null);
   const [displayName, setDisplayName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
+  const [avatarFileName, setAvatarFileName] = useState("");
   const [phone, setPhone] = useState("");
-  const [bio, setBio] = useState("");
+  const [bio, setBio] = useState(profile?.bio ?? "");
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -46,8 +47,10 @@ const AccountPage = () => {
 
         setProfile(data);
         setDisplayName(data.userName ?? "");
-        setAvatarUrl( data.userImage ? `${baseUrl}/media/images/users/${data.userImage}`: "");
+        setAvatarFileName(data.userImage ?? ""); 
+        setAvatarUrl(data.userImage ? `${baseUrl}/media/images/users/${data.userImage}` : "");
         setPhone(data.phone ?? "");
+        setBio(data.bio ?? "");
       } catch (err) {
         console.error("LOAD PROFILE ERROR:", err);
         setError("Không thể tải hồ sơ từ backend.");
@@ -66,31 +69,43 @@ const AccountPage = () => {
       setSaving(true);
 
       const res = await userApi.updateProfile(authUser.id, {
-        userName: displayName,
-        userImage: avatarUrl,
-        phone,
-        bio,
-      });
+      userName: displayName,
+      userImage: avatarFileName,
+      phone,
+      bio,
+    });
 
-      const data = res.data?.data as UserProfileDto;
+    // Lấy cục dữ liệu sạch từ API trả về
+    const data = res.data?.data as UserProfileDto;
 
+    if (data) {
+      // 1. Tạo ra đường dẫn ảnh đầy đủ chuẩn xác
+      const fullAvatarUrl = data.userImage 
+        ? `${baseUrl}/media/images/users/${data.userImage}` 
+        : "";
+
+      // 2. Cập nhật state nội bộ của trang Account
       setProfile(data);
       setDisplayName(data.userName ?? "");
-      setAvatarUrl(data.userImage ?? "");
+      setAvatarFileName(data.userImage ?? "");
+      setAvatarUrl(fullAvatarUrl); // Cập nhật link ảnh đầy đủ cho thẻ <img> trên giao diện
       setPhone(data.phone ?? "");
       setBio(data.bio ?? "");
 
+      // 3. Cập nhật đồng bộ vào Zustand Store
       setUser({
-        id: data.userID,
+        id: data.userID || authUser?.id,
         username: data.userName,
-        email: data.email,
-        role: data.role,
-        avatarUrl: data.userImage,
+        email: authUser?.email, // Bảo toàn email cũ, tránh bị undefined
+        role: authUser?.role,   // Bảo toàn role cũ, tránh bị undefined
+        avatarUrl: fullAvatarUrl, // SỬA: Đưa URL đầy đủ vào Store để các nơi khác (Navbar) hiển thị đúng
         phone: data.phone,
         bio: data.bio,
       });
 
       setIsEditing(false);
+      alert("Cập nhật hồ sơ thành công!");
+    }
     } catch (err) {
       console.error("SAVE PROFILE ERROR:", err);
       alert("Cập nhật hồ sơ thất bại");
@@ -162,8 +177,10 @@ const AccountPage = () => {
               <button
                 onClick={() => {
                   setDisplayName(profile.userName ?? "");
-                  setAvatarUrl(profile.userImage ?? "");
+                  setAvatarFileName(profile.userImage ?? "");
+                  setAvatarUrl(profile.userImage ? `${baseUrl}/media/images/users/${profile.userImage}` : "");
                   setPhone(profile.phone ?? "");
+                  setBio(profile.bio ?? "");
                   setIsEditing(false);
                 }}
                 style={buttonSecondaryStyle}
@@ -172,9 +189,18 @@ const AccountPage = () => {
               </button>
             </>
           ) : (
-            <button onClick={() => setIsEditing(true)} style={buttonPrimaryStyle}>
-              Chỉnh sửa hồ sơ
-            </button>
+            <button 
+            onClick={() => {
+              setDisplayName(profile.userName ?? "");
+              setAvatarFileName(profile.userImage ?? "");
+              setPhone(profile.phone ?? "");
+              setBio(profile.bio ?? ""); // <-- Đổ giá trị bio cũ vào ô textarea
+              setIsEditing(true);
+            }} 
+            style={buttonPrimaryStyle}
+          >
+            Chỉnh sửa hồ sơ
+          </button>
           )}
         </div>
 
@@ -192,11 +218,16 @@ const AccountPage = () => {
               style={inputStyle}
             />
 
-            <label style={labelStyle}>Ảnh đại diện</label>
+            <label style={labelStyle}>Ảnh đại diện (Tên file)</label>
             <input
-              value={avatarUrl}
-              onChange={(e) => setAvatarUrl(e.target.value)}
-              placeholder="Dán URL ảnh avatar..."
+              value={avatarFileName} // Thay đổi từ avatarUrl thành avatarFileName
+              onChange={(e) => {
+                const fileName = e.target.value;
+                setAvatarFileName(fileName);
+                // Cập nhật luôn avatarUrl để trên Avatar hình tròn thay đổi theo thời gian thực
+                setAvatarUrl(fileName ? `${baseUrl}/media/images/users/${fileName}` : "");
+              }}
+              placeholder="Ví dụ: avatar_khanhdang.jpg"
               style={inputStyle}
             />
 
