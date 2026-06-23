@@ -1,0 +1,63 @@
+graph TD
+    subgraph auth ["1. AUTH PIPELINE (Register / Login)"]
+        RC[RegisterCommand] -->|1a. Validate Input DTO| RV[RegisterValidator]
+        RV -->|2a. Create User, Hash Password & Gen JWT| RH[RegisterHandler]
+        
+        LC[LoginCommand] -->|1b. Verify Password & Gen JWT| LH[LoginHandler]
+        
+        RH -->|3a| RD[AuthResponseDto]
+        LH -->|3b| RD
+    end
+
+    subgraph share ["2. SHARE MEDIA PIPELINE (Share)"]
+        SC[ShareMediaCommand] -->|1. Validate Receiver, Media/Playlist ID| SV[ShareMediaValidator]
+        SV -->|2. Check duplicates, insert Share & Notification, push SignalR| SH[ShareMediaHandler]
+        SH -->|3. Return Share Record Details| SD[ShareMediaResponseDto]
+    end
+
+    subgraph notifications ["3. NOTIFICATIONS PIPELINE (Get Notifications)"]
+        NC[GetNotificationsQuery] -->|1. Fetch Notifications from Database| NH[GetNotificationsHandler]
+        NH -->|2. Return list of notifications| ND["IEnumerable&lt;NotificationDto&gt;"]
+    end
+
+    subgraph upload ["4. UPLOAD MEDIA PIPELINE (Upload)"]
+        UC[UploadMediaCommand] -->|1. Validate File, Title, Format| UV[UploadMediaValidator]
+        UV -->|2. Save File to Disk, insert MediaItem to DB| UH[UploadMediaHandler]
+        UH -->|3. Return Uploaded Media metadata| UD[MediaItemDto]
+    end
+
+    subgraph follow ["5. FOLLOW PIPELINE (Follow User)"]
+        FC[FollowCommand] -->|1. Create Follow record, insert Notification, push SignalR| FH[FollowHandler]
+        FH -->|2. Return Created Follow ID| FD["int (FollowID)"]
+    end
+
+    %% Invisible links to force vertical stacking in correct order (1, 2, 3, 4, 5)
+    RD ~~~ SC
+    SD ~~~ NC
+    ND ~~~ UC
+    UD ~~~ FC
+
+    style RC fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000
+    style RV fill:#f5f5f5,stroke:#666666,stroke-width:1px,color:#333
+    style RH fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000
+    style LC fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000
+    style LH fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000
+    style RD fill:#f5f5f5,stroke:#666666,stroke-width:1px,color:#333
+
+    style SC fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000
+    style SV fill:#f5f5f5,stroke:#666666,stroke-width:1px,color:#333
+    style SH fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000
+    style SD fill:#f5f5f5,stroke:#666666,stroke-width:1px,color:#333
+
+    style NC fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000
+    style NH fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000
+    style ND fill:#f5f5f5,stroke:#666666,stroke-width:1px,color:#333
+
+    style UC fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000
+    style UV fill:#f5f5f5,stroke:#666666,stroke-width:1px,color:#333
+    style UH fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000
+    style UD fill:#f5f5f5,stroke:#666666,stroke-width:1px,color:#333
+
+    style FC fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000
+    style FH fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000
+    style FD fill:#f5f5f5,stroke:#666666,stroke-width:1px,color:#333
