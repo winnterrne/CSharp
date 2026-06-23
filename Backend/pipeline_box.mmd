@@ -1,3 +1,4 @@
+%%{init: {'theme': 'dark'}}%%
 graph TD
     subgraph auth ["1. AUTH PIPELINE (Register / Login)"]
         RC[RegisterCommand] -->|1a. Validate Input DTO| RV[RegisterValidator]
@@ -37,27 +38,33 @@ graph TD
     ND ~~~ UC
     UD ~~~ FC
 
-    style RC fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000
-    style RV fill:#f5f5f5,stroke:#666666,stroke-width:1px,color:#333
-    style RH fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000
-    style LC fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000
-    style LH fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000
-    style RD fill:#f5f5f5,stroke:#666666,stroke-width:1px,color:#333
+    style auth fill:#111111,stroke:#333333,stroke-width:1px,color:#ffffff
+    style share fill:#111111,stroke:#333333,stroke-width:1px,color:#ffffff
+    style notifications fill:#111111,stroke:#333333,stroke-width:1px,color:#ffffff
+    style upload fill:#111111,stroke:#333333,stroke-width:1px,color:#ffffff
+    style follow fill:#111111,stroke:#333333,stroke-width:1px,color:#ffffff
 
-    style SC fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000
-    style SV fill:#f5f5f5,stroke:#666666,stroke-width:1px,color:#333
-    style SH fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000
-    style SD fill:#f5f5f5,stroke:#666666,stroke-width:1px,color:#333
+    style RC fill:#000000,stroke:#ffffff,stroke-width:2px,color:#ffffff
+    style RV fill:#222222,stroke:#aaaaaa,stroke-width:1px,color:#dddddd
+    style RH fill:#000000,stroke:#ffffff,stroke-width:2px,color:#ffffff
+    style LC fill:#000000,stroke:#ffffff,stroke-width:2px,color:#ffffff
+    style LH fill:#000000,stroke:#ffffff,stroke-width:2px,color:#ffffff
+    style RD fill:#222222,stroke:#aaaaaa,stroke-width:1px,color:#dddddd
 
-    style NC fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000
-    style NH fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000
-    style ND fill:#f5f5f5,stroke:#666666,stroke-width:1px,color:#333
+    style SC fill:#000000,stroke:#ffffff,stroke-width:2px,color:#ffffff
+    style SV fill:#222222,stroke:#aaaaaa,stroke-width:1px,color:#dddddd
+    style SH fill:#000000,stroke:#ffffff,stroke-width:2px,color:#ffffff
+    style SD fill:#222222,stroke:#aaaaaa,stroke-width:1px,color:#dddddd
 
-    style UC fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000
-    style UV fill:#f5f5f5,stroke:#666666,stroke-width:1px,color:#333
-    style UH fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000
-    style UD fill:#f5f5f5,stroke:#666666,stroke-width:1px,color:#333
+    style NC fill:#000000,stroke:#ffffff,stroke-width:2px,color:#ffffff
+    style NH fill:#000000,stroke:#ffffff,stroke-width:2px,color:#ffffff
+    style ND fill:#222222,stroke:#aaaaaa,stroke-width:1px,color:#dddddd
 
-    style FC fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000
-    style FH fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000
-    style FD fill:#f5f5f5,stroke:#666666,stroke-width:1px,color:#333
+    style UC fill:#000000,stroke:#ffffff,stroke-width:2px,color:#ffffff
+    style UV fill:#222222,stroke:#aaaaaa,stroke-width:1px,color:#dddddd
+    style UH fill:#000000,stroke:#ffffff,stroke-width:2px,color:#ffffff
+    style UD fill:#222222,stroke:#aaaaaa,stroke-width:1px,color:#dddddd
+
+    style FC fill:#000000,stroke:#ffffff,stroke-width:2px,color:#ffffff
+    style FH fill:#000000,stroke:#ffffff,stroke-width:2px,color:#ffffff
+    style FD fill:#222222,stroke:#aaaaaa,stroke-width:1px,color:#dddddd
