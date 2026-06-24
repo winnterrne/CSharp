@@ -77,6 +77,8 @@ const PlaylistDetailPage = () => {
   const [sharePlaylistOpen, setSharePlaylistOpen] = useState(false);
 
   // PLAYLIST MENU: menu 3 chấm playlist
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editedName, setEditedName] = useState("");
   const [showPlaylistMenu, setShowPlaylistMenu] = useState(false);
   const [updatingPlaylist, setUpdatingPlaylist] = useState(false);
 
@@ -216,6 +218,31 @@ const PlaylistDetailPage = () => {
     }
   };
 
+  const handleStartEditName = () => {
+  setEditedName(playlist?.name || playlist?.playlistName || "");
+  setIsEditingName(true);
+  setShowPlaylistMenu(false);
+};
+
+  const handleSaveName = async () => {
+    if (!playlist || !editedName.trim()) return;
+    try {
+      setUpdatingPlaylist(true);
+      await playlistApi.update(playlist.id, {
+        playlistID: playlist.id,
+        playlistName: editedName.trim(),
+        description: playlist.description ?? "",
+        isPublic: playlist.isPublic ?? false,
+      });
+      await loadPlaylist();
+    } catch {
+      alert("Không đổi được tên playlist");
+    } finally {
+      setUpdatingPlaylist(false);
+      setIsEditingName(false);
+    }
+  };
+
   useEffect(() => {
     if (!showAddTrackBar) return;
 
@@ -339,17 +366,44 @@ const PlaylistDetailPage = () => {
             : "Danh sách phát riêng tư"}
           </div>
 
-          <h1
-            style={{
-              color: "#fff",
-              fontSize: "clamp(34px, 5vw, 72px)",
-              lineHeight: 1,
-              margin: "0 0 14px",
-              wordBreak: "break-word",
-            }}
-          >
-            {playlist.name || playlist.playlistName}
-          </h1>
+          {isEditingName ? (
+            <input
+              autoFocus
+              value={editedName}
+              onChange={(e) => setEditedName(e.target.value)}
+              onBlur={handleSaveName}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleSaveName();
+                if (e.key === "Escape") setIsEditingName(false);
+              }}
+              style={{
+                fontSize: "clamp(34px, 5vw, 72px)",
+                lineHeight: 1,
+                margin: "0 0 14px",
+                fontWeight: 900,
+                color: "#fff",
+                background: "rgba(255,255,255,0.1)",
+                border: "2px solid #1DB954",
+                borderRadius: "8px",
+                padding: "4px 12px",
+                outline: "none",
+                width: "100%",
+                boxSizing: "border-box",
+              }}
+            />
+          ) : (
+            <h1
+              style={{
+                color: "#fff",
+                fontSize: "clamp(34px, 5vw, 72px)",
+                lineHeight: 1,
+                margin: "0 0 14px",
+                wordBreak: "break-word",
+              }}
+            >
+              {playlist.name || playlist.playlistName}
+            </h1>
+          )}
 
           {playlist.description && (
             <p
@@ -501,6 +555,10 @@ const PlaylistDetailPage = () => {
                 : playlist.isPublic ?
                   "Chuyển sang riêng tư"
                 : "Chuyển sang công khai"}
+              </button>
+
+              <button onClick={handleStartEditName} style={playlistMenuItemStyle}>
+                Đổi tên playlist
               </button>
 
               <button

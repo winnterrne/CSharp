@@ -1,6 +1,5 @@
 import type { Media } from "../../types/media";
 import { usePlayer } from "../../hooks/usePlayer";
-import AlbumCardLarge from "./AlbumCardLarge";
 import { NowPlayingIcon, PlayIcon } from "../common/icons";
 import { useFollowStore } from "../../store/followStore";
 import { useEffect, useState } from "react";
