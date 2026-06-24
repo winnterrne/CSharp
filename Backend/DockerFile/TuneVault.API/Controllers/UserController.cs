@@ -2,7 +2,6 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TuneVault.Application.DTos;
-using TuneVault.Application.DTOs;
 using TuneVault.Application.UseCases;
 using TuneVault.Application.UseCases.User;
 
@@ -32,12 +31,12 @@ public class UserController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateProfile(
         string id,
-        [FromBody] UpdateProfileDto dto)
+        [FromForm] UpdateProfileDto dto)
     {
         var command = new UpdateProfileCommand(
             id, 
             dto.UserName,
-            dto.UserImage,
+            dto.Avatar,
             dto.Phone,
             dto.Bio
         );

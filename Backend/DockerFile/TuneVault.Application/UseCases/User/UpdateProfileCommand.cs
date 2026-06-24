@@ -1,13 +1,13 @@
 using MediatR;
 using TuneVault.Application.DTos;
-using TuneVault.Application.DTOs;
+using Microsoft.AspNetCore.Http;
 
 namespace TuneVault.Application.UseCases.User;
 
 public record UpdateProfileCommand (
     string UserID, 
     string? UserName,
-    string? UserImage,
+    IFormFile? Avatar,
     string? Phone,
     string? Bio
 ) : IRequest<UserProfileDto>;

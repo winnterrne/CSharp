@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 namespace TuneVault.Application.DTos;
 public record RegisterRequestDto (
     string UserName,
@@ -32,7 +33,7 @@ public record UserProfileDto (
 
 public record UpdateProfileDto (
     string? UserName,
-    string? UserImage,
+    IFormFile? Avatar,
     string? Phone,
     string? Bio
 );
