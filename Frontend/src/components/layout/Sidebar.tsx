@@ -3,7 +3,6 @@ import type { CSSProperties, ReactNode } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { playlistApi } from "../../api/playlistApi";
-import { mediaApi } from "../../api/mediaApi";
 import type { Playlist } from "../../types/playlist";
 import type { Media } from "../../types/media";
 import { ROUTES } from "../../constant/routes";
@@ -65,7 +64,7 @@ const Sidebar = ({
 
   const recentTracks = useHistoryStore((state) => state.recentTracks);
   const { favoriteTracks, loadFavorites } = useFavorite();
-  const { followedArtists, loadFollowedArtists } = useFollowStore();
+  const {followedArtists,followedUsers,loadFollowing} = useFollowStore();
   const { playTrack, setQueue } = usePlayer();
 
   const [albums, setAlbums] = useState<Album[]>([]);
@@ -119,10 +118,10 @@ const Sidebar = ({
 
       if (canUseAuthApi) {
         await loadFavorites();
-        await loadFollowedArtists();
+        await loadFollowing();
       }
     })();
-  }, [fetchPlaylists, loadFavorites, loadFollowedArtists, canUseAuthApi]);
+  }, [fetchPlaylists, loadFavorites, loadFollowing, canUseAuthApi]);
 
 // ✅ Khi đổi route, reload lại playlist để Sidebar sync DB
 useEffect(() => {
@@ -508,17 +507,31 @@ useEffect(() => {
               />
             ))
 
-        : activeTab === "following" ?
-          followedArtists.length === 0 ?
-            <EmptyText text="Chưa follow nghệ sĩ nào" />
-          : followedArtists.map((artist) => (
-              <ArtistRow
-                key={artist.artistID}
-                artist={artist}
-                isWide={isWide}
-                onClick={() => navigate(`/artist/${encodeURIComponent(artist.artistName)}`)}
-              />
-            ))
+        : activeTab === "following" ? followedArtists.length === 0 && followedUsers.length === 0 ?
+          <EmptyText text="Chưa follow ai" />
+        : (
+            <>
+              {followedArtists.map((artist) => (
+                <ArtistRow
+                  key={`artist-${artist.artistID}`}
+                  artist={artist}
+                  isWide={isWide}
+                  onClick={() =>
+                    navigate(`/artist/${encodeURIComponent(artist.artistName)}`)
+                  }
+                />
+              ))}
+
+              {followedUsers.map((user) => (
+                <UserRow
+                  key={`user-${user.userID}`}
+                  user={user}
+                  isWide={isWide}
+                  onClick={() => navigate(`/profile/${user.userID}`)}
+                />
+              ))}
+            </>
+          )
 
         : activeTab === "favorite" ?
           filteredFavorites.length === 0 ?
@@ -871,6 +884,95 @@ const ArtistRow = ({
           }}
         >
           Nghệ sĩ
+        </div>
+      </div>
+    </div>
+  );
+};
+type FollowedUser = {
+  userID: string;
+  userName: string;
+  userImage?: string | null;
+  email?: string;
+};
+
+const buildUserImageUrl = (img?: string | null) => {
+  if (!img) return "";
+
+  if (img.startsWith("http")) return img;
+
+  if (img.startsWith("/")) return `http://localhost:5081${img}`;
+
+  if (img.includes("/")) return `http://localhost:5081/${img}`;
+
+  return `http://localhost:5081/media/images/users/${img}`;
+};
+
+const UserRow = ({
+  user,
+  isWide,
+  onClick,
+}: {
+  user: FollowedUser;
+  isWide: boolean;
+  onClick?: () => void;
+}) => {
+  const [hovered, setHovered] = useState(false);
+
+  const imageUrl = buildUserImageUrl(user.userImage);
+
+  return (
+    <div
+      onClick={onClick}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: isWide ? "16px" : "12px",
+        padding: isWide ? "12px" : "8px",
+        borderRadius: "8px",
+        background: hovered ? "#1a1a1a" : "transparent",
+        cursor: "pointer",
+      }}
+    >
+      <CoverBox size={isWide ? 56 : 48}>
+        {imageUrl ? (
+          <img
+            src={imageUrl}
+            alt={user.userName}
+            style={{
+              ...imgFullStyle,
+              borderRadius: "50%",
+            }}
+          />
+        ) : (
+          "👤"
+        )}
+      </CoverBox>
+
+      <div style={{ minWidth: 0, flex: 1 }}>
+        <div
+          style={{
+            color: "#fff",
+            fontSize: isWide ? "15px" : "14px",
+            fontWeight: 700,
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {user.userName}
+        </div>
+
+        <div
+          style={{
+            color: "#b3b3b3",
+            fontSize: isWide ? "13px" : "12px",
+            marginTop: "4px",
+          }}
+        >
+          Người dùng
         </div>
       </div>
     </div>

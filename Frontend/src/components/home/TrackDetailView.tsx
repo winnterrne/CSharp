@@ -24,11 +24,11 @@ import { aiApi } from "../../api/aiApi";
   const TrackDetailView = ({ track, onOpenArtist }: TrackDetailViewProps) => {
     const [shareOpen, setShareOpen] = useState(false);
 
-     const [aiStatus, setAiStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+    const [aiStatus, setAiStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
     const [aiDescription, setAiDescription] = useState<string | null>(null);
     const [aiError, setAiError] = useState<string | null>(null);
 
-    const { playTrack, isPlaying, currentTrack, setQueue } = usePlayer();
+    const { playTrack, isPlaying, currentTrack, setQueue, play, pause } = usePlayer();
     const { isFavorite, toggleFavorite } = useFavorite();
 
     const artistID = track.artist?.id;
@@ -187,9 +187,17 @@ console.log("track full:", JSON.stringify(track, null, 2));
       >
         <button
           onClick={() => {
-            setQueue([track]);
-            playTrack(track);
-          }}
+            if (isThisTrackPlaying) {
+                if (isPlaying) {
+                    pause();       
+                } else {
+                    play();       
+                }
+            } else {
+                setQueue([track]);
+                playTrack(track);
+            }
+        }}
           title="Phát"
           style={{
             width: "64px",
