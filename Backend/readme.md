@@ -19,7 +19,7 @@ LoginCommand
   -> LoginHandler                  % Nghiệp vụ: xác thực thông tin đăng nhập trong DB, kiểm tra mật khẩu và cấp JWT Token
   -> AuthResponseDto               % Trả về DTO chứa thông tin đăng nhập và chuỗi JWT Token hợp lệ
 ```
-Mô tả:Mô tả:
+Mô tả:
 Đăng ký (Register): Người dùng điền thông tin đăng ký gửi lên API. Bộ validator RegisterValidator kiểm tra định dạng email và độ dài mật khẩu. MediatR ValidationBehavior tự động chặn luồng nếu phát hiện dữ liệu không hợp lệ. Khi dữ liệu đúng chuẩn, RegisterHandler thực hiện băm mật khẩu bằng thuật toán an toàn, chèn người dùng mới vào bảng AspNetUsers thông qua Dapper, và cấp phát JWT Token trong AuthResponseDto.
 Đăng nhập (Login): Bộ kiểm tra LoginValidator đảm bảo email và mật khẩu không trống. LoginHandler tìm kiếm tài khoản theo email trong cơ sở dữ liệu, đối chiếu mật khẩu đã băm. Nếu trùng khớp, hệ thống tạo JWT Token đại diện cho phiên làm việc để client đính kèm vào header các request sau.
 
