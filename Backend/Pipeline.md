@@ -6,84 +6,155 @@ Mỗi chức năng bao gồm ít nhất một **Command** (lệnh ghi) hoặc **
 
 ---
 
-## 1. Danh sách 10 Application Pipelines
+## 1. Danh sách 10 Application Pipelines (Chú thích chi tiết từng dòng)
 
-### 1.1. Pipeline 1: Xác thực tài khoản (Authentication)
-* **Command/Query**: `RegisterCommand` (Đăng ký) và `LoginCommand` (Đăng nhập).
-* **Luồng xử lý**:
-  1. Client gửi dữ liệu qua HTTP POST.
-  2. `RegisterValidator` (FluentValidation) kiểm tra tính hợp lệ của DTO đầu vào (định dạng email, độ dài mật khẩu).
-  3. `RegisterHandler`/`LoginHandler` thực hiện mã hóa mật khẩu, kiểm tra sự tồn tại của người dùng bằng Dapper (`DataContextDapper`), phát hành mã bảo mật JWT Token.
-  4. Trả về kết quả: `AuthResponseDto` chứa thông tin tài khoản và JWT Token.
+Dưới đây là chi tiết luồng xử lý (Application Pipeline) của 10 chức năng hệ thống theo cấu trúc MediatR CQRS, FluentValidation và Clean Architecture.
 
-### 1.2. Pipeline 2: Tải lên phương tiện đa phương tiện (Upload MediaItem)
-* **Command/Query**: `UploadMediaCommand`.
-* **Luồng xử lý**:
-  1. HTTP POST multipart form-data mang tệp tin gửi lên.
-  2. `UploadMediaValidator` kiểm tra định dạng đuôi file (.mp3, .wav, .mp4, .webm) và kích thước tệp (max 20MB cho audio, 100MB cho video).
-  3. `UploadMediaHandler` gọi `FileStorageService` ghi dữ liệu stream vật lý trực tiếp xuống đĩa cứng, sau đó gọi `IMediaItemRepository` chèn metadata vào database qua Dapper.
-  4. Trả về kết quả: `MediaItemDto` chứa đầy đủ metadata bài hát/video.
+### 1.1. Chức năng 1: Xác thực (Authentication)
+* **Đăng ký tài khoản (Register):**
+```
+RegisterCommand
+  -> RegisterValidator             % Xác thực thông tin đầu vào (UserName, Email, Password) hợp lệ bằng FluentValidation
+  -> ValidationBehavior            % MediatR Pipeline Behavior tự động kiểm tra lỗi và ném ValidationException nếu có
+  -> RegisterHandler               % Xử lý nghiệp vụ: băm mật khẩu, lưu tài khoản qua Dapper và tạo JWT Token
+  -> AuthResponseDto               % Trả về DTO chứa thông tin tài khoản và chuỗi JWT Token để xác thực các request sau
+```
 
-### 1.3. Pipeline 3: Truyền phát & Phát nhạc (Playback & Streaming)
-* **Command/Query**: `GetMediaInfoQuery`.
-* **Luồng xử lý**:
-  1. Frontend gửi yêu cầu lấy thông tin bài hát.
-  2. `GetMediaInfoQueryHandler` truy vấn Dapper: `SELECT * FROM MediaItem WHERE MediaItemID = @ID` để lấy đường dẫn tệp.
-  3. API Controller sử dụng `FileStreamResult` để trả về stream dạng chunk hỗ trợ HTTP Range Request (mã 206) để phát nhạc/video trực tuyến mà không cần tải toàn bộ tệp.
-  4. Trả về kết quả: `MediaItemDto`.
+* **Đăng nhập (Login):**
+```
+LoginCommand
+  -> LoginValidator                % Kiểm tra định dạng Email và Password không được trống
+  -> ValidationBehavior            % MediatR Pipeline Behavior tự động xác thực dữ liệu đầu vào
+  -> LoginHandler                  % Nghiệp vụ: xác thực thông tin đăng nhập trong DB, kiểm tra mật khẩu và cấp JWT Token
+  -> AuthResponseDto               % Trả về DTO chứa thông tin đăng nhập và chuỗi JWT Token hợp lệ
+```
 
-### 1.4. Pipeline 4: Chia sẻ bài hát và Playlist (Share Media)
-* **Command/Query**: `ShareMediaCommand`.
-* **Luồng xử lý**:
-  1. Client gửi yêu cầu chia sẻ bài hát/playlist tới người nhận.
-  2. `ShareMediaValidator` kiểm tra tính hợp lệ của ReceiverID và MediaItemID/PlaylistID.
-  3. `ShareMediaHandler` gọi Dapper kiểm tra trùng lặp (`AlreadySharedAsync`), ghi nhận bản ghi vào bảng `MediaShare`, chèn bản ghi thông báo mới vào bảng `Notification`, và gọi SignalR Hub để đẩy thông báo thời gian thực.
-  4. Trả về kết quả: `ShareMediaResponseDto` chứa thông tin chi tiết lượt chia sẻ.
+### 1.2. Chức năng 2: Hồ sơ người dùng (User Profile)
+* **Xem hồ sơ người dùng:**
+```
+GetProfileQuery
+  -> ValidationBehavior            % Bỏ qua FluentValidation (Query này không cần validator)
+  -> GetProfileHandler             % Truy vấn DB qua Dapper lấy thông tin hồ sơ người dùng (UserName, Email, UserImage, Bio)
+  -> UserDTO                       % Trả về DTO chứa thông tin chi tiết hồ sơ người dùng hiển thị lên giao diện
+```
 
-### 1.5. Pipeline 5: Nhận thông báo thời gian thực (Real-time Notifications)
-* **Command/Query**: `GetNotificationsQuery`.
-* **Luồng xử lý**:
-  1. Frontend gửi yêu cầu tải thông báo khi mở ứng dụng.
-  2. `GetNotificationsHandler` truy vấn cơ sở dữ liệu qua Dapper: `SELECT * FROM Notification WHERE UserID = @UserID` để lấy các thông báo chưa đọc.
-  3. (Luồng Real-time): Khi có Handler khác (như Follow hay Share) chạy, hệ thống sẽ tiêm `INotificationPushService` để đẩy trực tiếp qua kết nối SignalR WebSocket.
-  4. Trả về kết quả: `IEnumerable<NotificationDto>`.
+* **Cập nhật hồ sơ người dùng:**
+```
+UpdateProfileCommand
+  -> UpdateProfileValidator        % Xác thực dữ liệu cập nhật (UserName không trống, định dạng ảnh đại diện hợp lệ)
+  -> ValidationBehavior            % MediatR Pipeline Behavior tự động kiểm duyệt lỗi đầu vào
+  -> UpdateProfileHandler          % Nghiệp vụ: Cập nhật thông tin profile (UserName, UserImage, Bio) trong bảng AspNetUsers
+  -> int                           % Trả về số dòng bị ảnh hưởng trong database (1: Thành công, 0: Thất bại)
+```
 
-### 1.6. Pipeline 6: Quản lý danh sách phát (Playlist Management - Create Playlist)
-* **Command/Query**: `CreatePlaylistCommand` (hoặc `AddTrackToPlaylistCommand`).
-* **Luồng xử lý**:
-  1. Client gửi yêu cầu tạo danh sách phát mới.
-  2. `CreatePlaylistHandler` thực thi câu lệnh SQL INSERT qua Dapper: `INSERT INTO Playlist (PlaylistName, IsPublic, Description, UserID) VALUES (...)`.
-  3. Trả về kết quả: `int` (Playlist ID mới được sinh tự động).
+### 1.3. Chức năng 3: Thư viện Media (Media Library)
+* **Tải lên tệp phương tiện (Audio/Video):**
+```
+UploadMediaCommand
+  -> UploadMediaValidator          % Kiểm tra tiêu đề, định dạng tệp (mp3, wav, mp4) và kích thước tệp tải lên
+  -> ValidationBehavior            % MediatR Pipeline Behavior kiểm duyệt dữ liệu file đính kèm và metadata
+  -> UploadMediaHandler            % Nghiệp vụ: lưu file vật lý qua FileStorageService và chèn metadata vào bảng MediaItem
+  -> MediaItemDto                  % Trả về thông tin chi tiết tệp phương tiện vừa được tạo thành công trong hệ thống
+```
 
-### 1.7. Pipeline 7: Yêu thích bài hát (Favorite/Like Media)
-* **Command/Query**: `AddFavoriteCommand` / `RemoveFavoriteCommand`.
-* **Luồng xử lý**:
-  1. Người dùng nhấn nút yêu thích (thả tim) trên giao diện.
-  2. `AddFavoriteHandler` thực thi truy vấn Dapper: `INSERT INTO Favorite (UserID, MediaItemID) VALUES (@UserID, @MediaItemID)`.
-  3. Trả về kết quả: `int` (số dòng bị ảnh hưởng, xác nhận thành công).
+### 1.4. Chức năng 4: Audio Player (Trình phát nhạc)
+* **Truyền phát audio (HTTP Range Requests):**
+```
+GetMediaInfoQuery
+  -> ValidationBehavior            % Bỏ qua FluentValidation (không cần validator)
+  -> GetMediaInfoQueryHandler      % Lấy thông tin bài hát và đường dẫn vật lý tệp tin từ bảng MediaItem
+  -> MediaItemDto                  % Trả về DTO chứa đường dẫn tệp để API Controller tạo luồng phát nhạc (HTTP Range Request 206)
+```
 
-### 1.8. Pipeline 8: Ghi nhận lịch sử nghe nhạc (Play History Tracking)
-* **Command/Query**: `RecordPlayHistoryCommand`.
-* **Luồng xử lý**:
-  1. Sau khi bài hát phát được 10 giây trên Frontend, Client gửi request lưu lịch sử.
-  2. `RecordPlayHistoryHandler` thực thi câu lệnh SQL INSERT qua Dapper chèn một dòng vào bảng `PlayHistory` kèm thời gian `GETUTCDATE()`.
-  3. Trả về kết quả: `int` (số dòng bị ảnh hưởng).
+* **Ghi nhận lịch sử nghe nhạc:**
+```
+RecordPlayHistoryCommand
+  -> ValidationBehavior            % Bỏ qua FluentValidation (không cần validator)
+  -> RecordPlayHistoryHandler      % Nghiệp vụ: Thêm bản ghi mới lưu vết người dùng vừa nghe bài hát vào bảng PlayHistory
+  -> int                           % Trả về số lượng dòng bị ảnh hưởng (1: Đã lưu lịch sử thành công)
+```
 
-### 1.9. Pipeline 9: Gợi ý nhạc thông minh bằng AI (AI Recommendations)
-* **Command/Query**: `GetRecommendationsQuery`.
-* **Luồng xử lý**:
-  1. Client yêu cầu danh sách gợi ý nhạc cá nhân hóa.
-  2. `GetRecommendationsQueryHandler` lấy lịch sử nghe gần đây và danh sách bài hát yêu thích của người dùng qua Dapper, tạo thành Prompt chi tiết tiếng Việt gửi tới Google Gemini AI API.
-  3. Gemini AI phản hồi danh sách 5 bài hát gợi ý. Handler phân tích cú pháp, truy vấn chi tiết bài hát bằng Dapper (có cơ chế dự phòng tự động sang thuật toán ngẫu nhiên nếu API AI lỗi).
-  4. Trả về kết quả: `List<MediaItemRecommendationDto>`.
+### 1.5. Chức năng 5: Video Player (Trình phát video)
+* **Truyền phát video (HTTP Range Requests):**
+```
+GetMediaInfoQuery
+  -> ValidationBehavior            % Bỏ qua FluentValidation (không cần validator)
+  -> GetMediaInfoQueryHandler      % Lấy thông tin video và đường dẫn tệp video (.mp4, .webm) từ DB qua Dapper
+  -> MediaItemDto                  % Trả về thông tin video phục vụ luồng truyền tải video chunk-by-chunk trên giao diện
+```
 
-### 1.10. Pipeline 10: Tự động viết mô tả bài hát bằng AI (AI Description Generation)
-* **Command/Query**: `GenerateMediaDescriptionCommand`.
-* **Luồng xử lý**:
-  1. Khi bài hát tải lên thành công, hệ thống gửi lệnh tạo mô tả.
-  2. `GenerateMediaDescriptionHandler` gửi tên bài hát, ca sĩ, thể loại sang Gemini AI API để sinh đoạn văn cảm thụ nghệ thuật âm nhạc dài khoảng 100 từ.
-  3. Mô tả được trả về và cập nhật ngược lại vào trường `Description` của `MediaItem` trong cơ sở dữ liệu qua Dapper.
-  4. Trả về kết quả: `string` (Văn bản mô tả được tạo thành công).
+### 1.6. Chức năng 6: Playlist (Danh sách phát)
+* **Tạo danh sách phát mới:**
+```
+CreatePlaylistCommand
+  -> CreatePlaylistValidator       % Xác thực thông tin đầu vào (PlaylistName không được để trống)
+  -> ValidationBehavior            % MediatR Pipeline Behavior tự động xác thực tên playlist
+  -> CreatePlaylistHandler         % Nghiệp vụ: Thực thi câu lệnh SQL INSERT tạo bản ghi mới trong bảng Playlist
+  -> int                           % Trả về ID tự tăng của Playlist vừa được tạo thành công
+```
+
+* **Thêm bài hát vào danh sách phát:**
+```
+AddTrackToPlaylistCommand
+  -> AddTrackToPlaylistValidator   % Xác thực sự tồn tại của PlaylistID và MediaItemID
+  -> ValidationBehavior            % MediatR Pipeline Behavior kiểm tra tính hợp lệ của liên kết track-playlist
+  -> AddTrackToPlaylistHandler     % Nghiệp vụ: Chèn bản ghi liên kết vào bảng trung gian PlaylistTrack
+  -> int                           % Trả về số lượng dòng bị ảnh hưởng (1: Thêm bài hát thành công)
+```
+
+### 1.7. Chức năng 7: Tìm kiếm & Khám phá (Search & Discovery)
+* **Tìm kiếm bài hát, nghệ sĩ, playlist:**
+```
+SearchMediaQuery
+  -> SearchMediaValidator          % Kiểm tra từ khóa tìm kiếm (SearchTerm không trống) và tham số phân trang
+  -> ValidationBehavior            % MediatR Pipeline Behavior tự động xác thực các tham số tìm kiếm
+  -> SearchMediaQueryHandler       % Nghiệp vụ: Truy vấn Dapper thực hiện tìm kiếm đa bảng (MediaItem, Artist, Playlist)
+  -> List<MediaItemDto>            % Trả về danh sách kết quả bài hát/video khớp với từ khóa kèm phân trang
+```
+
+### 1.8. Chức năng 8: Chia sẻ Media (Media Share)
+* **Chia sẻ bài hát hoặc playlist cho người dùng khác:**
+```
+ShareMediaCommand
+  -> ShareMediaValidator           % Xác thực sự tồn tại của ReceiverID, MediaItemID/PlaylistID và định dạng đầu vào
+  -> ValidationBehavior            % MediatR Pipeline Behavior tự động kiểm duyệt dữ liệu chia sẻ
+  -> ShareMediaHandler             % Nghiệp vụ: Tạo bản ghi MediaShare, tạo thông báo mới Notification, gửi realtime qua SignalR
+  -> ShareMediaResponseDto         % Trả về DTO chứa thông tin chi tiết của giao dịch chia sẻ vừa hoàn thành
+```
+
+### 1.9. Chức năng 9: Thông báo (Real-time Notifications)
+* **Lấy danh sách thông báo:**
+```
+GetNotificationsQuery
+  -> ValidationBehavior            % Bỏ qua FluentValidation (không cần validator)
+  -> GetNotificationsHandler       % Nghiệp vụ: Truy vấn bảng Notification lấy các thông báo của người dùng qua Dapper
+  -> IEnumerable<NotificationDto>  % Trả về danh sách thông báo kèm payload chi tiết (chứa link, loại thông báo)
+```
+
+* **Đánh dấu thông báo đã đọc:**
+```
+MarkNotificationReadCommand
+  -> ValidationBehavior            % Bỏ qua FluentValidation (không cần validator)
+  -> MarkNotificationReadHandler   % Nghiệp vụ: Cập nhật trạng thái IsRead = true cho thông báo theo ID trong DB
+  -> int                           % Trả về số dòng được cập nhật thành công (1: Thành công)
+```
+
+### 1.10. Chức năng 10: Tương tác & Lịch sử (Interaction & History)
+* **Thêm bài hát vào danh sách yêu thích:**
+```
+AddFavoriteCommand
+  -> ValidationBehavior            % Bỏ qua FluentValidation (không cần validator)
+  -> AddFavoriteHandler            % Nghiệp vụ: Chèn cặp giá trị (UserID, MediaItemID) vào bảng Favorite qua Dapper
+  -> int                           % Trả về số lượng dòng bị ảnh hưởng (1: Đã thích thành công)
+```
+
+* **Lấy danh sách lịch sử nghe nhạc gần đây:**
+```
+GetRecentPlayHistoryQuery
+  -> ValidationBehavior            % Bỏ qua FluentValidation (không cần validator)
+  -> GetRecentPlayHistoryHandler   % Nghiệp vụ: Truy vấn bảng PlayHistory lấy 10 bài hát đã phát gần nhất kèm thời gian
+  -> IEnumerable<PlayHistoryDTO>   % Trả về danh sách DTO thông tin 10 bài hát được nghe gần nhất của người dùng
+```
 
 ---
 
