@@ -158,7 +158,48 @@ GetRecentPlayHistoryQuery
 
 ---
 
-## 2. Kiến trúc Pipeline chung (MediatR Behaviors)
+## 2. Mô tả chi tiết hoạt động của từng Pipeline
+
+Dưới đây là mô tả chi tiết quy trình xử lý, các nghiệp vụ kiểm tra và bảng dữ liệu tương tác cho từng chức năng:
+
+### 2.1. Chức năng 1: Xác thực (Authentication)
+* **Đăng ký (Register)**: Người dùng điền thông tin đăng ký gửi lên API. Bộ validator `RegisterValidator` kiểm tra định dạng email và độ dài mật khẩu. MediatR `ValidationBehavior` tự động chặn luồng nếu phát hiện dữ liệu không hợp lệ. Khi dữ liệu đúng chuẩn, `RegisterHandler` thực hiện băm mật khẩu bằng thuật toán an toàn, chèn người dùng mới vào bảng `AspNetUsers` thông qua Dapper, và cấp phát JWT Token trong `AuthResponseDto`.
+* **Đăng nhập (Login)**: Bộ kiểm tra `LoginValidator` đảm bảo email và mật khẩu không trống. `LoginHandler` tìm kiếm tài khoản theo email trong cơ sở dữ liệu, đối chiếu mật khẩu đã băm. Nếu trùng khớp, hệ thống tạo JWT Token đại diện cho phiên làm việc để client đính kèm vào header các request sau.
+
+### 2.2. Chức năng 2: Hồ sơ người dùng (User Profile)
+* **Xem hồ sơ**: Gửi `GetProfileQuery` chứa ID của người dùng. Handler `GetProfileHandler` thực thi truy vấn SELECT bằng Dapper trên bảng `AspNetUsers` để lấy các trường hồ sơ công khai như `UserName`, `UserImage`, `Bio` và trả về qua `UserDTO`.
+* **Cập nhật hồ sơ**: Gửi `UpdateProfileCommand` để chỉnh sửa các trường thông tin cá nhân. Handler `UpdateProfileHandler` thực hiện câu lệnh SQL UPDATE cập nhật bảng `AspNetUsers` và trả về kết quả số dòng bị ảnh hưởng (1 nếu thành công).
+
+### 2.3. Chức năng 3: Thư viện Media (Media Library)
+* **Tải lên Media**: Người dùng hoặc nghệ sĩ gửi request POST dưới dạng `multipart/form-data` chứa file âm thanh/hình ảnh/video và thông tin bài hát. `UploadMediaValidator` kiểm duyệt kỹ đuôi tệp tin và giới hạn dung lượng tối đa. `UploadMediaHandler` tiến hành lưu file vật lý vào thư mục lưu trữ trên server thông qua `FileStorageService`, đồng thời lưu thông tin meta (như tên bài hát, thời lượng, tag thể loại, nghệ sĩ trình bày) vào bảng `MediaItem` trong cơ sở dữ liệu.
+
+### 2.4. Chức năng 4: Audio Player (Trình phát nhạc)
+* **Phát nhạc trực tuyến**: Khi người dùng click phát bài hát, Frontend gửi yêu cầu lấy thông tin. Handler `GetMediaInfoQueryHandler` lấy đường dẫn tệp tin lưu trên server từ bảng `MediaItem`. API Controller sử dụng cơ chế HTTP Range Request (HTTP 206) để trả về từng luồng dữ liệu (chunk) file nhạc giúp tối ưu băng thông và giảm độ trễ khi tua nhạc.
+* **Ghi nhận lịch sử nghe**: Khi bài hát được phát (đáp ứng điều kiện thời gian tối thiểu), client gọi `RecordPlayHistoryCommand` để ghi vết người dùng đã nghe bài hát vào bảng `PlayHistory` phục vụ việc phân tích thói quen nghe nhạc của người dùng.
+
+### 2.5. Chức năng 5: Video Player (Trình phát video)
+* **Phát video**: Tương tự luồng phát nhạc, nhưng tối ưu cho việc tải luồng video có dung lượng lớn. `GetMediaInfoQueryHandler` sẽ tìm và trả về đường dẫn tệp video, sau đó video được truyền phát dưới dạng các phân đoạn nhỏ thông qua cơ chế HTTP 206 Range Request giúp hiển thị hình ảnh mượt mà trên UI.
+
+### 2.6. Chức năng 6: Playlist (Danh sách phát)
+* **CRUD Playlist**: Gửi yêu cầu tạo Playlist qua `CreatePlaylistCommand`. Handler `CreatePlaylistHandler` lưu tên, mô tả và chế độ hiển thị (công khai/riêng tư) của Playlist vào bảng `Playlist`.
+* **Thêm bài hát**: Khi người dùng thêm bài hát vào danh sách phát, `AddTrackToPlaylistCommand` được kiểm tra tính hợp lệ bằng `AddTrackToPlaylistValidator` để đảm bảo bài hát và danh sách phát đều tồn tại. Handler chèn một bản ghi liên kết mới vào bảng trung gian `PlaylistTrack`.
+
+### 2.7. Chức năng 7: Tìm kiếm & Khám phá (Search & Discovery)
+* **Tìm kiếm nội dung**: Gửi `SearchMediaQuery` chứa từ khóa và tham số phân trang. Handler `SearchMediaQueryHandler` sử dụng các câu lệnh SQL JOIN để tìm kiếm đồng thời trên các bảng `MediaItem` (bài hát/video), `Artist` (nghệ sĩ) và `Playlist` (danh sách phát) theo từ khóa khớp tương đối, trả về kết quả định dạng phân trang đẹp mắt.
+
+### 2.8. Chức năng 8: Chia sẻ Media (Media Share)
+* **Chia sẻ nội dung**: Gửi `ShareMediaCommand` chứa thông tin người gửi, người nhận và ID bài hát/playlist. Handler `ShareMediaHandler` ghi bản ghi giao dịch vào bảng `MediaShare`, tạo một thông báo mới lưu vào bảng `Notification` và ngay lập tức gọi dịch vụ SignalR `INotificationPushService` để đẩy trực tiếp thông báo đến thiết bị của người nhận theo thời gian thực.
+
+### 2.9. Chức năng 9: Thông báo (Real-time Notifications)
+* **Nhận thông báo**: Khi người dùng mở app hoặc click vào chuông thông báo, Frontend gửi `GetNotificationsQuery`. Handler `GetNotificationsHandler` lấy danh sách thông báo chưa đọc của người dùng từ bảng `Notification`. Khi người dùng click xem thông báo, hệ thống gọi lệnh `MarkNotificationReadCommand` cập nhật cột `IsRead = 1` trong DB.
+
+### 2.10. Chức năng 10: Tương tác & Lịch sử (Interaction & History)
+* **Yêu thích bài hát (Like)**: Gửi `AddFavoriteCommand` để chèn bản ghi vào bảng `Favorite`, đánh dấu bài hát đã thích. Nếu bỏ thích, hệ thống gọi lệnh xóa bản ghi.
+* **Lịch sử nghe nhạc**: Khi người dùng mở lịch sử phát nhạc, `GetRecentPlayHistoryQuery` sẽ được gửi lên. Handler truy vấn bảng `PlayHistory` lấy chính xác 10 bản ghi lịch sử nghe nhạc gần đây nhất của người dùng sắp xếp giảm dần theo thời gian phát `PlayedAt`.
+
+---
+
+## 3. Kiến trúc Pipeline chung (MediatR Behaviors)
 
 Tất cả các pipeline trên đều được chạy qua mô hình Middleware Pipeline Behaviors của MediatR theo quy trình sau:
 
