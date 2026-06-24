@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams} from "react-router-dom";
 
+import { authStore } from "../../store/authStore";
+import { useFollowStore } from "../../store/followStore";
 import { playlistApi } from "../../api/playlistApi";
 import { interactionApi } from "../../api/interactionApi";
 import type { Playlist, PlaylistDetailDto } from "../../types/playlist";
@@ -36,7 +38,6 @@ const getPlaylistId = (item: any) =>
 
 const mapBasicPlaylist = (item: any): Playlist => {
   const playlistId = getPlaylistId(item);
-
   return {
     id: playlistId,
     playlistID: playlistId,
@@ -63,18 +64,40 @@ const mapBasicPlaylist = (item: any): Playlist => {
 
 const ProfilePage = () => {
   const navigate = useNavigate();
-   const { userId } = useParams<{  userId?: string }>();
-   const isOwnProfile = !userId;
+  const { userId } = useParams<{  userId?: string }>();
+  const currentUser = authStore((state) => state.user) as any;
+
+  const currentUserId =
+    currentUser?.id ??
+    currentUser?.userID ??
+    currentUser?.userId ??
+    currentUser?.UserID ??
+    "";
+
+  const isOwnProfile = !userId || userId === currentUserId;
 
   const [profileUser, setProfileUser] = useState<{
+    userID?: string;
+    userId?: string;
+    UserID?: string;
+
     userName?: string;
+    UserName?: string;
+
     userImage?: string | null;
+    UserImage?: string | null;
   } | null>(null);
 
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [followedUsers, setFollowedUsers] = useState<FollowedUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const {
+    loadFollowedUsers,
+    toggleFollowUser,
+    isFollowingUser,
+    loading: followLoading,
+  } = useFollowStore();
 
   const publicPlaylists = useMemo(
     () => playlists.filter((item) => item.isPublic),
@@ -85,12 +108,31 @@ const ProfilePage = () => {
     () => playlists.filter((item) => !item.isPublic),
     [playlists],
   );
+  const profileUserId =
+    profileUser?.userID ??
+    profileUser?.userId ??
+    profileUser?.UserID ??
+    userId ??
+    "";
+
+  const profileUserName =
+    profileUser?.userName ??
+    profileUser?.UserName ??
+    "Người dùng";
+
+  const profileUserImage =
+    profileUser?.userImage ??
+    profileUser?.UserImage ??
+    "";
+
+  const isFollowedProfileUser =   profileUserId ? isFollowingUser(profileUserId) : false;
 
   useEffect(() => {
     const loadProfilePageData = async () => {
       try {
         setLoading(true);
         setError("");
+        await loadFollowedUsers();
 
         if (isOwnProfile) {
           // === PROFILE CỦA MÌNH: giữ nguyên logic cũ ===
@@ -112,9 +154,8 @@ const ProfilePage = () => {
 
             const basicPlaylists = rawPlaylists.map(mapBasicPlaylist);
 
-            // ✅ FIX: lấy lại detail từng playlist để isPublic luôn mới nhất
             const playlistsWithLatestStatus = await Promise.all(
-              basicPlaylists.map(async (playlist) => {
+              basicPlaylists.map(async (playlist : Playlist) => {
                 try {
                   const detailRes = await playlistApi.getById(playlist.id);
 
@@ -183,8 +224,7 @@ const ProfilePage = () => {
     };
 
     loadProfilePageData();
-  }, [userId]);
-
+  }, [userId, loadFollowedUsers]);
   return (
     <main
       style={{
@@ -215,8 +255,10 @@ const ProfilePage = () => {
 
           <h1 style={{ fontSize: "clamp(42px, 7vw, 82px)", lineHeight: 1, margin: 0, fontWeight: 900 }}>
             {isOwnProfile
-              ? "Playlist của tôi"
-              : profileUser?.userName ?? "Người dùng"}
+              ? currentUser?.username ?? currentUser?.userName ?? "Tài khoản của tôi"
+              : profileUser?.userName ??
+                profileUser?.UserName ??
+                "Người dùng"}
           </h1>
 
           <p style={{ color: "#b3b3b3", marginTop: "16px", fontSize: "15px" }}>
@@ -312,11 +354,37 @@ const ProfilePage = () => {
                       </div>
                       <div>
                         <p style={{ color: "#fff", fontSize: "18px", fontWeight: 700, margin: 0 }}>
-                          {profileUser.userName}
+                          {profileUserName}
                         </p>
-                        <p style={{ color: "#b3b3b3", fontSize: "14px", margin: "4px 0 0" }}>
+
+                        <p style={{ color: "#b3b3b3", fontSize: "14px", margin: "4px 0 14px" }}>
                           {playlists.length} playlist công khai
                         </p>
+
+                        {!isOwnProfile && (
+                          <button
+                            disabled={followLoading || !profileUserId}
+                            onClick={() =>
+                              toggleFollowUser(
+                                profileUserId,
+                                profileUserName,
+                                profileUserImage,
+                              )
+                            }
+                            style={{
+                              border: "none",
+                              borderRadius: "999px",
+                              padding: "10px 20px",
+                              background: isFollowedProfileUser ? "#333" : "#fff",
+                              color: isFollowedProfileUser ? "#fff" : "#000",
+                              fontWeight: 800,
+                              cursor: followLoading ? "not-allowed" : "pointer",
+                              opacity: followLoading ? 0.7 : 1,
+                            }}
+                          >
+                            {isFollowedProfileUser ? "Đang theo dõi" : "Theo dõi"}
+                          </button>
+                        )}
                       </div>
                     </div>
 

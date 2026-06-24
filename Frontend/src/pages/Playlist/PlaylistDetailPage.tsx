@@ -11,13 +11,13 @@ import { mapPlaylistDetailDtoToPlaylist } from "../../types/playlist";
 import type { Media } from "../../types/media";
 import { usePlayer } from "../../hooks/usePlayer";
 import { useSearch } from "../../hooks/useSearch";
-import TrackActionMenu from "../../components/common/TrackActionMenu";
 import ShareMediaModal from "../../components/share/ShareModal";
 import {
   AddToPlaylistIcon,
   MoreHorizIcon,
   NowPlayingIcon,
   PlayIcon,
+  RemoveTrackIcon,
   ShareIcon,
   ShuffleIcon,
 } from "../../components/common/icons";
@@ -76,7 +76,7 @@ const PlaylistDetailPage = () => {
 
   const [sharePlaylistOpen, setSharePlaylistOpen] = useState(false);
 
-  // ✅ PLAYLIST MENU: menu 3 chấm playlist
+  // PLAYLIST MENU: menu 3 chấm playlist
   const [showPlaylistMenu, setShowPlaylistMenu] = useState(false);
   const [updatingPlaylist, setUpdatingPlaylist] = useState(false);
 
@@ -148,7 +148,7 @@ const PlaylistDetailPage = () => {
     }
   };
 
-  // ✅ PLAYLIST PUBLIC/PRIVATE: đổi công khai / riêng tư
+  // PLAYLIST PUBLIC/PRIVATE: đổi công khai / riêng tư
   const handleTogglePlaylistPublic = async () => {
     if (!playlist) return;
 
@@ -164,7 +164,7 @@ const PlaylistDetailPage = () => {
         isPublic: nextIsPublic,
       });
 
-      // ✅ reload lại từ server cho chắc
+      // reload lại từ server cho chắc
       await loadPlaylist();
 
       setShowPlaylistMenu(false);
@@ -176,7 +176,7 @@ const PlaylistDetailPage = () => {
     }
   };
 
-  // ✅ PLAYLIST DELETE
+  // PLAYLIST DELETE
  const handleDeletePlaylist = async () => {
   if (!id) return;
 
@@ -188,7 +188,7 @@ const PlaylistDetailPage = () => {
   try {
     await playlistApi.delete(playlistId);
 
-    // ✅ báo Sidebar xóa ngay
+    // báo Sidebar xóa ngay
     window.dispatchEvent(
       new CustomEvent("tunevault:playlist-deleted", {
         detail: { playlistId },
@@ -202,6 +202,17 @@ const PlaylistDetailPage = () => {
   } catch (error) {
     console.error("DELETE PLAYLIST ERROR:", error);
     alert("Không xóa được playlist");
+    }
+  };
+
+  const handleRemoveTrack = async (mediaItemId: number) => {
+    if (!id) return;
+    try {
+      await playlistApi.removeTrack(Number(id), mediaItemId);
+      await loadPlaylist();
+    } catch (err) {
+      console.error("REMOVE TRACK ERROR:", err);
+      alert("Không xóa được bài hát");
     }
   };
 
@@ -695,6 +706,7 @@ const PlaylistDetailPage = () => {
                 isPlaying={isPlaying}
                 playlistQueue={mediaTracks}
                 onPlay={() => handlePlayTrack(item.media)}
+                onRemove={() => handleRemoveTrack(getMediaId(item.media))}
               />
             ))}
           </>
@@ -719,6 +731,7 @@ const PlaylistTrackRow = ({
   isPlaying,
   playlistQueue,
   onPlay,
+  onRemove,
 }: {
   item: PlaylistTrack;
   index: number;
@@ -726,9 +739,9 @@ const PlaylistTrackRow = ({
   isPlaying: boolean;
   playlistQueue: Media[];
   onPlay: () => void;
+  onRemove: () => void;
 }) => {
   const [hovered, setHovered] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
   const [addModalOpen, setAddModalOpen] = useState(false);
   const { playTrack, pause, play, setQueue } = usePlayer();
   const navigate = useNavigate();
@@ -893,7 +906,7 @@ const PlaylistTrackRow = ({
               fontWeight: 700,
             }}
           >
-            +
+            <AddToPlaylistIcon/>
           </button>
         )}
 
@@ -936,28 +949,23 @@ const PlaylistTrackRow = ({
         <span>{formatDuration(media.duration)}</span>
 
         {hovered && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setMenuOpen((prev) => !prev);
-            }}
-            style={{
-              border: "none",
-              background: "transparent",
-              color: "#fff",
-              cursor: "pointer",
-              fontSize: "24px",
-            }}
-          >
-            <MoreHorizIcon/>
-          </button>
-        )}
-
-        <TrackActionMenu
-          track={media}
-          open={menuOpen}
-          onClose={() => setMenuOpen(false)}
-        />
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove();
+          }}
+          title="Xóa khỏi playlist"
+          style={{
+            border: "none",
+            background: "transparent",
+            color: "#ff7676",
+            cursor: "pointer",
+            fontSize: "18px",
+          }}
+        >
+          <RemoveTrackIcon/>
+        </button>
+      )}
       </div>
     </div>
   );

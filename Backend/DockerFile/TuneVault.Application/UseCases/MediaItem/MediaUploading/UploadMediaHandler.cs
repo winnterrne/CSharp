@@ -23,12 +23,11 @@ public class UploadMediaHandler : IRequestHandler<UploadMediaCommand, MediaItemD
             request.File.FileName,
             folder
         );
+        string? imagePath = null;
 
-        string? thumbnailPath = null;
-
-        if (request.Thumbnail != null && request.Thumbnail.Length > 0)
+        if (request.Thumbnail != null)
         {
-            thumbnailPath = await _fileStorage.SaveFileAsync(
+            imagePath = await _fileStorage.SaveFileAsync(
                 request.Thumbnail.OpenReadStream(),
                 request.Thumbnail.FileName,
                 "images/media"
@@ -38,12 +37,14 @@ public class UploadMediaHandler : IRequestHandler<UploadMediaCommand, MediaItemD
         {
             MediaItemID = 0,  // DB sẽ tự tăng IDENTITY
             TitleName = request.TitleName,
+            
+            MediaItemImage = imagePath,
+
             Description = request.Description,
             MediaItemTag = request.MediaItemTag,
             MediaItemType = request.MediaItemType,
             Duration = request.Duration,
             filePath = filePath,
-            MediaItemImage = thumbnailPath,
             ArtistID = request.ArtistID,
             AlbumID = request.AlbumID,
             UserID = request.UserID,

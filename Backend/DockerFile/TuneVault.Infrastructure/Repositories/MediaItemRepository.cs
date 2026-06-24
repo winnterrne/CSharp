@@ -77,32 +77,49 @@ public class MediaItemRepository : IMediaItemRepository
     public async Task<int> CreateMediaAsync(MediaItem media)
     {
         string sql = @"
-        INSERT INTO MediaItem 
+        INSERT INTO MediaItem
         (
-            TitleName, MediaItemImage, filePath, MediaItemTag, MediaItemType, 
-            Duration, UploadAT, Description, ArtistID, AlbumID, UserID, IsDeleted 
+            TitleName,
+            MediaItemImage,
+            filePath,
+            MediaItemTag,
+            MediaItemType,
+            Duration,
+            UploadAT,
+            Description,
+            ArtistID,
+            AlbumID,
+            UserID,
+            IsDeleted
         )
-        OUTPUT INSERTED.MediaItemID   
-        VALUES 
+        OUTPUT INSERTED.MediaItemID
+        VALUES
         (
-            @TitleName, 
-            @MediaItemImage, 
+            @TitleName,
+
+            CASE
+                WHEN @MediaItemImage IS NULL THEN NULL
+                ELSE RIGHT(@MediaItemImage,
+                    CHARINDEX('/', REVERSE(REPLACE(@MediaItemImage, '\', '/'))) - 1)
+            END,
+
             CASE
                 WHEN @filePath IS NULL OR @filePath = '' THEN NULL
                 ELSE RIGHT(
-                    REPLACE(@filePath, '\', '/'),
-                    CHARINDEX('/', REVERSE(REPLACE(@filePath, '\', '/')) + '/') - 1
+                    REPLACE(@filePath, '', '/'),
+                    CHARINDEX('/', REVERSE(REPLACE(@filePath, '', '/')) + '/') - 1
                 )
             END,
-            @MediaItemTag, 
-            @MediaItemType, 
-            @Duration, 
-            @UploadAt, 
-            @Description, 
-            @ArtistID, 
-            @AlbumID, 
+
+            @MediaItemTag,
+            @MediaItemType,
+            @Duration,
+            @UploadAt,
+            @Description,
+            @ArtistID,
+            @AlbumID,
             @UserID,
-            0 
+            0
         )";
         return await _db.ExecuteScalarAsync<int>(sql, media);
     }

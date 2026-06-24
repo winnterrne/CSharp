@@ -9,7 +9,7 @@ import axios from "axios";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
-  const { login, setLoading, isLoading } = useAuth();
+  const {setLoading, isLoading } = useAuth();
 
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -37,18 +37,16 @@ const RegisterPage = () => {
     try {
       setLoading(true);
 
-      // NEW: gọi API backend thật
-      const res = await authApi.register({
+      await authApi.register({
         username,
         email,
         password,
         phone,
       });
 
-      // Backend nên trả về: { user, accessToken }
-      login(res.data.user, res.data.accessToken);
-
-      navigate("/login");
+      navigate("/login", {
+        state: { message: "Đăng ký thành công! Vui lòng đăng nhập." },
+      });
     } catch (error: unknown) {
       console.error("REGISTER ERROR:", error);
 

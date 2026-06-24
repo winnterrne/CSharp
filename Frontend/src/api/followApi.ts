@@ -6,26 +6,59 @@ export type FollowedArtist = {
   artistImage: string;
 };
 
+export type FollowedUser = {
+  userID: string;
+  userName: string;
+  userImage?: string | null;
+  email?: string;
+};
+
 export const followApi = {
-  // GET LIST
+  // =========================
+  // ARTIST
+  // =========================
+
   getFollowedArtists: async (): Promise<FollowedArtist[]> => {
     const res = await api.get("/interaction/follow-artist");
-    return res.data;
+    console.log("FOLLOWED ARTISTS RAW:", res.data);
+
+    return res.data?.data ?? res.data ?? [];
   },
 
-  // FOLLOW
   followArtist: async (artistId: number) => {
-    const res = await api.post(
-      `/interaction/follow/artist/${artistId}`
-    );
+    const res = await api.post(`/interaction/follow/artist/${artistId}`);
     return res.data;
   },
 
-  // UNFOLLOW
   unfollowArtist: async (artistId: number) => {
-    const res = await api.delete(
-      `/interaction/unfollow/artist/${artistId}`
-    );
+    const res = await api.delete(`/interaction/unfollow/artist/${artistId}`);
     return res.data;
+  },
+
+  // =========================
+  // USER
+  // =========================
+
+  followUser: async (followingUserId: string) => {
+    const res = await api.post(
+      `/interaction/follow/user/${followingUserId}`,
+    );
+
+    return res.data;
+  },
+
+  unfollowUser: async (followingUserId: string) => {
+    const res = await api.delete(
+      `/interaction/unfollow/user/${followingUserId}`,
+    );
+
+    return res.data;
+  },
+
+  getFollowedUsers: async (): Promise<FollowedUser[]> => {
+    const res = await api.get("/interaction/follow-user");
+    console.log("FOLLOWED USERS RAW:", res.data);
+
+    return res.data?.data ?? res.data ?? [];
   },
 };

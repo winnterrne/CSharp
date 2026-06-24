@@ -26,7 +26,8 @@ public class GetProfileHandler : IRequestHandler<GetProfileQuery, UserProfileDto
             user.UserImage,
             user.Email,
             user.Role,
-            user.Phone
+            user.Phone,
+            user.Bio
         );
     }
 }
