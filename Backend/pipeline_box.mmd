@@ -1,70 +1,81 @@
 %%{init: {'theme': 'dark'}}%%
 graph TD
     subgraph auth ["1. AUTH PIPELINE"]
-        RC[RegisterCommand] -->|1a. Validate Input DTO| RV[RegisterValidator]
-        RV -->|2a. Create User, Hash Password & Gen JWT| RH[RegisterHandler]
-        
-        LC[LoginCommand] -->|1b. Verify Password & Gen JWT| LH[LoginHandler]
-        
+        RC[RegisterCommand] -->|1a. Validate| RV[RegisterValidator]
+        RV -->|2a. Handle| RH[RegisterHandler]
+        LC[LoginCommand] -->|1b. Handle| LH[LoginHandler]
         RH -->|3a| RD[AuthResponseDto]
         LH -->|3b| RD
     end
 
-    subgraph share ["2. SHARE MEDIA PIPELINE (Share)"]
-        SC[ShareMediaCommand] -->|1. Validate Receiver, Media/Playlist ID| SV[ShareMediaValidator]
-        SV -->|2. Check duplicates, insert Share & Notification, push SignalR| SH[ShareMediaHandler]
-        SH -->|3. Return Share Record Details| SD[ShareMediaResponseDto]
+    subgraph upload ["2. UPLOAD MEDIA PIPELINE"]
+        UC[UploadMediaCommand] -->|1. Validate| UV[UploadMediaValidator]
+        UV -->|2. Handle| UH[UploadMediaHandler]
+        UH -->|3. Output| UD[MediaItemDto]
     end
 
-    subgraph notifications ["3. NOTIFICATIONS PIPELINE (Get Notifications)"]
-        NC[GetNotificationsQuery] -->|1. Fetch Notifications from Database| NH[GetNotificationsHandler]
-        NH -->|2. Return list of notifications| ND["IEnumerable&lt;NotificationDto&gt;"]
+    subgraph streaming ["3. PLAYBACK & STREAMING PIPELINE"]
+        GMC[GetMediaInfoQuery] -->|1. Handle| GMH[GetMediaInfoQueryHandler]
+        GMH -->|2. Output| GMD[MediaItemDto]
     end
 
-    subgraph upload ["4. UPLOAD MEDIA PIPELINE (Upload)"]
-        UC[UploadMediaCommand] -->|1. Validate File, Title, Format| UV[UploadMediaValidator]
-        UV -->|2. Save File to Disk, insert MediaItem to DB| UH[UploadMediaHandler]
-        UH -->|3. Return Uploaded Media metadata| UD[MediaItemDto]
+    subgraph share ["4. SHARE MEDIA PIPELINE"]
+        SC[ShareMediaCommand] -->|1. Validate| SV[ShareMediaValidator]
+        SV -->|2. Handle| SH[ShareMediaHandler]
+        SH -->|3. Output| SD[ShareMediaResponseDto]
     end
 
-    subgraph follow ["5. FOLLOW PIPELINE (Follow User)"]
-        FC[FollowCommand] -->|1. Create Follow record, insert Notification, push SignalR| FH[FollowHandler]
-        FH -->|2. Return Created Follow ID| FD["int (FollowID)"]
+    subgraph notifications ["5. REAL-TIME NOTIFICATIONS PIPELINE"]
+        NC[GetNotificationsQuery] -->|1. Handle| NH[GetNotificationsHandler]
+        NH -->|2. Output| ND["IEnumerable&lt;NotificationDto&gt;"]
     end
 
-    %% Invisible links to force vertical stacking in correct order (1, 2, 3, 4, 5)
-    RD ~~~ SC
+    subgraph playlist ["6. PLAYLIST MANAGEMENT PIPELINE"]
+        CPC[CreatePlaylistCommand] -->|1. Handle| CPH[CreatePlaylistHandler]
+        CPH -->|2. Output| CPD["int (PlaylistID)"]
+    end
+
+    subgraph favorite ["7. FAVORITE PIPELINE"]
+        AFC[AddFavoriteCommand] -->|1. Handle| AFH[AddFavoriteHandler]
+        AFH -->|2. Output| AFD["int (Result)"]
+    end
+
+    subgraph playhistory ["8. PLAY HISTORY PIPELINE"]
+        PHC[RecordPlayHistoryCommand] -->|1. Handle| PHH[RecordPlayHistoryHandler]
+        PHH -->|2. Output| PHD["int (Result)"]
+    end
+
+    subgraph ai_rec ["9. AI MUSIC RECOMMENDATION PIPELINE"]
+        ARC[GetRecommendationsQuery] -->|1. Handle| ARH[GetRecommendationsQueryHandler]
+        ARH -->|2. Output| ARD["List&lt;MediaItemRecommendationDto&gt;"]
+    end
+
+    subgraph ai_desc ["10. AI DESCRIPTION GENERATION PIPELINE"]
+        ADC[GenerateMediaDescriptionCommand] -->|1. Handle| ADH[GenerateMediaDescriptionHandler]
+        ADH -->|2. Output| ADD["string (Description)"]
+    end
+
+    %% Invisible links to force vertical stacking in correct order (1 to 10)
+    RD ~~~ UC
+    UD ~~~ GMC
+    GMD ~~~ SC
     SD ~~~ NC
-    ND ~~~ UC
-    UD ~~~ FC
+    ND ~~~ CPC
+    CPD ~~~ AFC
+    AFD ~~~ PHC
+    PHD ~~~ ARC
+    ARD ~~~ ADC
 
     style auth fill:#111111,stroke:#333333,stroke-width:1px,color:#ffffff
+    style upload fill:#111111,stroke:#333333,stroke-width:1px,color:#ffffff
+    style streaming fill:#111111,stroke:#333333,stroke-width:1px,color:#ffffff
     style share fill:#111111,stroke:#333333,stroke-width:1px,color:#ffffff
     style notifications fill:#111111,stroke:#333333,stroke-width:1px,color:#ffffff
-    style upload fill:#111111,stroke:#333333,stroke-width:1px,color:#ffffff
-    style follow fill:#111111,stroke:#333333,stroke-width:1px,color:#ffffff
+    style playlist fill:#111111,stroke:#333333,stroke-width:1px,color:#ffffff
+    style favorite fill:#111111,stroke:#333333,stroke-width:1px,color:#ffffff
+    style playhistory fill:#111111,stroke:#333333,stroke-width:1px,color:#ffffff
+    style ai_rec fill:#111111,stroke:#333333,stroke-width:1px,color:#ffffff
+    style ai_desc fill:#111111,stroke:#333333,stroke-width:1px,color:#ffffff
 
-    style RC fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000000
-    style RV fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000000
-    style RH fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000000
-    style LC fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000000
-    style LH fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000000
-    style RD fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000000
-
-    style SC fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000000
-    style SV fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000000
-    style SH fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000000
-    style SD fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000000
-
-    style NC fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000000
-    style NH fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000000
-    style ND fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000000
-
-    style UC fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000000
-    style UV fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000000
-    style UH fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000000
-    style UD fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000000
-
-    style FC fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000000
-    style FH fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000000
-    style FD fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000000
+    classDef bw fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000000
+    class RC,RV,RH,LC,LH,RD,UC,UV,UH,UD,GMC,GMH,GMD,SC,SV,SH,SD,NC,NH,ND,CPC,CPH,CPD,AFC,AFH,AFD,PHC,PHH,PHD,ARC,ARH,ARD,ADC,ADH,ADD bw;
