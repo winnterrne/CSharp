@@ -3,9 +3,8 @@ import type { Media } from "../../types/media";
 import { usePlayer } from "../../hooks/usePlayer";
 import { useFavorite } from "../../hooks/useFavorite";
 import AddToPlaylistButton from "../playlist/AddToPlaylistButton";
-import TrackActionMenu from "../common/TrackActionMenu";
 import ShareMediaModal from "../share/ShareModal";
-import { HeartIcon, MoreHorizIcon, NowPlayingIcon, PlayIcon, ShareIcon } from "../common/icons";
+import { HeartIcon, NowPlayingIcon, PlayIcon, ShareIcon } from "../common/icons";
 import { aiApi } from "../../api/aiApi";
 
   type TrackDetailViewProps = {
@@ -23,7 +22,6 @@ import { aiApi } from "../../api/aiApi";
   };
 
   const TrackDetailView = ({ track, onOpenArtist }: TrackDetailViewProps) => {
-    const [menuOpen, setMenuOpen] = useState(false);
     const [shareOpen, setShareOpen] = useState(false);
 
      const [aiStatus, setAiStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
@@ -236,32 +234,6 @@ console.log("track full:", JSON.stringify(track, null, 2));
         >
           <ShareIcon/>
         </button>
-
-        <div style={{ position: "relative" }}>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setMenuOpen((prev) => !prev);
-            }}
-            title="Tùy chọn khác"
-            style={{
-              border: "none",
-              background: "transparent",
-              fontSize: "30px",
-              cursor: "pointer",
-              color: "#b3b3b3",
-            }}
-          >
-            <MoreHorizIcon/>
-          </button>
-
-          <TrackActionMenu
-            track={track}
-            open={menuOpen}
-            onClose={() => setMenuOpen(false)}
-            onOpenArtist={onOpenArtist}
-          />
-        </div>
       </section>
 
       <section

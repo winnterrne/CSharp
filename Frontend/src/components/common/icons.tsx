@@ -185,3 +185,18 @@ export const OpenAppIcon = () => (
     <path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
   </svg>
 );
+
+export const RemoveTrackIcon = () => (
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 16 16"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+  >
+    <line x1="2" y1="2" x2="14" y2="14" />
+    <line x1="14" y1="2" x2="2" y2="14" />
+  </svg>
+);

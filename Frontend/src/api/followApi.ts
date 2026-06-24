@@ -10,6 +10,7 @@ export const followApi = {
   // GET LIST
   getFollowedArtists: async (): Promise<FollowedArtist[]> => {
     const res = await api.get("/interaction/follow-artist");
+    console.log("FOLLOWED ARTISTS RAW:", res.data);
     return res.data;
   },
 

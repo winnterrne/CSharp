@@ -92,7 +92,8 @@ const handleFollowToggle = async () => {
     console.error("ArtistId invalid:", artistId);
     return;
   }
-  await toggleFollow(id, artistName, artistImage || "");
+  const imageToUse = profile?.artistImage || artistImage || "";
+  await toggleFollow(id, artistName, imageToUse);
   console.log({
   artistId,
   artistName,
@@ -213,19 +214,6 @@ useEffect(() => {
           }}
         >
           {isFollowed ? "✓ Đang theo dõi" : "Theo dõi"}
-        </button>
-
-        {/* MORE */}
-        <button
-          style={{
-            background: "none",
-            border: "none",
-            color: "#b3b3b3",
-            fontSize: "26px",
-            cursor: "pointer",
-          }}
-        >
-          ⋯
         </button>
       </div>
 

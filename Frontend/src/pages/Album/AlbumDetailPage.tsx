@@ -8,6 +8,7 @@ import type { Album } from "../../types/album";
 import type { Media } from "../../types/media";
 import { usePlayer } from "../../hooks/usePlayer";
 import {
+  AddToPlaylistIcon,
   MoreHorizIcon,
   NowPlayingIcon,
   PlayIcon,
@@ -15,6 +16,8 @@ import {
 } from "../../components/common/icons";
 import { playerStore } from "../../store/playerStore";
 import { useNavigate } from "react-router-dom";
+import AddToPlaylistModal from "../../components/playlist/AddToPlaylistModal";
+
 
 const formatDuration = (seconds?: number) => {
   if (!seconds || Number.isNaN(seconds)) return "0:00";
@@ -381,6 +384,7 @@ const AlbumDetailPage = () => {
   const [tracks, setTracks] = useState<Media[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  
 
   const albumImageUrl = getAlbumImageUrl(album);
 
@@ -714,7 +718,7 @@ const AlbumDetailPage = () => {
               style={{
                 display: "grid",
                 gridTemplateColumns:
-                  "40px minmax(0, 1.7fr) minmax(120px, 1fr) 110px",
+                  "40px minmax(0, 1.7fr) 48px minmax(120px, 1fr) 110px",
                 gap: "12px",
                 color: "#b3b3b3",
                 fontSize: "13px",
@@ -725,6 +729,7 @@ const AlbumDetailPage = () => {
             >
               <div>#</div>
               <div>Tiêu đề</div>
+              <div></div>
               <div>Nghệ sĩ</div>
               <div style={{ textAlign: "right" }}>Thời lượng</div>
             </div>
@@ -775,6 +780,7 @@ const AlbumTrackRow = ({
   onOpenArtist: () => void;
 }) => {
   const [hovered, setHovered] = useState(false);
+  const [addModalOpen, setAddModalOpen] = useState(false);
 
   const imageUrl = getTrackImageUrl(track);
   const artistName = getArtistName(track);
@@ -787,7 +793,7 @@ const AlbumTrackRow = ({
       style={{
         display: "grid",
         gridTemplateColumns:
-          "40px minmax(0, 1.7fr) minmax(120px, 1fr) 110px",
+          "40px minmax(0, 1.7fr) 48px minmax(120px, 1fr) 110px",
         gap: "12px",
         alignItems: "center",
         height: "64px",
@@ -886,6 +892,33 @@ const AlbumTrackRow = ({
         </div>
       </div>
 
+      <div>
+        {hovered && (
+          <button
+            title="Thêm vào playlist"
+            onClick={(e) => {
+              e.stopPropagation();
+              setAddModalOpen(true);
+            }}
+            style={{
+              border: "none",
+              background: "transparent",
+              color: "#fff",
+              cursor: "pointer",
+              fontSize: "22px",
+              fontWeight: 700,
+            }}
+          >
+            <AddToPlaylistIcon/>
+          </button>
+        )}
+        <AddToPlaylistModal
+          open={addModalOpen}
+          media={track}
+          onClose={() => setAddModalOpen(false)}
+        />
+      </div>
+
       <button
         onClick={(e) => {
           e.stopPropagation();
@@ -901,6 +934,8 @@ const AlbumTrackRow = ({
           whiteSpace: "nowrap",
           overflow: "hidden",
           textOverflow: "ellipsis",
+          padding: "0",    
+          margin: "0",    
         }}
       >
         {artistName}
