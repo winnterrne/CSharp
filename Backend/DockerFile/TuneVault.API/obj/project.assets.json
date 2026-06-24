@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "targets": {
     "net10.0": {
       "BCrypt.Net-Next/4.2.0": {
@@ -1703,33 +1703,36 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\DoAnMonHoc\\CSharp\\Backend\\DockerFile\\TuneVault.API\\TuneVault.API.csproj",
+      "projectUniqueName": "C:\\Users\\ADMIN\\.gemini\\antigravity\\scratch\\TuneVault\\Backend\\DockerFile\\TuneVault.API\\TuneVault.API.csproj",
       "projectName": "TuneVault.API",
-      "projectPath": "C:\\DoAnMonHoc\\CSharp\\Backend\\DockerFile\\TuneVault.API\\TuneVault.API.csproj",
+      "projectPath": "C:\\Users\\ADMIN\\.gemini\\antigravity\\scratch\\TuneVault\\Backend\\DockerFile\\TuneVault.API\\TuneVault.API.csproj",
       "packagesPath": "C:\\Users\\ADMIN\\.nuget\\packages\\",
-      "outputPath": "C:\\DoAnMonHoc\\CSharp\\Backend\\DockerFile\\TuneVault.API\\obj\\",
+      "outputPath": "C:\\Users\\ADMIN\\.gemini\\antigravity\\scratch\\TuneVault\\Backend\\DockerFile\\TuneVault.API\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\ADMIN\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\ADMIN\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net10.0"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "net10.0": {
+          "framework": "net10.0",
           "targetAlias": "net10.0",
           "projectReferences": {
-            "C:\\DoAnMonHoc\\CSharp\\Backend\\DockerFile\\TuneVault.Application\\TuneVault.Application.csproj": {
-              "projectPath": "C:\\DoAnMonHoc\\CSharp\\Backend\\DockerFile\\TuneVault.Application\\TuneVault.Application.csproj"
+            "C:\\Users\\ADMIN\\.gemini\\antigravity\\scratch\\TuneVault\\Backend\\DockerFile\\TuneVault.Application\\TuneVault.Application.csproj": {
+              "projectPath": "C:\\Users\\ADMIN\\.gemini\\antigravity\\scratch\\TuneVault\\Backend\\DockerFile\\TuneVault.Application\\TuneVault.Application.csproj"
             },
-            "C:\\DoAnMonHoc\\CSharp\\Backend\\DockerFile\\TuneVault.Domain\\TuneVault.Domain.csproj": {
-              "projectPath": "C:\\DoAnMonHoc\\CSharp\\Backend\\DockerFile\\TuneVault.Domain\\TuneVault.Domain.csproj"
+            "C:\\Users\\ADMIN\\.gemini\\antigravity\\scratch\\TuneVault\\Backend\\DockerFile\\TuneVault.Domain\\TuneVault.Domain.csproj": {
+              "projectPath": "C:\\Users\\ADMIN\\.gemini\\antigravity\\scratch\\TuneVault\\Backend\\DockerFile\\TuneVault.Domain\\TuneVault.Domain.csproj"
             },
-            "C:\\DoAnMonHoc\\CSharp\\Backend\\DockerFile\\TuneVault.Infrastructure\\TuneVault.Infrastructure.csproj": {
-              "projectPath": "C:\\DoAnMonHoc\\CSharp\\Backend\\DockerFile\\TuneVault.Infrastructure\\TuneVault.Infrastructure.csproj"
+            "C:\\Users\\ADMIN\\.gemini\\antigravity\\scratch\\TuneVault\\Backend\\DockerFile\\TuneVault.Infrastructure\\TuneVault.Infrastructure.csproj": {
+              "projectPath": "C:\\Users\\ADMIN\\.gemini\\antigravity\\scratch\\TuneVault\\Backend\\DockerFile\\TuneVault.Infrastructure\\TuneVault.Infrastructure.csproj"
             }
           }
         }
@@ -1744,10 +1747,11 @@
         "auditLevel": "low",
         "auditMode": "all"
       },
-      "SdkAnalysisLevel": "10.0.200"
+      "SdkAnalysisLevel": "10.0.300"
     },
     "frameworks": {
       "net10.0": {
+        "framework": "net10.0",
         "targetAlias": "net10.0",
         "dependencies": {
           "FluentValidation": {
@@ -1794,7 +1798,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.204/PortableRuntimeIdentifierGraph.json",
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.301/PortableRuntimeIdentifierGraph.json",
         "packagesToPrune": {
           "Microsoft.AspNetCore": "(,10.0.32767]",
           "Microsoft.AspNetCore.Antiforgery": "(,10.0.32767]",
@@ -2211,13 +2215,5 @@
         }
       }
     }
-  },
-  "logs": [
-    {
-      "code": "Undefined",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "Problem reading the cache file D:\\TuneVault\\CSharp\\Backend\\DockerFile\\TuneVault.API\\obj\\project.nuget.cache : '<' is an invalid start of a property name. Expected a '\"'. Path: $ | LineNumber: 2 | BytePositionInLine: 0."
-    }
-  ]
+  }
 }

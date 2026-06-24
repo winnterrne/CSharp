@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "59LYkNKa6nw=",
+  "dgSpecHash": "LaBrnuLQXN0=",
   "success": true,
-  "projectFilePath": "C:\\DoAnMonHoc\\CSharp\\Backend\\DockerFile\\TuneVault.API\\TuneVault.API.csproj",
+  "projectFilePath": "C:\\Users\\ADMIN\\.gemini\\antigravity\\scratch\\TuneVault\\Backend\\DockerFile\\TuneVault.API\\TuneVault.API.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\ADMIN\\.nuget\\packages\\bcrypt.net-next\\4.2.0\\bcrypt.net-next.4.2.0.nupkg.sha512",
     "C:\\Users\\ADMIN\\.nuget\\packages\\dapper\\2.1.79\\dapper.2.1.79.nupkg.sha512",
@@ -40,15 +40,5 @@
     "C:\\Users\\ADMIN\\.nuget\\packages\\system.security.cryptography.pkcs\\9.0.13\\system.security.cryptography.pkcs.9.0.13.nupkg.sha512",
     "C:\\Users\\ADMIN\\.nuget\\packages\\system.security.cryptography.protecteddata\\9.0.13\\system.security.cryptography.protecteddata.9.0.13.nupkg.sha512"
   ],
-  "logs": [
-    {
-      "code": "Undefined",
-      "level": "Warning",
-      "message": "Problem reading the cache file D:\\TuneVault\\CSharp\\Backend\\DockerFile\\TuneVault.API\\obj\\project.nuget.cache : '<' is an invalid start of a property name. Expected a '\"'. Path: $ | LineNumber: 2 | BytePositionInLine: 0.",
-      "projectPath": "D:\\TuneVault\\CSharp\\Backend\\DockerFile\\TuneVault.API\\TuneVault.API.csproj",
-      "warningLevel": 1,
-      "filePath": "D:\\TuneVault\\CSharp\\Backend\\DockerFile\\TuneVault.API\\TuneVault.API.csproj",
-      "targetGraphs": []
-    }
-  ]
+  "logs": []
 }
