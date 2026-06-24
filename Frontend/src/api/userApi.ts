@@ -29,8 +29,17 @@ export interface ApiResponse<T> {
 export const userApi = {
   getProfile: (userId: string) => api.get(`/User/${userId}`),
 
-  updateProfile: (userId: string, data: UpdateProfilePayload) =>
-    api.put(`/User/${userId}`, data),
+  updateProfile(id: string, formData: FormData) {
+    return api.put(
+      `/user/${id}`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+  },
 
   search: (keyword: string) =>
     api.get<ApiResponse<UserSearchResult[]>>("/User", {

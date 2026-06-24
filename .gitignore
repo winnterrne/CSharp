@@ -19,3 +19,5 @@ obj/
 *.dll
 *.pdb
 *.cache
+
+!TuneVault_API.postman_collection.json

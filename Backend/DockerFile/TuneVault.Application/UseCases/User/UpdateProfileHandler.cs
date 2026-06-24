@@ -29,8 +29,33 @@ public class UpdateProfileCommandHandler
         if (!string.IsNullOrWhiteSpace(request.UserName))
             user.UserName = request.UserName;
 
-        if (!string.IsNullOrWhiteSpace(request.UserImage))
-            user.UserImage = request.UserImage;
+        if (request.Avatar != null)
+        {
+            var uploadsFolder = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "wwwroot",
+                "media",
+                "images",
+                "users"
+            );
+
+            Directory.CreateDirectory(uploadsFolder);
+
+            var fileName =
+                $"{Guid.NewGuid()}{Path.GetExtension(request.Avatar.FileName)}";
+
+            var filePath =
+                Path.Combine(uploadsFolder, fileName);
+
+            using var stream = new FileStream(
+                filePath,
+                FileMode.Create
+            );
+
+            await request.Avatar.CopyToAsync(stream);
+
+            user.UserImage = fileName;
+        }
 
         if (!string.IsNullOrWhiteSpace(request.Phone))
             user.Phone = request.Phone;

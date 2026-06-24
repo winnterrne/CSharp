@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { userApi } from "../../api/userApi";
 import { authStore } from "../../store/authStore";
+import { useRef } from "react";
+import { EditAvatarIcon } from "../../components/common/icons";
 
 interface UserProfileDto {
   userID: string;
@@ -30,6 +32,11 @@ const AccountPage = () => {
 
   const [error, setError] = useState("");
   const [isEditing, setIsEditing] = useState(false);
+
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [isAvatarHover, setIsAvatarHover] = useState(false);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -68,12 +75,20 @@ const AccountPage = () => {
 
       setSaving(true);
 
-      const res = await userApi.updateProfile(authUser.id, {
-      userName: displayName,
-      userImage: avatarFileName,
-      phone,
-      bio,
-    });
+      const formData = new FormData();
+
+      formData.append("userName", displayName);
+      formData.append("phone", phone);
+      formData.append("bio", bio);
+
+      if (avatarFile) {
+        formData.append("avatar", avatarFile);
+      }
+
+      const res = await userApi.updateProfile(
+        authUser.id,
+        formData
+      );
 
     // Lấy cục dữ liệu sạch từ API trả về
     const data = res.data?.data as UserProfileDto;
@@ -114,6 +129,24 @@ const AccountPage = () => {
     }
   };
 
+  const handleAvatarChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = e.target.files?.[0];
+
+    if (!file) return;
+
+    setAvatarFile(file);
+
+    // preview ảnh ngay lập tức
+    const previewUrl = URL.createObjectURL(file);
+
+    setAvatarUrl(previewUrl);
+
+    // lưu tên file để gửi lên backend
+    setAvatarFileName(file.name);
+  };
+
   if (loading) {
     return (
       <main style={pageStyle}>
@@ -137,12 +170,62 @@ const AccountPage = () => {
   return (
     <main style={pageStyle}>
       <section style={heroStyle}>
-        <div style={avatarBoxStyle}>
+        <div
+          style={{
+            ...avatarBoxStyle,
+            position: "relative",
+            cursor: isEditing ? "pointer" : "default",
+          }}
+          onMouseEnter={() => setIsAvatarHover(true)}
+          onMouseLeave={() => setIsAvatarHover(false)}
+          onClick={() => {
+            if (isEditing) {
+              fileInputRef.current?.click();
+            }
+          }}
+        >
           {avatarUrl ? (
-            <img src={avatarUrl} alt={displayName} style={avatarImgStyle} />
+            <img
+              src={avatarUrl}
+              alt={displayName}
+              style={avatarImgStyle}
+            />
           ) : (
-            <span style={{ fontSize: "64px", color: "#b3b3b3" }}>👤</span>
+            <span style={{ fontSize: "64px", color: "#b3b3b3" }}>
+              👤
+            </span>
           )}
+
+          {isEditing && isAvatarHover && (
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                background: "rgba(0,0,0,0.5)",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                borderRadius: "50%",
+              }}
+            >
+              <span
+                style={{
+                  fontSize: "32px",
+                  color: "#fff",
+                }}
+              >
+                <EditAvatarIcon/>
+              </span>
+            </div>
+          )}
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            style={{ display: "none" }}
+            onChange={handleAvatarChange}
+          />
         </div>
 
         <div style={{ minWidth: 0, flex: 1 }}>
@@ -215,19 +298,6 @@ const AccountPage = () => {
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
               placeholder="Tên người dùng"
-              style={inputStyle}
-            />
-
-            <label style={labelStyle}>Ảnh đại diện (Tên file)</label>
-            <input
-              value={avatarFileName} // Thay đổi từ avatarUrl thành avatarFileName
-              onChange={(e) => {
-                const fileName = e.target.value;
-                setAvatarFileName(fileName);
-                // Cập nhật luôn avatarUrl để trên Avatar hình tròn thay đổi theo thời gian thực
-                setAvatarUrl(fileName ? `${baseUrl}/media/images/users/${fileName}` : "");
-              }}
-              placeholder="Ví dụ: avatar_khanhdang.jpg"
               style={inputStyle}
             />
 
