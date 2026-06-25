@@ -39,12 +39,9 @@ const LoginPage = () => {
         return;
       }
 
-      // ✅ QUAN TRỌNG: lưu token để SignalR lấy được
       localStorage.setItem("token", authData.token);
 
       let userImage: string | undefined = undefined;
-
-      // ✅ Fetch profile để lấy userImage, lỗi thì bỏ qua
       try {
         const profileRes = await userApi.getProfile(authData.userID);
         const profile = profileRes.data?.data;
@@ -54,7 +51,6 @@ const LoginPage = () => {
         console.warn("GET PROFILE AFTER LOGIN ERROR:", profileError);
       }
 
-      // ✅ Lưu user vào auth store
       login(
         {
           id: authData.userID,

@@ -14,5 +14,6 @@ public record PlayHistoryDto(
     int MediaItemID,
     string? TitleName,
     string? MediaItemImage,
-    DateTime PlayedAt
+    DateTime PlayedAt,
+    string? ArtistName
 );

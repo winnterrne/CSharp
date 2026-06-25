@@ -7,26 +7,36 @@ interface LoginResult {
 }
 
 export const authService = {
-  login: async (data: { email: string; password: string }): Promise<LoginResult> => {
+  login: async (data: {
+    email: string;
+    password: string;
+  }): Promise<LoginResult> => {
     const res = await authApi.login(data.email, data.password);
-    // Adjust these fields to match your actual BE response shape
+
+    const loginData = res.data.data;
+
     return {
-      user: res.data.user,
-      token: res.data.accessToken,
+      user: {
+        id: loginData.userID,
+        username: loginData.userName,
+        email: loginData.email,
+        role: loginData.role,
+      },
+      token: loginData.token,
     };
   },
 
-  register: async (data: { username: string; email: string; password: string }) => {
+  register: async (data: {
+    username: string;
+    email: string;
+    password: string;
+    phone?: string;
+  }) => {
     const res = await authApi.register(data);
     return res.data;
   },
 
   logout: async () => {
-    await authApi.logout();
-  },
-
-  refreshToken: async () => {
-    const res = await authApi.refreshToken();
-    return res.data;
+    authApi.logout();
   },
 };

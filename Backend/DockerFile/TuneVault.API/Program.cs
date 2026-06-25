@@ -70,7 +70,6 @@ builder.Services
                 Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
         };
 
-        
         opt.Events = new JwtBearerEvents
         {
             OnMessageReceived = context =>

@@ -18,7 +18,8 @@ public class GetRecentPlayHistoryHandler : IRequestHandler<GetRecentPlayHistoryQ
             p.MediaItemID,
             p.MediaItem.TitleName,
             p.MediaItem.MediaItemImage,
-            p.PlayedAt ?? DateTime.UtcNow
+            p.PlayedAt ?? DateTime.UtcNow,
+            p.MediaItem?.ArtistName
         ));
     }
 }

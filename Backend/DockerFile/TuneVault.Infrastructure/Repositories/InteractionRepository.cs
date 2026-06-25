@@ -64,17 +64,35 @@ namespace TuneVault.Infrastructure.Repositories
         //Lấy 10 bài mới nhất trong lịch sử nghe nhạc của người dùng
         public async Task<IEnumerable<PlayHistory>> GetRecentPlayHistoryAsync(string userId, int limit = 10)
         {
-            string sql = @"SELECT TOP (@Limit) p.historyID, p.UserID, p.MediaItemID, p.PlayedAt, m.TitleName, m.MediaItemID, m.MediaItemImage 
-                        FROM PlayHistory as p
-                        INNER JOIN MediaItem m on p.MediaItemID = m.MediaItemID
-                        WHERE p.UserID = @UserID
-                        ORDER BY p.PlayedAt DESC";
+            string sql = @"
+                SELECT TOP (@Limit) 
+                    p.HistoryID,
+                    p.UserID,
+                    p.MediaItemID,
+                    p.PlayedAt,
+                    m.MediaItemID,
+                    m.TitleName,
+                    m.MediaItemImage,
+                    a.ArtistID,
+                    a.ArtistName
+                FROM PlayHistory p
+                INNER JOIN MediaItem m ON p.MediaItemID = m.MediaItemID
+                LEFT JOIN Artist a ON m.ArtistID = a.ArtistID
+                WHERE p.UserID = @UserID
+                ORDER BY p.PlayedAt DESC";
+
             using var con = _db.CreateConnection();
-            var result = await con.QueryAsync<PlayHistory, MediaItem, PlayHistory>(sql, (history, media) =>
-            {
-                history.MediaItem = media;
-                return history;
-            }, new { UserID = userId, Limit = limit }, splitOn: "MediaItemID");
+            var result = await con.QueryAsync<PlayHistory, MediaItem, Artist, PlayHistory>(
+                sql,
+                (history, media, artist) =>
+                {
+                    media.ArtistName = artist?.ArtistName;
+                    history.MediaItem = media;
+                    return history;
+                },
+                new { UserID = userId, Limit = limit },
+                splitOn: "MediaItemID,ArtistID"
+            );
             return result;
         }
 

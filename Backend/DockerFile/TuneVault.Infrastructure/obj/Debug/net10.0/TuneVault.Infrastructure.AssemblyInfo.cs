@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TuneVault.Infrastructure")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5cc9e54934b8ab8ea69cd252e5dbe90840dcb386")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f909068d23253224463446c2995cd7d358db081b")]
 [assembly: System.Reflection.AssemblyProductAttribute("TuneVault.Infrastructure")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TuneVault.Infrastructure")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
