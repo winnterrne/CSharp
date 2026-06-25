@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import type { Album } from "../types/album";
 
 interface AlbumStore {
   selectedAlbumId: number | null;

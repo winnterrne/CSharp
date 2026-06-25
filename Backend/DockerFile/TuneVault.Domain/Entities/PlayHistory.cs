@@ -18,7 +18,6 @@ namespace TuneVault.Domain.Entities
             MediaItemID = mediaItemID;
             PlayedAt = playedAt ?? DateTime.UtcNow;
         }
-        public PlayHistory() { } // Parameterless constructor
-        public MediaItem MediaItem { get; set; }
+        public MediaItem? MediaItem { get; set; }
     }
 }
