@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  db:
+    container_name: TuneVault
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=sqlserver_container;Database=TuneVaultDb;User Id=sa;Password=TuneVault_12`3!@# ;TrustServerCertificate=True
+    ports:
+      - "1433:1433" 
+    volumes:
+      - sql_data:/var/opt/mssql 
+
+volumes:
+  sql_data:
+
