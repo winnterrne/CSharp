@@ -50,9 +50,12 @@ export const authStore = create<AuthStore>((set, get) => ({
   setLoading: (isLoading) => set({ isLoading }),
 
   login: (user, token) => {
-    useHistoryStore.getState().clearHistory();
-    const hasValidImage = user.userImage && user.userImage .trim() != "";
+    const currentUser = get().user;
+    if (currentUser && currentUser.id !== user.id) {
+      useHistoryStore.getState().clearHistory();
+    }
 
+    const hasValidImage = user.userImage && user.userImage.trim() !== "";
     set({
       user: {
         ...user,
@@ -64,16 +67,13 @@ export const authStore = create<AuthStore>((set, get) => ({
       isAuthenticated: true,
       isLoading: false,
     });
+
+    // Load lịch sử từ DB
+    useHistoryStore.getState().loadHistoryFromServer();
   },
 
   logout: () => {
-    useHistoryStore.getState().clearHistory();
-    set({
-      user: null,
-      token: null,
-      isAuthenticated: false,
-      isLoading: false,
-    });
+    set({ user: null, token: null, isAuthenticated: false, isLoading: false });
   },
 
   getUser: () => get().user,
