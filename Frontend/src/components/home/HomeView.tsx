@@ -167,7 +167,7 @@ const HomeView = ({
               gap: "10px",
             }}
           >
-            {recentTracks.slice(0, 8).map((track) => (
+            {recentTracks.slice(0, 10).map((track) => (
               <QuickPlayCard
                 key={track.id}
                 track={track}
