@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "UMALS7hn2Jk=",
+  "dgSpecHash": "cBT/4XItVik=",
   "success": true,
-  "projectFilePath": "C:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\DockerFile\\TuneVault.API\\TuneVault.API.csproj",
+  "projectFilePath": "c:\\CODE\\C Sharp\\DoanCsharp\\CSharp\\Backend\\DockerFile\\TuneVault.API\\TuneVault.API.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\NHAN\\.nuget\\packages\\bcrypt.net-next\\4.2.0\\bcrypt.net-next.4.2.0.nupkg.sha512",
     "C:\\Users\\NHAN\\.nuget\\packages\\dapper\\2.1.79\\dapper.2.1.79.nupkg.sha512",
