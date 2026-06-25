@@ -18,20 +18,9 @@ const AudioPlayer = () => {
     setDuration,
   } = usePlayer();
 
-  const isAudio = currentTrack?.type !== "video";
-
   useEffect(() => {
     const audio = audioRef.current;
-    if (!audio) return;
-
-    // Nếu không có bài hoặc đang là video thì AudioPlayer không chạy
-    if (!currentTrack || !isAudio) {
-      audio.pause();
-      audio.removeAttribute("src");
-      audio.load();
-      setBlobUrl("");
-      return;
-    }
+    if (!audio || !currentTrack) return;
 
     let objectUrl = "";
     let cancelled = false;
@@ -49,7 +38,7 @@ const AudioPlayer = () => {
         });
 
         if (!res.ok) {
-          throw new Error(`AUDIO STREAM ERROR: ${res.status}`);
+          throw new Error(`Stream lỗi: ${res.status}`);
         }
 
         const blob = await res.blob();
@@ -62,7 +51,6 @@ const AudioPlayer = () => {
 
         setBlobUrl(objectUrl);
         audio.src = objectUrl;
-        audio.currentTime = 0;
         audio.load();
 
         if (isPlaying) {
@@ -82,11 +70,11 @@ const AudioPlayer = () => {
         URL.revokeObjectURL(objectUrl);
       }
     };
-  }, [currentTrack?.id, currentTrack?.url, isAudio]);
+  }, [currentTrack]);
 
   useEffect(() => {
     const audio = audioRef.current;
-    if (!audio || !blobUrl || !isAudio) return;
+    if (!audio || !blobUrl) return;
 
     if (isPlaying) {
       audio.play().catch((error) => {
@@ -95,13 +83,13 @@ const AudioPlayer = () => {
     } else {
       audio.pause();
     }
-  }, [isPlaying, blobUrl, isAudio]);
+  }, [isPlaying, blobUrl]);
 
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
 
-    audio.volume = Math.max(0, Math.min(1, volume / 100));
+    audio.volume = volume / 100;
   }, [volume]);
 
   useEffect(() => {
@@ -113,22 +101,19 @@ const AudioPlayer = () => {
 
   useEffect(() => {
     const audio = audioRef.current;
-    if (!audio || !blobUrl || !isAudio) return;
+    if (!audio) return;
 
     if (Math.abs(audio.currentTime - position) > 1) {
       audio.currentTime = position;
     }
-  }, [position, blobUrl, isAudio]);
+  }, [position]);
 
   return (
     <audio
       ref={audioRef}
       preload="metadata"
       onLoadedMetadata={(e) => {
-        const duration = e.currentTarget.duration;
-        if (Number.isFinite(duration)) {
-          setDuration(duration);
-        }
+        setDuration(e.currentTarget.duration);
       }}
       onTimeUpdate={(e) => {
         seek(e.currentTarget.currentTime);

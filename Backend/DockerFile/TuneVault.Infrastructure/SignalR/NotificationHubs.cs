@@ -14,6 +14,7 @@ namespace TuneVault.Infrastructure.SignalR
 
             if (!string.IsNullOrWhiteSpace(userId))
             {
+                // ✅ NOTIFICATION FLOW: mỗi user vào group theo UserID
                 await Groups.AddToGroupAsync(
                     Context.ConnectionId,
                     userId

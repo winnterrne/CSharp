@@ -59,7 +59,7 @@ console.log("track full:", JSON.stringify(track, null, 2));
     try {
       const res = await aiApi.getDescription(mediaId);
       // Điều chỉnh nếu backend trả về shape khác
-      const desc = res.data?.description ?? res.data?.data?.description ?? "";
+      const desc = res.data?.data ?? res.data?.description ?? "";     
       setAiDescription(desc);
       setAiStatus("success");
     } catch (err: any) {
@@ -318,9 +318,31 @@ console.log("track full:", JSON.stringify(track, null, 2));
                     ✕
                   </button>
                 </div>
-                <p style={{ color: "#b3b3b3", lineHeight: 1.8, fontSize: "14px", margin: 0 }}>
-                  {aiDescription}
-                </p>
+                <div style={{ color: "#b3b3b3", lineHeight: 1.8, fontSize: "14px", margin: 0 }}>
+                  {aiDescription!.split("\n").map((line, i) => {
+                    // Bỏ dòng "---"
+                    if (line.trim() === "---") return null;
+                    // Bold: **text**
+                    const parts = line.split(/\*\*(.*?)\*\*/g).map((part, j) =>
+                      j % 2 === 1
+                        ? <strong key={j} style={{ color: "#fff" }}>{part}</strong>
+                        : part
+                    );
+                    // Dòng bullet "* text" → chấm tròn
+                    if (line.trim().startsWith("* ")) {
+                      return (
+                        <div key={i} style={{ display: "flex", gap: "8px", marginBottom: "4px" }}>
+                          <span style={{ color: "#1DB954", flexShrink: 0 }}>•</span>
+                          <span>{parts}</span>
+                        </div>
+                      );
+                    }
+                    // Dòng thường / tiêu đề
+                    return line.trim()
+                      ? <p key={i} style={{ margin: "0 0 8px" }}>{parts}</p>
+                      : <br key={i} />;
+                  })}
+                </div>
               </div>
             )}
 

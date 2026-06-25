@@ -17,7 +17,7 @@ public class UpdatePlaylistHandler : IRequestHandler<UpdatePlaylistCommand, int>
             PlaylistName = request.PlaylistName,
             IsPublic = request.IsPublic,
             Description = request.Description,
-            UserID = ""
+            UserID = "" // Không cần thiết vì không cập nhật UserID 
         };
         return await _repo.UpdatePlaylistAsync(result);
     }

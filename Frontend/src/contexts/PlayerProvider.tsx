@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import type { Media } from "../types/media";
 import { PlayerContext } from "./PlayerContext";
 import { playerStore } from "../store/playerStore";
 
 export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [playingContextId, setPlayingContextId] = useState<string | null>(null);
+
   // State từ playerStore
   const currentTrack = playerStore((state) => state.currentTrack);
   const queue = playerStore((state) => state.queue);
@@ -234,8 +234,6 @@ audio.src =
         isShuffle,
         repeatMode,
         isLoading,
-        playingContextId,
-        setPlayingContextId,
         playTrack: handlePlayTrack,
         setQueue,
         togglePlay: handleTogglePlay,

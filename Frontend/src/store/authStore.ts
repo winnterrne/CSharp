@@ -50,7 +50,6 @@ export const authStore = create<AuthStore>((set, get) => ({
   setLoading: (isLoading) => set({ isLoading }),
 
   login: (user, token) => {
-    useHistoryStore.getState().clearHistory();
     const hasValidImage = user.userImage && user.userImage .trim() != "";
 
     set({
