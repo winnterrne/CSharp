@@ -12,13 +12,14 @@ namespace TuneVault.Domain.Entities
         public int MediaItemID { get; set; } // Foreign Key to MediaItem
         public DateTime? PlayedAt { get; set; }
 
+        public PlayHistory() {}
+
         public PlayHistory(string userID, int mediaItemID, DateTime? playedAt = null)
         {
             UserID = userID ?? throw new ArgumentNullException(nameof(userID));
             MediaItemID = mediaItemID;
             PlayedAt = playedAt ?? DateTime.UtcNow;
         }
-        public PlayHistory() { } // Parameterless constructor
-        public MediaItem MediaItem { get; set; }
+        public MediaItem? MediaItem { get; set; }
     }
 }

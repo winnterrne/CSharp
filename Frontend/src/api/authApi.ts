@@ -2,7 +2,7 @@ import api from "./axios";
 
 export const authApi = {
   login: (email: string, password: string) =>
-    api.post("/auth/login", {
+    api.post("/Auth/login", {
       email,
       password,
     }),
@@ -19,4 +19,9 @@ export const authApi = {
       password: data.password,
       phone: data.phone,
     }),
+
+  logout: () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+  },
 };

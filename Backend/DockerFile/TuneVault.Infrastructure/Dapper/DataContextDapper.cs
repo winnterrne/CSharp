@@ -16,7 +16,7 @@ namespace TuneVault.Infrastructure.Dapper
         public IDbConnection CreateConnection() => new SqlConnection(_connectionString);
         
         // Đọc Data (SELECT)
-        public async Task<T> LoadDataSingleAsync<T>(string sql, object? parameters = null)
+        public async Task<T?> LoadDataSingleAsync<T>(string sql, object? parameters = null)
         {
             using var conn = CreateConnection();
             return await conn.QueryFirstOrDefaultAsync<T>(sql, parameters);
@@ -27,7 +27,6 @@ namespace TuneVault.Infrastructure.Dapper
             return await conn.QueryAsync<T>(sql, parameters);
         }
         // Thêm, cập nhật, xóa (INSERT, UPDATE, DELETE)
-        // Trả về số dòng bị ảnh hưởng
         public async Task<int> ExecuteDataAsync(string sql, object? parameters = null)
         {
             using var conn = CreateConnection();
