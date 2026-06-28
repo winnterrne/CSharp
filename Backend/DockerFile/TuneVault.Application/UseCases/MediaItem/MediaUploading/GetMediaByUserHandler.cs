@@ -14,9 +14,7 @@ public class GetMediaByUserHandler : IRequestHandler<GetMediaByUserQuery, IEnume
         _mediaRepo = mediaRepo;
     }
 
-    public async Task<IEnumerable<MediaItemDto>> Handle(
-        GetMediaByUserQuery request,
-        CancellationToken cancellationToken)
+    public async Task<IEnumerable<MediaItemDto>> Handle(GetMediaByUserQuery request, CancellationToken cancellationToken)
     {
         var mediaList = await _mediaRepo.GetMediaByUserIdAsync(request.UserID);
         return mediaList.Select(media => new MediaItemDto(

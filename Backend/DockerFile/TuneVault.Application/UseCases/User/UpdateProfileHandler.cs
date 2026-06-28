@@ -1,6 +1,7 @@
 using MediatR;
 using TuneVault.Application.DTos;
 using TuneVault.Application.DTOs;
+using TuneVault.Application.Interfaces;
 using TuneVault.Domain.Interfaces;
 
 namespace TuneVault.Application.UseCases.User;
@@ -9,10 +10,14 @@ public class UpdateProfileCommandHandler
     : IRequestHandler<UpdateProfileCommand, UserProfileDto>
 {
     private readonly IUserRepository _userRepository;
+    private readonly IFileStorageService _fileStorage;
 
-    public UpdateProfileCommandHandler(IUserRepository userRepository)
+    public UpdateProfileCommandHandler(
+        IUserRepository userRepository,
+        IFileStorageService fileStorage)
     {
         _userRepository = userRepository;
+        _fileStorage = fileStorage;
     }
 
     public async Task<UserProfileDto> Handle(
@@ -22,39 +27,19 @@ public class UpdateProfileCommandHandler
         var user = await _userRepository.GetUserByIdAsync(request.UserID);
 
         if (user == null)
-        {
             throw new Exception("User not found");
-        }
 
         if (!string.IsNullOrWhiteSpace(request.UserName))
             user.UserName = request.UserName;
 
         if (request.Avatar != null)
         {
-            var uploadsFolder = Path.Combine(
-                Directory.GetCurrentDirectory(),
-                "wwwroot",
-                "media",
-                "images",
-                "users"
+            var fileName = await _fileStorage.SaveFileAsync(
+                request.Avatar.OpenReadStream(),
+                request.Avatar.FileName,
+                "images/users"
             );
-
-            Directory.CreateDirectory(uploadsFolder);
-
-            var fileName =
-                $"{Guid.NewGuid()}{Path.GetExtension(request.Avatar.FileName)}";
-
-            var filePath =
-                Path.Combine(uploadsFolder, fileName);
-
-            using var stream = new FileStream(
-                filePath,
-                FileMode.Create
-            );
-
-            await request.Avatar.CopyToAsync(stream);
-
-            user.UserImage = fileName;
+            user.UserImage = Path.GetFileName(fileName);
         }
 
         if (!string.IsNullOrWhiteSpace(request.Phone))

@@ -1,10 +1,10 @@
-import api from "./axios";
+import api from "../api/axios";
 import type { CreatePlaylistDto } from "../types/playlist";
 
 export const playlistApi = {
   getMyPlaylists: () => api.get("/Playlist/my-playlist"),
 
-  getUserPlaylists: (userId: string) => api.get("/Playlist/")
+  getUserPlaylists: (userId: string) => api.get("/Playlist/"),
 
   getById: (id: number) => api.get(`/Playlist/${id}`),
 

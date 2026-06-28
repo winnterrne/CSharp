@@ -46,7 +46,6 @@ export interface PlaylistDetailDto {
   description?: string;
   Description?: string;
 
-  // ✅ FIX PUBLIC / PRIVATE
   isPublic?: boolean;
   IsPublic?: boolean;
 
@@ -124,7 +123,6 @@ export const mapPlaylistDetailDtoToPlaylist = (
       item.TrackCount ??
       tracks.length,
 
-    // ✅ FIX PUBLIC / PRIVATE
     isPublic:
       item.isPublic ??
       item.IsPublic ??

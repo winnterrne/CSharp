@@ -9,8 +9,7 @@ namespace TuneVault.Infrastructure.SignalR
     {
         public override async Task OnConnectedAsync()
         {
-            var userId =
-                Context.User?.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = Context.User?.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (!string.IsNullOrWhiteSpace(userId))
             {
@@ -25,8 +24,7 @@ namespace TuneVault.Infrastructure.SignalR
 
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
-            var userId =
-                Context.User?.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = Context.User?.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (!string.IsNullOrWhiteSpace(userId))
             {

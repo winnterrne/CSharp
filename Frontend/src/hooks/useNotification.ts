@@ -51,7 +51,6 @@ export const useNotification = () => {
   );
 
   const markAllAsRead = useCallback(async () => {
-    // ✅ cập nhật store ngay để Page + Dropdown + Header cùng đổi
     markAllAsReadStore();
 
     try {

@@ -56,8 +56,7 @@ namespace TuneVault.Infrastructure.Repositories
             return await _db.ExecuteDataAsync(sql, new { ArtistID = artistId});
         }
 
-        public async Task<(IEnumerable<Artist> Artists, int TotalCount)> SearchAsync(
-            string keyword, int skip, int take)
+        public async Task<(IEnumerable<Artist> Artists, int TotalCount)> SearchAsync(string keyword, int skip, int take)
         {
             keyword = keyword?.Trim() ?? "";
 

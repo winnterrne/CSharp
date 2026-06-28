@@ -25,7 +25,6 @@ public class SignalRNotificationService : INotificationPushService
             .SendAsync("ReceiveNotificationMessage", message);
     }
 
-    // ✅ NOTIFICATION FLOW: gửi full notification realtime về FE
     public async Task SendNotificationAsync(
         string userId,
         Notification notification)

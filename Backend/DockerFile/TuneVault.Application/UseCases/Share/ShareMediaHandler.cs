@@ -7,8 +7,7 @@ using TuneVault.Domain.Interfaces;
 
 namespace TuneVault.Application.UseCases.Share;
 
-public class ShareMediaHandler
-    : IRequestHandler<ShareMediaCommand, ShareMediaResponseDto>
+public class ShareMediaHandler: IRequestHandler<ShareMediaCommand, ShareMediaResponseDto>
 {
     private readonly IShareRepository _shareRepo;
     private readonly INotificationRepository _notifRepo;
@@ -49,8 +48,7 @@ public class ShareMediaHandler
         if (request.MediaItemID != null && request.PlaylistID != null)
             throw new Exception("Chỉ được chia sẻ một loại nội dung");
 
-        var alreadyShared =
-            await _shareRepo.AlreadySharedAsync(
+        var alreadyShared = await _shareRepo.AlreadySharedAsync(
                 request.SenderID,
                 request.ReceiverID,
                 request.MediaItemID,
@@ -101,46 +99,43 @@ public class ShareMediaHandler
 
         var isSong = request.MediaItemID.HasValue;
 
-        // ✅ NOTIFICATION FLOW: phân loại rõ share_song / share_playlist
-        var notification =
-    new TuneVault.Domain.Entities.Notification
-    {
-        NotificationID = 0,
-        Title = isSong
-                ? $"{sender?.UserName ?? "Ai đó"} đã chia sẻ bài hát"
-                : $"{sender?.UserName ?? "Ai đó"} đã chia sẻ playlist",
-        Type = isSong ? "share_song" : "share_playlist",
-        Payload = JsonSerializer.Serialize(new
+        var notification = new TuneVault.Domain.Entities.Notification
         {
-            shareID,
-            senderID = request.SenderID,
-            senderName = sender?.UserName,
-            senderAvatar = sender?.UserImage,
+            NotificationID = 0,
+            Title = isSong
+                    ? $"{sender?.UserName ?? "Ai đó"} đã chia sẻ bài hát"
+                    : $"{sender?.UserName ?? "Ai đó"} đã chia sẻ playlist",
+            Type = isSong ? "share_song" : "share_playlist",
+            Payload = JsonSerializer.Serialize(new
+            {
+                shareID,
+                senderID = request.SenderID,
+                senderName = sender?.UserName,
+                senderAvatar = sender?.UserImage,
 
-            targetType = isSong ? "song" : "playlist",
+                targetType = isSong ? "song" : "playlist",
 
-            mediaItemID = request.MediaItemID,
-            mediaTitle = media?.TitleName,
-            artistName = media?.ArtistName,
-            imageUrl = media?.MediaItemImage,
+                mediaItemID = request.MediaItemID,
+                mediaTitle = media?.TitleName,
+                artistName = media?.ArtistName,
+                imageUrl = media?.MediaItemImage,
 
-            playlistID = request.PlaylistID,
-            playlistName = playlist?.PlaylistName,
-            playlistDescription = playlist?.Description,
-            trackCount = playlistTrackCount
-        }),
-        IsRead = false,
-        UserID = request.ReceiverID,
-        NoticedAT = DateTime.UtcNow,
-        IsDeleted = false
-    };
+                playlistID = request.PlaylistID,
+                playlistName = playlist?.PlaylistName,
+                playlistDescription = playlist?.Description,
+                trackCount = playlistTrackCount
+            }),
+            IsRead = false,
+            UserID = request.ReceiverID,
+            NoticedAT = DateTime.UtcNow,
+            IsDeleted = false
+        };
 
-        var notificationID =
-            await _notifRepo.CreateNotificationAsync(notification);
+        var notificationID = await _notifRepo.CreateNotificationAsync(notification);
 
         notification.NotificationID = notificationID;
 
-        // ✅ NOTIFICATION FLOW: push realtime về FE
+
         await _pushService.SendNotificationAsync(
             request.ReceiverID,
             notification
